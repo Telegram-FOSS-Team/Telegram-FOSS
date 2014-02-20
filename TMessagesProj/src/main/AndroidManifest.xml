@@ -15,13 +15,9 @@
 
     <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
-    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
-    <uses-feature android:name="android.hardware.location.network" android:required="false" />
-    <uses-feature android:name="android.hardware.location" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.wifi" android:required="false" />
-    <uses-feature android:name="android.hardware.LOCATION" android:required="false" />
     <uses-feature android:name="android.hardware.screen.PORTRAIT" android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -30,14 +26,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="org.telegram.messenger.permission.MAPS_RECEIVE"/>
-    <uses-permission android:name="org.telegram.messenger.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -51,9 +41,6 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <permission android:name="org.telegram.messenger.permission.MAPS_RECEIVE" android:protectionLevel="signature"/>
-    <permission android:name="org.telegram.messenger.permission.C2D_MESSAGE" android:protectionLevel="signature" />
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -62,9 +49,6 @@
         android:name="org.telegram.ui.ApplicationLoader"
         android:hardwareAccelerated="true"
         android:largeHeap="true">
-
-        <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="your-google-maps-api-key-here" />
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 
         <activity
                 android:name="org.telegram.ui.LaunchActivity"
@@ -127,25 +111,6 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
         </activity>
 
-
-        <activity android:name="net.hockeyapp.android.UpdateActivity" />
-
-        <receiver android:name="org.telegram.messenger.SmsListener">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-                android:name="org.telegram.messenger.GcmBroadcastReceiver"
-                android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <category android:name="org.telegram.messenger" />
-            </intent-filter>
-        </receiver>
-
         <service android:name="org.telegram.messenger.AuthenticatorService"
             android:exported="true">
             <intent-filter>
@@ -166,10 +131,7 @@
                 android:resource="@xml/contacts" />
         </service>
         
-        <service android:name="org.telegram.messenger.GcmService" android:enabled="true" android:exported="true"/>
         <service android:name=".BackgroundService" android:enabled="true" android:stopWithTask="false"/>
-
-        <uses-library android:name="com.google.android.maps" android:required="false"/>
     </application>
 
 </manifest>

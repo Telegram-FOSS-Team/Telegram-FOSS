@@ -17,15 +17,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.view.ViewConfiguration;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.BackgroundService;
 import org.telegram.messenger.ConnectionsManager;
 import org.telegram.messenger.FileLog;
@@ -35,21 +29,11 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.Views.BaseFragment;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApplicationLoader extends Application {
-    private GoogleCloudMessaging gcm;
-    private AtomicInteger msgId = new AtomicInteger();
-    private String regid;
-    private String SENDER_ID = "760348033672";
-    public static final String EXTRA_MESSAGE = "message";
-    public static final String PROPERTY_REG_ID = "registration_id";
-    private static final String PROPERTY_APP_VERSION = "appVersion";
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static long lastPauseTime;
     public static Bitmap cachedWallpaper = null;
     public static Context applicationContext;
@@ -74,7 +58,6 @@ public class ApplicationLoader extends Application {
 
         UserConfig.loadConfig();
         if (UserConfig.currentUser != null) {
-            boolean changed = false;
             SharedPreferences preferences = getSharedPreferences("Notifications", MODE_PRIVATE);
             int v = preferences.getInt("v", 0);
             if (v != 1) {
@@ -116,20 +99,7 @@ public class ApplicationLoader extends Application {
             e.printStackTrace();
         }
 
-        if (checkPlayServices()) {
-            gcm = GoogleCloudMessaging.getInstance(this);
-            regid = getRegistrationId(applicationContext);
-
-            if (regid.length() == 0) {
-                registerInBackground();
-            } else {
-                sendRegistrationIdToBackend(false);
-            }
-        } else {
-            FileLog.d("tmessages", "No valid Google Play Services APK found.");
-        }
-
-        PhoneFormat format = PhoneFormat.Instance;
+        FileLog.d("tmessages", "This version doesn't support Google Play Services");
 
         lastPauseTime = System.currentTimeMillis();
         FileLog.e("tmessages", "start application with time " + lastPauseTime);
@@ -156,40 +126,6 @@ public class ApplicationLoader extends Application {
         ConnectionsManager.Instance.applicationMovedToForeground();
     }
 
-    private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        return resultCode == ConnectionResult.SUCCESS;
-        /*if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i("tmessages", "This device is not supported.");
-            }
-            return false;
-        }
-        return true;*/
-    }
-
-    private String getRegistrationId(Context context) {
-        final SharedPreferences prefs = getGCMPreferences(context);
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
-        if (registrationId.length() == 0) {
-            FileLog.d("tmessages", "Registration not found.");
-            return "";
-        }
-        int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-        int currentVersion = getAppVersion();
-        if (registeredVersion != currentVersion) {
-            FileLog.d("tmessages", "App version changed.");
-            return "";
-        }
-        return registrationId;
-    }
-
-    private SharedPreferences getGCMPreferences(Context context) {
-        return getSharedPreferences(ApplicationLoader.class.getSimpleName(), Context.MODE_PRIVATE);
-    }
-
     public static int getAppVersion() {
         try {
             PackageInfo packageInfo = applicationContext.getPackageManager().getPackageInfo(applicationContext.getPackageName(), 0);
@@ -197,65 +133,5 @@ public class ApplicationLoader extends Application {
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException("Could not get package name: " + e);
         }
-    }
-
-    private void registerInBackground() {
-        AsyncTask<String, String, Boolean> task = new AsyncTask<String, String, Boolean>() {
-            @Override
-            protected Boolean doInBackground(String... objects) {
-                if (gcm == null) {
-                    gcm = GoogleCloudMessaging.getInstance(applicationContext);
-                }
-                int count = 0;
-                while (count < 1000) {
-                    try {
-                        count++;
-                        regid = gcm.register(SENDER_ID);
-                        sendRegistrationIdToBackend(true);
-                        storeRegistrationId(applicationContext, regid);
-                        return true;
-                    } catch (IOException e) {
-                        FileLog.e("tmessages", e);
-                    }
-                    try {
-                        if (count % 20 == 0) {
-                            Thread.sleep(60000 * 30);
-                        } else {
-                            Thread.sleep(5000);
-                        }
-                    } catch (InterruptedException e) {
-                        FileLog.e("tmessages", e);
-                    }
-                }
-                return false;
-            }
-        }.execute(null, null, null);
-    }
-
-    private void sendRegistrationIdToBackend(final boolean isNew) {
-        Utilities.stageQueue.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                UserConfig.pushString = regid;
-                UserConfig.registeredForPush = !isNew;
-                UserConfig.saveConfig(false);
-                Utilities.RunOnUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MessagesController.Instance.registerForPush(regid);
-                    }
-                });
-            }
-        });
-    }
-
-    private void storeRegistrationId(Context context, String regId) {
-        final SharedPreferences prefs = getGCMPreferences(context);
-        int appVersion = getAppVersion();
-        FileLog.e("tmessages", "Saving regId on app version " + appVersion);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(PROPERTY_REG_ID, regId);
-        editor.putInt(PROPERTY_APP_VERSION, appVersion);
-        editor.commit();
     }
 }

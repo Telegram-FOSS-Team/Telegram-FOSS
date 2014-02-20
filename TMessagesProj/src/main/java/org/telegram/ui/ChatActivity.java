@@ -2722,14 +2722,6 @@ public class ChatActivity extends BaseFragment implements SizeNotifierRelativeLa
                 }
                 break;
             }
-            case R.id.attach_location: {
-                if (!isGoogleMapsInstalled()) {
-                    return true;
-                }
-                LocationActivity fragment = new LocationActivity();
-                ((ApplicationActivity)parentActivity).presentFragment(fragment, "location", false);
-                break;
-            }
             case R.id.attach_document: {
                 DocumentSelectActivity fragment = new DocumentSelectActivity();
                 fragment.delegate = this;
@@ -3872,12 +3864,8 @@ public class ChatActivity extends BaseFragment implements SizeNotifierRelativeLa
             }
             if (message != null) {
                 if (message.type == 4 || message.type == 5) {
-                    if (!isGoogleMapsInstalled()) {
-                        return;
-                    }
-                    NotificationCenter.Instance.addToMemCache(0, message);
-                    LocationActivity fragment = new LocationActivity();
-                    ((ApplicationActivity)parentActivity).presentFragment(fragment, "location_view", false);
+                    /* This version doesn't support Location services */
+                    return;
                 } else if (message.type == 2 || message.type == 3) {
                     if (photoFile == null || photoObjectToSet == null || photoFile != null && photoFile.exists()) {
                         NotificationCenter.Instance.addToMemCache(51, message);
