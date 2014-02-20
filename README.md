@@ -1,8 +1,17 @@
-## Telegram messenger for Android
+## Telegram-FOSS
 
 [Telegram](http://telegram.org) is a messaging app with a focus on speed and security. It’s superfast, simple and free.
 
-This repo contains official [Telegram App for Android](https://play.google.com/store/apps/details?id=org.telegram.messenger) source code.
+This is an unofficial, FOSS friendly fork of the original [Telegram App for Android](https://github.com/DrKLO/Telegram).
+
+### Versioning
+
+This repository contains tags to make tracking versions easier.
+
+Versions are in form "v$UPSTREAM$RELEASE" where:
+
+* $UPSTREAM is the public, visible version of upstream.
+* $RELEASE is a letter ([a-z]) indicating minor releases between official versions (sometimes, upstream is updated without relating the changes to an specific version).
 
 ### API, Protocol documentation
 
