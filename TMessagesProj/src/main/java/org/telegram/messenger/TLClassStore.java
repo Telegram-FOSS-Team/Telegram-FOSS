@@ -6,10 +6,7 @@
  * Copyright Nikolai Kudashov, 2013.
  */
 
-package org.telegram.TL;
-
-import org.telegram.messenger.FileLog;
-import org.telegram.messenger.SerializedData;
+package org.telegram.messenger;
 
 import java.util.HashMap;
 
@@ -317,6 +314,7 @@ public class TLClassStore {
         classStore.put(TLRPC.TL_req_DH_params.constructor, TLRPC.TL_req_DH_params.class);
         classStore.put(TLRPC.TL_set_client_DH_params.constructor, TLRPC.TL_set_client_DH_params.class);
         classStore.put(TLRPC.TL_ping.constructor, TLRPC.TL_ping.class);
+        classStore.put(TLRPC.TL_ping_delay_disconnect.constructor, TLRPC.TL_ping_delay_disconnect.class);
         classStore.put(TLRPC.TL_destroy_session.constructor, TLRPC.TL_destroy_session.class);
         classStore.put(TLRPC.TL_destroy_sessions.constructor, TLRPC.TL_destroy_sessions.class);
         classStore.put(TLRPC.TL_get_future_salts.constructor, TLRPC.TL_get_future_salts.class);
@@ -408,6 +406,8 @@ public class TLClassStore {
         classStore.put(TLRPC.TL_messages_sendEncryptedService.constructor, TLRPC.TL_messages_sendEncryptedService.class);
         classStore.put(TLRPC.TL_messages_receivedQueue.constructor, TLRPC.TL_messages_receivedQueue.class);
         classStore.put(TLRPC.TL_upload_saveBigFilePart.constructor, TLRPC.TL_upload_saveBigFilePart.class);
+        classStore.put(TLRPC.TL_help_support.constructor, TLRPC.TL_help_support.class);
+        classStore.put(TLRPC.TL_help_getSupport.constructor, TLRPC.TL_help_getSupport.class);
 
         classStore.put(TLRPC.TL_msg_container.constructor, TLRPC.TL_msg_container.class);
         classStore.put(TLRPC.TL_fileEncryptedLocation.constructor, TLRPC.TL_fileEncryptedLocation.class);
@@ -434,7 +434,7 @@ public class TLClassStore {
         return store;
     }
 
-    public TLObject TLdeserialize(SerializedData stream, int constructor) {
+    public TLObject TLdeserialize(AbsSerializedData stream, int constructor) {
         try {
             return TLdeserialize(stream, constructor, null);
         } catch (Exception e) {
@@ -442,7 +442,7 @@ public class TLClassStore {
         }
     }
 
-    public TLObject TLdeserialize(SerializedData stream, int constructor, TLObject request) {
+    public TLObject TLdeserialize(AbsSerializedData stream, int constructor, TLObject request) {
         Class objClass = classStore.get(constructor);
         if (objClass != null) {
             try {

@@ -11,7 +11,6 @@ package org.telegram.ui;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -103,8 +102,6 @@ public class ApplicationLoader extends Application {
 
         lastPauseTime = System.currentTimeMillis();
         FileLog.e("tmessages", "start application with time " + lastPauseTime);
-
-        startService(new Intent(this, BackgroundService.class));
     }
 
     @Override
@@ -119,6 +116,7 @@ public class ApplicationLoader extends Application {
             }
             currentLocale = newLocale;
         }
+        Utilities.checkDisplaySize();
     }
 
     public static void resetLastPauseTime() {

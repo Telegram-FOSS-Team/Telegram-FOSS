@@ -6,16 +6,14 @@
  * Copyright Nikolai Kudashov, 2013.
  */
 
-package org.telegram.TL;
-
-import org.telegram.messenger.SerializedData;
+package org.telegram.messenger;
 
 public class TLObject {
     public TLObject () {
 
     }
 
-    public void readParams(SerializedData stream) {
+    public void readParams(AbsSerializedData stream) {
 
     }
 
@@ -23,7 +21,7 @@ public class TLObject {
         return null;
     }
 
-    public void serializeToStream(SerializedData stream) {
+    public void serializeToStream(AbsSerializedData stream) {
 
     }
 
@@ -35,7 +33,11 @@ public class TLObject {
        return 11;
     }
 
-    public void parseVector(TLRPC.Vector vector, SerializedData data) {
+    public void parseVector(TLRPC.Vector vector, AbsSerializedData data) {
+
+    }
+
+    public void freeResources() {
 
     }
 }
