@@ -12,15 +12,28 @@ repositories {
     mavenCentral()
 }
 
+task nativeLibsToJar(
+    type: Zip,
+    description: 'create a jar archive of the native libs') {
+    destinationDir file("$buildDir/native-libs")
+    baseName 'native-libs'
+    extension 'jar'
+    from fileTree(dir: 'libs', include: '**/*.so')
+    into 'lib/'
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn(nativeLibsToJar)
 }
 
 dependencies {
     compile 'com.android.support:support-v4:19.0.+'
     compile 'com.android.support:appcompat-v7:19.0.+'
-    compile 'com.google.android.gms:play-services:4.1.+'
-    compile 'net.hockeyapp.android:HockeySDK:3.0.1'
+    compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
 android {
@@ -59,23 +72,6 @@ android {
             debuggable false
             jniDebugBuild false
             signingConfig signingConfigs.release
-        }
-    }
-
-    sourceSets.main {
-        jniLibs.srcDir 'libs'
-        jni.srcDirs = [] //disable automatic ndk-build call
-    }
-
-    sourceSets {
-        debug {
-            manifest.srcFile 'config/debug/AndroidManifest.xml'
-        }
-        release {
-            manifest.srcFile 'config/release/AndroidManifest.xml'
-        }
-        foss {
-            manifest.srcFile 'config/foss/AndroidManifest.xml'
         }
     }
 

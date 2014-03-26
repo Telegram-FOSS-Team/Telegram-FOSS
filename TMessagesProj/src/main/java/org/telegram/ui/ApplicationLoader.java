@@ -98,9 +98,6 @@ public class ApplicationLoader extends Application {
             MessagesController.getInstance().users.put(UserConfig.clientUserId, UserConfig.currentUser);
             ConnectionsManager.getInstance().applyCountryPortNumber(UserConfig.currentUser.phone);
         }
-
-        ApplicationLoader app = (ApplicationLoader)ApplicationLoader.applicationContext;
-        app.initPlayServices();
     }
 
     @Override

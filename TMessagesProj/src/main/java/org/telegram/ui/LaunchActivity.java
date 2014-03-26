@@ -48,9 +48,6 @@ import org.telegram.objects.MessageObject;
 import org.telegram.ui.Views.BaseFragment;
 import org.telegram.ui.Views.NotificationView;
 
-import net.hockeyapp.android.CrashManager;
-import net.hockeyapp.android.UpdateManager;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -526,16 +523,6 @@ public class LaunchActivity extends ActionBarActivity implements NotificationCen
         }
     }
 
-    private void checkForCrashes() {
-        CrashManager.register(this, BuildVars.HOCKEY_APP_HASH);
-    }
-
-    private void checkForUpdates() {
-        if (BuildVars.DEBUG_VERSION) {
-            UpdateManager.register(this, BuildVars.HOCKEY_APP_HASH);
-        }
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -562,8 +549,6 @@ public class LaunchActivity extends ActionBarActivity implements NotificationCen
             notificationView = (NotificationView) getLayoutInflater().inflate(R.layout.notification_layout, null);
         }
         fixLayout();
-        checkForCrashes();
-        checkForUpdates();
         ApplicationLoader.resetLastPauseTime();
         supportInvalidateOptionsMenu();
         updateActionBar();

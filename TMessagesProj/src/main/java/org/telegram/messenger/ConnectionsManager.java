@@ -70,7 +70,7 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
     private int nextWakeUpTimeout = 60000;
     private int nextSleepTimeout = 60000;
 
-    private static volatile ConnectionsManager Instance = null;
+    public static volatile ConnectionsManager Instance = null;
     public static ConnectionsManager getInstance() {
         ConnectionsManager localInstance = Instance;
         if (localInstance == null) {
