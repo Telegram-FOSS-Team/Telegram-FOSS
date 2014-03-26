@@ -14,7 +14,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 
 import org.telegram.objects.MessageObject;
 import org.telegram.ui.ApplicationLoader;
@@ -23,6 +25,7 @@ import org.telegram.ui.Views.ImageReceiver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,7 +36,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FileLoader {
-    public static FileLoader Instance = new FileLoader();
     public LruCache memCache;
 
     private String ignoreRemoval = null;
@@ -47,8 +49,10 @@ public class FileLoader {
     private ConcurrentHashMap<String, FileUploadOperation> uploadOperationPathsEnc;
     private int currentUploadOperationsCount = 0;
     private Queue<FileLoadOperation> loadOperationQueue;
+    private Queue<FileLoadOperation> audioLoadOperationQueue;
     private ConcurrentHashMap<String, FileLoadOperation> loadOperationPaths;
     private int currentLoadOperationsCount = 0;
+    private int currentAudioLoadOperationsCount = 0;
     public static long lastCacheOutTime = 0;
     public ConcurrentHashMap<String, Float> fileProgresses = new ConcurrentHashMap<String, Float>();
     private long lastProgressUpdateTime = 0;
@@ -254,6 +258,20 @@ public class FileLoader {
         }
     }*/
 
+    private static volatile FileLoader Instance = null;
+    public static FileLoader getInstance() {
+        FileLoader localInstance = Instance;
+        if (localInstance == null) {
+            synchronized (FileLoader.class) {
+                localInstance = Instance;
+                if (localInstance == null) {
+                    Instance = localInstance = new FileLoader();
+                }
+            }
+        }
+        return localInstance;
+    }
+
     public FileLoader() {
         int cacheSize = Math.min(15, ((ActivityManager) ApplicationLoader.applicationContext.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass() / 7) * 1024 * 1024;
 
@@ -297,6 +315,7 @@ public class FileLoader {
         uploadOperationPathsEnc = new ConcurrentHashMap<String, FileUploadOperation>();
         loadOperationPaths = new ConcurrentHashMap<String, FileLoadOperation>();
         loadOperationQueue = new LinkedList<FileLoadOperation>();
+        audioLoadOperationQueue = new LinkedList<FileLoadOperation>();
     }
 
     public void cancelUploadFile(final String location, final boolean enc) {
@@ -352,7 +371,7 @@ public class FileLoader {
                                 Utilities.stageQueue.postRunnable(new Runnable() {
                                     @Override
                                     public void run() {
-                                        NotificationCenter.Instance.postNotificationName(FileDidUpload, location, inputFile, inputEncryptedFile);
+                                        NotificationCenter.getInstance().postNotificationName(FileDidUpload, location, inputFile, inputEncryptedFile);
                                         fileProgresses.remove(location);
                                     }
                                 });
@@ -383,7 +402,7 @@ public class FileLoader {
                                     public void run() {
                                         fileProgresses.remove(location);
                                         if (operation.state != 2) {
-                                            NotificationCenter.Instance.postNotificationName(FileDidFailUpload, location, key != null);
+                                            NotificationCenter.getInstance().postNotificationName(FileDidFailUpload, location, key != null);
                                         }
                                     }
                                 });
@@ -415,7 +434,7 @@ public class FileLoader {
                             Utilities.RunOnUIThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    NotificationCenter.Instance.postNotificationName(FileUploadProgressChanged, location, progress, key != null);
+                                    NotificationCenter.getInstance().postNotificationName(FileUploadProgressChanged, location, progress, key != null);
                                 }
                             });
                         }
@@ -453,7 +472,11 @@ public class FileLoader {
                 }
                 FileLoadOperation operation = loadOperationPaths.get(fileName);
                 if (operation != null) {
-                    loadOperationQueue.remove(operation);
+                    if (audio != null) {
+                        audioLoadOperationQueue.remove(operation);
+                    } else {
+                        loadOperationQueue.remove(operation);
+                    }
                     operation.cancel();
                 }
             }
@@ -478,7 +501,7 @@ public class FileLoader {
                 } else if (audio != null) {
                     fileName = MessageObject.getAttachFileName(audio);
                 }
-                if (fileName == null) {
+                if (fileName == null || fileName.contains("" + Integer.MIN_VALUE)) {
                     return;
                 }
                 if (loadOperationPaths.containsKey(fileName)) {
@@ -508,25 +531,36 @@ public class FileLoader {
                         Utilities.RunOnUIThread(new Runnable() {
                             @Override
                             public void run() {
-                                NotificationCenter.Instance.postNotificationName(FileLoadProgressChanged, arg1, 1.0f);
+                                NotificationCenter.getInstance().postNotificationName(FileLoadProgressChanged, arg1, 1.0f);
                             }
                         });
                         Utilities.RunOnUIThread(new Runnable() {
                             @Override
                             public void run() {
-                                NotificationCenter.Instance.postNotificationName(FileDidLoaded, arg1);
+                                NotificationCenter.getInstance().postNotificationName(FileDidLoaded, arg1);
                             }
                         });
                         Utilities.fileUploadQueue.postRunnable(new Runnable() {
                             @Override
                             public void run() {
                                 loadOperationPaths.remove(arg1);
-                                currentLoadOperationsCount--;
-                                if (currentLoadOperationsCount < 2) {
-                                    FileLoadOperation operation = loadOperationQueue.poll();
-                                    if (operation != null) {
-                                        currentLoadOperationsCount++;
-                                        operation.start();
+                                if (audio != null) {
+                                    currentAudioLoadOperationsCount--;
+                                    if (currentAudioLoadOperationsCount < 2) {
+                                        FileLoadOperation operation = audioLoadOperationQueue.poll();
+                                        if (operation != null) {
+                                            currentAudioLoadOperationsCount++;
+                                            operation.start();
+                                        }
+                                    }
+                                } else {
+                                    currentLoadOperationsCount--;
+                                    if (currentLoadOperationsCount < 2) {
+                                        FileLoadOperation operation = loadOperationQueue.poll();
+                                        if (operation != null) {
+                                            currentLoadOperationsCount++;
+                                            operation.start();
+                                        }
                                     }
                                 }
                             }
@@ -541,7 +575,7 @@ public class FileLoader {
                             Utilities.RunOnUIThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    NotificationCenter.Instance.postNotificationName(FileDidFailedLoad, arg1);
+                                    NotificationCenter.getInstance().postNotificationName(FileDidFailedLoad, arg1);
                                 }
                             });
                         }
@@ -549,12 +583,23 @@ public class FileLoader {
                             @Override
                             public void run() {
                                 loadOperationPaths.remove(arg1);
-                                currentLoadOperationsCount--;
-                                if (currentLoadOperationsCount < 2) {
-                                    FileLoadOperation operation = loadOperationQueue.poll();
-                                    if (operation != null) {
-                                        currentLoadOperationsCount++;
-                                        operation.start();
+                                if (audio != null) {
+                                    currentAudioLoadOperationsCount--;
+                                    if (currentAudioLoadOperationsCount < 2) {
+                                        FileLoadOperation operation = audioLoadOperationQueue.poll();
+                                        if (operation != null) {
+                                            currentAudioLoadOperationsCount++;
+                                            operation.start();
+                                        }
+                                    }
+                                } else {
+                                    currentLoadOperationsCount--;
+                                    if (currentLoadOperationsCount < 2) {
+                                        FileLoadOperation operation = loadOperationQueue.poll();
+                                        if (operation != null) {
+                                            currentLoadOperationsCount++;
+                                            operation.start();
+                                        }
                                     }
                                 }
                             }
@@ -572,17 +617,26 @@ public class FileLoader {
                             Utilities.RunOnUIThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    NotificationCenter.Instance.postNotificationName(FileLoadProgressChanged, arg1, progress);
+                                    NotificationCenter.getInstance().postNotificationName(FileLoadProgressChanged, arg1, progress);
                                 }
                             });
                         }
                     }
                 };
-                if (currentLoadOperationsCount < 2) {
-                    currentLoadOperationsCount++;
-                    operation.start();
+                if (audio != null) {
+                    if (currentAudioLoadOperationsCount < 2) {
+                        currentAudioLoadOperationsCount++;
+                        operation.start();
+                    } else {
+                        audioLoadOperationQueue.add(operation);
+                    }
                 } else {
-                    loadOperationQueue.add(operation);
+                    if (currentLoadOperationsCount < 2) {
+                        currentLoadOperationsCount++;
+                        operation.start();
+                    } else {
+                        loadOperationQueue.add(operation);
+                    }
                 }
             }
         });
@@ -796,13 +850,13 @@ public class FileLoader {
                                 Utilities.RunOnUIThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        NotificationCenter.Instance.postNotificationName(FileLoadProgressChanged, arg1, 1.0f);
+                                        NotificationCenter.getInstance().postNotificationName(FileLoadProgressChanged, arg1, 1.0f);
                                     }
                                 });
                                 Utilities.RunOnUIThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        NotificationCenter.Instance.postNotificationName(FileDidLoaded, arg1);
+                                        NotificationCenter.getInstance().postNotificationName(FileDidLoaded, arg1);
                                     }
                                 });
                             }
@@ -833,7 +887,7 @@ public class FileLoader {
                                     Utilities.RunOnUIThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            NotificationCenter.Instance.postNotificationName(FileDidFailedLoad, arg1);
+                                            NotificationCenter.getInstance().postNotificationName(FileDidFailedLoad, arg1);
                                         }
                                     });
                                 }
@@ -853,7 +907,7 @@ public class FileLoader {
                                     Utilities.RunOnUIThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            NotificationCenter.Instance.postNotificationName(FileLoadProgressChanged, arg1, progress);
+                                            NotificationCenter.getInstance().postNotificationName(FileLoadProgressChanged, arg1, progress);
                                         }
                                     });
                                 }
@@ -961,10 +1015,45 @@ public class FileLoader {
         });
     }
 
-    public static Bitmap loadBitmap(String path, float maxWidth, float maxHeight) {
+    public static Bitmap loadBitmap(String path, Uri uri, float maxWidth, float maxHeight) {
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, bmOptions);
+        FileDescriptor fileDescriptor = null;
+        ParcelFileDescriptor parcelFD = null;
+
+        if (path == null && uri != null && uri.getScheme() != null) {
+            String imageFilePath = null;
+            if (uri.getScheme().contains("file")) {
+                path = uri.getPath();
+            } else {
+                try {
+                    path = Utilities.getPath(uri);
+                } catch (Exception e) {
+                    FileLog.e("tmessages", e);
+                }
+            }
+        }
+
+        if (path != null) {
+            BitmapFactory.decodeFile(path, bmOptions);
+        } else if (uri != null) {
+            boolean error = false;
+            try {
+                parcelFD = ApplicationLoader.applicationContext.getContentResolver().openFileDescriptor(uri, "r");
+                fileDescriptor = parcelFD.getFileDescriptor();
+                BitmapFactory.decodeFileDescriptor(fileDescriptor, null, bmOptions);
+            } catch (Exception e) {
+                FileLog.e("tmessages", e);
+                try {
+                    if (parcelFD != null) {
+                        parcelFD.close();
+                    }
+                } catch (Exception e2) {
+                    FileLog.e("tmessages", e2);
+                }
+                return null;
+            }
+        }
         float photoW = bmOptions.outWidth;
         float photoH = bmOptions.outHeight;
         float scaleFactor = Math.max(photoW / maxWidth, photoH / maxHeight);
@@ -974,39 +1063,70 @@ public class FileLoader {
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = (int)scaleFactor;
 
-        ExifInterface exif;
-        Matrix matrix = null;
-        try {
-            exif = new ExifInterface(path);
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
-            matrix = new Matrix();
-            switch (orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    matrix.postRotate(90);
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    matrix.postRotate(180);
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    matrix.postRotate(270);
-                    break;
-            }
-        } catch (Exception e) {
-            FileLog.e("tmessages", e);
+        String exifPath = null;
+        if (path != null) {
+            exifPath = path;
+        } else if (uri != null) {
+            exifPath = Utilities.getPath(uri);
         }
 
-        Bitmap b;
-        try {
-            b = BitmapFactory.decodeFile(path, bmOptions);
-            if (b != null && matrix != null) {
-                b = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
+        Matrix matrix = null;
+
+        if (exifPath != null) {
+            ExifInterface exif;
+            try {
+                exif = new ExifInterface(exifPath);
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                matrix = new Matrix();
+                switch (orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        matrix.postRotate(90);
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        matrix.postRotate(180);
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        matrix.postRotate(270);
+                        break;
+                }
+            } catch (Exception e) {
+                FileLog.e("tmessages", e);
             }
-        } catch (Exception e) {
-            FileLog.e("tmessages", e);
-            FileLoader.Instance.memCache.evictAll();
-            b = BitmapFactory.decodeFile(path, bmOptions);
-            if (b != null && matrix != null) {
-                b = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
+        }
+
+        Bitmap b = null;
+        if (path != null) {
+            try {
+                b = BitmapFactory.decodeFile(path, bmOptions);
+                if (b != null) {
+                    b = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
+                }
+            } catch (Exception e) {
+                FileLog.e("tmessages", e);
+                FileLoader.getInstance().memCache.evictAll();
+                if (b == null) {
+                    b = BitmapFactory.decodeFile(path, bmOptions);
+                }
+                if (b != null) {
+                    b = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
+                }
+            }
+        } else if (uri != null) {
+            try {
+                b = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, bmOptions);
+                if (b != null) {
+                    b = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
+                }
+            } catch (Exception e) {
+                FileLog.e("tmessages", e);
+            } finally {
+                try {
+                    if (parcelFD != null) {
+                        parcelFD.close();
+                    }
+                } catch (Exception e) {
+                    FileLog.e("tmessages", e);
+                }
             }
         }
 

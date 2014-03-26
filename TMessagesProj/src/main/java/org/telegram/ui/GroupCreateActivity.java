@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v7.app.ActionBar;
 import android.text.Editable;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -35,6 +34,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.telegram.PhoneFormat.PhoneFormat;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.ConnectionsManager;
 import org.telegram.messenger.ContactsController;
@@ -58,10 +59,8 @@ import java.util.TimerTask;
 public class GroupCreateActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
     private SectionedBaseAdapter listViewAdapter;
     private PinnedHeaderListView listView;
-    private TextView epmtyTextView;
-    private TextView doneTextView;
+    private TextView emptyTextView;
     private EditText userSelectEditText;
-    private TextView countTextView;
     private boolean ignoreChange = false;
 
     private HashMap<Integer, Emoji.XImageSpan> selectedContacts =  new HashMap<Integer, Emoji.XImageSpan>();
@@ -69,7 +68,7 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
 
     private boolean searchWas;
     private boolean searching;
-    private Timer searchDialogsTimer;
+    private Timer searchTimer;
     public ArrayList<TLRPC.User> searchResult;
     public ArrayList<CharSequence> searchResultNames;
 
@@ -83,18 +82,18 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
     @Override
     public boolean onFragmentCreate() {
         super.onFragmentCreate();
-        NotificationCenter.Instance.addObserver(this, MessagesController.contactsDidLoaded);
-        NotificationCenter.Instance.addObserver(this, MessagesController.updateInterfaces);
-        NotificationCenter.Instance.addObserver(this, MessagesController.chatDidCreated);
+        NotificationCenter.getInstance().addObserver(this, MessagesController.contactsDidLoaded);
+        NotificationCenter.getInstance().addObserver(this, MessagesController.updateInterfaces);
+        NotificationCenter.getInstance().addObserver(this, MessagesController.chatDidCreated);
         return true;
     }
 
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
-        NotificationCenter.Instance.removeObserver(this, MessagesController.contactsDidLoaded);
-        NotificationCenter.Instance.removeObserver(this, MessagesController.updateInterfaces);
-        NotificationCenter.Instance.removeObserver(this, MessagesController.chatDidCreated);
+        NotificationCenter.getInstance().removeObserver(this, MessagesController.contactsDidLoaded);
+        NotificationCenter.getInstance().removeObserver(this, MessagesController.updateInterfaces);
+        NotificationCenter.getInstance().removeObserver(this, MessagesController.chatDidCreated);
     }
 
     @Override
@@ -112,9 +111,10 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
 
             fragmentView = inflater.inflate(R.layout.group_create_layout, container, false);
 
-            epmtyTextView = (TextView)fragmentView.findViewById(R.id.searchEmptyView);
+            emptyTextView = (TextView)fragmentView.findViewById(R.id.searchEmptyView);
+            emptyTextView.setText(LocaleController.getString("NoContacts", R.string.NoContacts));
             userSelectEditText = (EditText)fragmentView.findViewById(R.id.bubble_input_text);
-            countTextView = (TextView)fragmentView.findViewById(R.id.bubble_counter_text);
+            userSelectEditText.setHint(LocaleController.getString("SendMessageTo", R.string.SendMessageTo));
             if (Build.VERSION.SDK_INT >= 11) {
                 userSelectEditText.setTextIsSelectable(false);
             }
@@ -156,12 +156,10 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
                                         selectedContacts.remove(sp.uid);
                                     }
                                 }
-                                if (selectedContacts.isEmpty()) {
-                                    doneTextView.setText(getStringEntry(R.string.Done));
-                                } else {
-                                    doneTextView.setText(getStringEntry(R.string.Done) + " (" + selectedContacts.size() + ")");
+                                if (parentActivity != null) {
+                                    ActionBar actionBar = parentActivity.getSupportActionBar();
+                                    actionBar.setSubtitle(String.format("%d/200 %s", selectedContacts.size(), LocaleController.getString("Members", R.string.Members)));
                                 }
-                                countTextView.setText(selectedContacts.size() + "/200");
                                 listView.invalidateViews();
                             } else {
                                 search = true;
@@ -175,14 +173,14 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
                                 searchDialogs(text);
                                 searching = true;
                                 searchWas = true;
-                                epmtyTextView.setText(getStringEntry(R.string.NoResult));
+                                emptyTextView.setText(LocaleController.getString("NoResult", R.string.NoResult));
                                 listViewAdapter.notifyDataSetChanged();
                             } else {
                                 searchResult = null;
                                 searchResultNames = null;
                                 searching = false;
                                 searchWas = false;
-                                epmtyTextView.setText(getStringEntry(R.string.NoContacts));
+                                emptyTextView.setText(LocaleController.getString("NoContacts", R.string.NoContacts));
                                 listViewAdapter.notifyDataSetChanged();
                             }
                         }
@@ -191,7 +189,7 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
             });
 
             listView = (PinnedHeaderListView)fragmentView.findViewById(R.id.listView);
-            listView.setEmptyView(epmtyTextView);
+            listView.setEmptyView(emptyTextView);
             listView.setVerticalScrollBarEnabled(false);
 
             listView.setAdapter(listViewAdapter = new ListAdapter(parentActivity));
@@ -204,8 +202,8 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
                     if (searching && searchWas) {
                         user = searchResult.get(row);
                     } else {
-                        ArrayList<TLRPC.TL_contact> arr = ContactsController.Instance.usersSectionsDict.get(ContactsController.Instance.sortedUsersSectionsArray.get(section));
-                        user = MessagesController.Instance.users.get(arr.get(row).user_id);
+                        ArrayList<TLRPC.TL_contact> arr = ContactsController.getInstance().usersSectionsDict.get(ContactsController.getInstance().sortedUsersSectionsArray.get(section));
+                        user = MessagesController.getInstance().users.get(arr.get(row).user_id);
                         listView.invalidateViews();
                     }
                     if (selectedContacts.containsKey(user.id)) {
@@ -227,16 +225,14 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
                         span.uid = user.id;
                         ignoreChange = false;
                     }
-                    if (selectedContacts.isEmpty()) {
-                        doneTextView.setText(getStringEntry(R.string.Done));
-                    } else {
-                        doneTextView.setText(getStringEntry(R.string.Done) + " (" + selectedContacts.size() + ")");
+                    if (parentActivity != null) {
+                        ActionBar actionBar = parentActivity.getSupportActionBar();
+                        actionBar.setSubtitle(String.format("%d/200 %s", selectedContacts.size(), LocaleController.getString("Members", R.string.Members)));
                     }
-                    countTextView.setText(selectedContacts.size() + "/200");
                     if (searching || searchWas) {
                         searching = false;
                         searchWas = false;
-                        epmtyTextView.setText(getStringEntry(R.string.NoContacts));
+                        emptyTextView.setText(LocaleController.getString("NoContacts", R.string.NoContacts));
 
                         ignoreChange = true;
                         SpannableStringBuilder ssb = new SpannableStringBuilder("");
@@ -275,7 +271,8 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
         actionBar.setDisplayUseLogoEnabled(false);
         actionBar.setDisplayShowCustomEnabled(false);
         actionBar.setCustomView(null);
-        actionBar.setTitle(getStringEntry(R.string.NewGroup));
+        actionBar.setTitle(LocaleController.getString("NewGroup", R.string.NewGroup));
+        actionBar.setSubtitle(String.format("%d/200 %s", selectedContacts.size(), LocaleController.getString("Members", R.string.Members)));
 
         TextView title = (TextView)parentActivity.findViewById(R.id.action_bar_title);
         if (title == null) {
@@ -294,15 +291,19 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
         if (getActivity() == null) {
             return;
         }
-        ((ApplicationActivity)parentActivity).showActionBar();
-        ((ApplicationActivity)parentActivity).updateActionBar();
+        ((LaunchActivity)parentActivity).showActionBar();
+        ((LaunchActivity)parentActivity).updateActionBar();
     }
 
     public Emoji.XImageSpan createAndPutChipForUser(TLRPC.User user) {
         LayoutInflater lf = (LayoutInflater)parentActivity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View textView = lf.inflate(R.layout.group_create_bubble, null);
         TextView text = (TextView)textView.findViewById(R.id.bubble_text_view);
-        text.setText(Utilities.formatName(user.first_name, user.last_name));
+        String name = Utilities.formatName(user.first_name, user.last_name);
+        if (name.length() == 0 && user.phone != null && user.phone.length() != 0) {
+            name = PhoneFormat.getInstance().format("+" + user.phone);
+        }
+        text.setText(name + ", ");
 
         int spec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
         textView.measure(spec, spec);
@@ -338,19 +339,19 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
             searchResultNames = null;
         } else {
             try {
-                if (searchDialogsTimer != null) {
-                    searchDialogsTimer.cancel();
+                if (searchTimer != null) {
+                    searchTimer.cancel();
                 }
             } catch (Exception e) {
                 FileLog.e("tmessages", e);
             }
-            searchDialogsTimer = new Timer();
-            searchDialogsTimer.schedule(new TimerTask() {
+            searchTimer = new Timer();
+            searchTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     try {
-                        searchDialogsTimer.cancel();
-                        searchDialogsTimer = null;
+                        searchTimer.cancel();
+                        searchTimer = null;
                     } catch (Exception e) {
                         FileLog.e("tmessages", e);
                     }
@@ -361,30 +362,37 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
     }
 
     private void processSearch(final String query) {
-        Utilities.globalQueue.postRunnable(new Runnable() {
+        Utilities.RunOnUIThread(new Runnable() {
             @Override
             public void run() {
-                if (query.length() == 0) {
-                    updateSearchResults(new ArrayList<TLRPC.User>(), new ArrayList<CharSequence>());
-                    return;
-                }
-                long time = System.currentTimeMillis();
-                ArrayList<TLRPC.User> resultArray = new ArrayList<TLRPC.User>();
-                ArrayList<CharSequence> resultArrayNames = new ArrayList<CharSequence>();
-                String q = query.toLowerCase();
-
-                for (TLRPC.TL_contact contact : ContactsController.Instance.contacts) {
-                    TLRPC.User user = MessagesController.Instance.users.get(contact.user_id);
-                    if (user.first_name.toLowerCase().startsWith(q) || user.last_name.toLowerCase().startsWith(q)) {
-                        if (user.id == UserConfig.clientUserId) {
-                            continue;
+                final ArrayList<TLRPC.TL_contact> contactsCopy = new ArrayList<TLRPC.TL_contact>();
+                contactsCopy.addAll(ContactsController.getInstance().contacts);
+                Utilities.globalQueue.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (query.length() == 0) {
+                            updateSearchResults(new ArrayList<TLRPC.User>(), new ArrayList<CharSequence>());
+                            return;
                         }
-                        resultArrayNames.add(Utilities.generateSearchName(user.first_name, user.last_name, q));
-                        resultArray.add(user);
-                    }
-                }
+                        long time = System.currentTimeMillis();
+                        ArrayList<TLRPC.User> resultArray = new ArrayList<TLRPC.User>();
+                        ArrayList<CharSequence> resultArrayNames = new ArrayList<CharSequence>();
+                        String q = query.toLowerCase();
 
-                updateSearchResults(resultArray, resultArrayNames);
+                        for (TLRPC.TL_contact contact : contactsCopy) {
+                            TLRPC.User user = MessagesController.getInstance().users.get(contact.user_id);
+                            if (user.first_name.toLowerCase().startsWith(q) || user.last_name.toLowerCase().startsWith(q)) {
+                                if (user.id == UserConfig.clientUserId) {
+                                    continue;
+                                }
+                                resultArrayNames.add(Utilities.generateSearchName(user.first_name, user.last_name, q));
+                                resultArray.add(user);
+                            }
+                        }
+
+                        updateSearchResults(resultArray, resultArrayNames);
+                    }
+                });
             }
         });
     }
@@ -415,18 +423,19 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.group_create_menu, menu);
         SupportMenuItem doneItem = (SupportMenuItem)menu.findItem(R.id.done_menu_item);
-        doneTextView = (TextView)doneItem.getActionView().findViewById(R.id.done_button);
+        TextView doneTextView = (TextView)doneItem.getActionView().findViewById(R.id.done_button);
+        doneTextView.setText(LocaleController.getString("Next", R.string.Next));
         doneTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!selectedContacts.isEmpty()) {
                     ArrayList<Integer> result = new ArrayList<Integer>();
                     result.addAll(selectedContacts.keySet());
-                    NotificationCenter.Instance.addToMemCache(2, result);
+                    NotificationCenter.getInstance().addToMemCache(2, result);
                 } else {
                     return;
                 }
-                ((ApplicationActivity)parentActivity).presentFragment(new GroupCreateFinalActivity(), "group_craate_final", false);
+                ((LaunchActivity)parentActivity).presentFragment(new GroupCreateFinalActivity(), "group_craate_final", false);
             }
         });
     }
@@ -476,7 +485,7 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
             if (searching && searchWas) {
                 return searchResult == null || searchResult.isEmpty() ? 0 : 1;
             }
-            return ContactsController.Instance.sortedUsersSectionsArray.size();
+            return ContactsController.getInstance().sortedUsersSectionsArray.size();
         }
 
         @Override
@@ -484,7 +493,7 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
             if (searching && searchWas) {
                 return searchResult == null ? 0 : searchResult.size();
             }
-            ArrayList<TLRPC.TL_contact> arr = ContactsController.Instance.usersSectionsDict.get(ContactsController.Instance.sortedUsersSectionsArray.get(section));
+            ArrayList<TLRPC.TL_contact> arr = ContactsController.getInstance().usersSectionsDict.get(ContactsController.getInstance().sortedUsersSectionsArray.get(section));
             return arr.size();
         }
 
@@ -494,11 +503,11 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
             int size;
 
             if (searchWas && searching) {
-                user = MessagesController.Instance.users.get(searchResult.get(position).id);
+                user = MessagesController.getInstance().users.get(searchResult.get(position).id);
                 size = searchResult.size();
             } else {
-                ArrayList<TLRPC.TL_contact> arr = ContactsController.Instance.usersSectionsDict.get(ContactsController.Instance.sortedUsersSectionsArray.get(section));
-                user = MessagesController.Instance.users.get(arr.get(position).user_id);
+                ArrayList<TLRPC.TL_contact> arr = ContactsController.getInstance().usersSectionsDict.get(ContactsController.getInstance().sortedUsersSectionsArray.get(section));
+                user = MessagesController.getInstance().users.get(arr.get(position).user_id);
                 size = arr.size();
             }
 
@@ -514,9 +523,9 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
 
             ImageView checkButton = (ImageView)convertView.findViewById(R.id.settings_row_check_button);
             if (selectedContacts.containsKey(user.id)) {
-                checkButton.setImageResource(R.drawable.btn_check_on_old);
+                checkButton.setImageResource(R.drawable.btn_check_on_holo_light);
             } else {
-                checkButton.setImageResource(R.drawable.btn_check_off_old);
+                checkButton.setImageResource(R.drawable.btn_check_off_holo_light);
             }
 
             View divider = convertView.findViewById(R.id.settings_row_divider);
@@ -529,13 +538,15 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
             if (searchWas && searching) {
                 holder.nameTextView.setText(searchResultNames.get(position));
             } else {
-                if (user.first_name.length() != 0 && user.last_name.length() != 0) {
-                    holder.nameTextView.setText(Html.fromHtml(user.first_name + " <b>" + user.last_name + "</b>"));
-                } else if (user.first_name.length() != 0) {
-                    holder.nameTextView.setText(Html.fromHtml("<b>" + user.first_name + "</b>"));
-                } else {
-                    holder.nameTextView.setText(Html.fromHtml("<b>" + user.last_name + "</b>"));
+                String name = Utilities.formatName(user.first_name, user.last_name);
+                if (name.length() == 0) {
+                    if (user.phone != null && user.phone.length() != 0) {
+                        name = PhoneFormat.getInstance().format("+" + user.phone);
+                    } else {
+                        name = LocaleController.getString("HiddenName", R.string.HiddenName);
+                    }
                 }
+                holder.nameTextView.setText(name);
             }
 
             TLRPC.FileLocation photo = null;
@@ -546,18 +557,18 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
             holder.avatarImage.setImage(photo, "50_50", placeHolderId);
 
             if (user.status == null) {
-                holder.messageTextView.setText(getStringEntry(R.string.Offline));
+                holder.messageTextView.setText(LocaleController.getString("Offline", R.string.Offline));
                 holder.messageTextView.setTextColor(0xff808080);
             } else {
-                int currentTime = ConnectionsManager.Instance.getCurrentTime();
+                int currentTime = ConnectionsManager.getInstance().getCurrentTime();
                 if (user.status.expires > currentTime) {
                     holder.messageTextView.setTextColor(0xff357aa8);
-                    holder.messageTextView.setText(getStringEntry(R.string.Online));
+                    holder.messageTextView.setText(LocaleController.getString("Online", R.string.Online));
                 } else {
                     if (user.status.expires <= 10000) {
-                        holder.messageTextView.setText(getStringEntry(R.string.Invisible));
+                        holder.messageTextView.setText(LocaleController.getString("Invisible", R.string.Invisible));
                     } else {
-                        holder.messageTextView.setText(Utilities.formatDateOnline(user.status.expires));
+                        holder.messageTextView.setText(LocaleController.formatDateOnline(user.status.expires));
                     }
                     holder.messageTextView.setTextColor(0xff808080);
                 }
@@ -595,9 +606,9 @@ public class GroupCreateActivity extends BaseFragment implements NotificationCen
             }
             TextView textView = (TextView)convertView.findViewById(R.id.settings_section_text);
             if (searching && searchWas) {
-                textView.setText(getStringEntry(R.string.AllContacts));
+                textView.setText(LocaleController.getString("AllContacts", R.string.AllContacts));
             } else {
-                textView.setText(ContactsController.Instance.sortedUsersSectionsArray.get(section));
+                textView.setText(ContactsController.getInstance().sortedUsersSectionsArray.get(section));
             }
             return convertView;
         }

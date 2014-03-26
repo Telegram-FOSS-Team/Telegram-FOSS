@@ -10,7 +10,10 @@ package org.telegram.ui;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -20,44 +23,52 @@ import android.os.Handler;
 import android.view.ViewConfiguration;
 
 import org.telegram.messenger.BackgroundService;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ConnectionsManager;
 import org.telegram.messenger.FileLog;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
-import org.telegram.messenger.MessagesStorage;
+import org.telegram.messenger.NativeLoader;
+import org.telegram.messenger.ScreenReceiver;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.Views.BaseFragment;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApplicationLoader extends Application {
     public static long lastPauseTime;
     public static Bitmap cachedWallpaper = null;
-    public static Context applicationContext;
-    private Locale currentLocale;
 
-    public static ApplicationLoader Instance = null;
+    public static volatile Context applicationContext = null;
+    public static volatile Handler applicationHandler = null;
+    private static volatile boolean applicationInited = false;
 
     public static ArrayList<BaseFragment> fragmentsStack = new ArrayList<BaseFragment>();
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    public static void postInitApplication() {
+        if (applicationInited) {
+            return;
+        }
+        applicationInited = true;
 
-        currentLocale = Locale.getDefault();
-        Instance = this;
+        NativeLoader.initNativeLibs(applicationContext);
 
-        java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
-        java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
-
-        applicationContext = getApplicationContext();
-        Utilities.applicationHandler = new Handler(applicationContext.getMainLooper());
+        try {
+            final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+            filter.addAction(Intent.ACTION_SCREEN_OFF);
+            final BroadcastReceiver mReceiver = new ScreenReceiver();
+            applicationContext.registerReceiver(mReceiver, filter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         UserConfig.loadConfig();
         if (UserConfig.currentUser != null) {
-            SharedPreferences preferences = getSharedPreferences("Notifications", MODE_PRIVATE);
+            boolean changed = false;
+            SharedPreferences preferences = applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
             int v = preferences.getInt("v", 0);
             if (v != 1) {
                 SharedPreferences preferences2 = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
@@ -83,9 +94,31 @@ public class ApplicationLoader extends Application {
                 editor.remove("fons_size");
                 editor.commit();
             }
-            MessagesStorage init = MessagesStorage.Instance;
-            MessagesController.Instance.users.put(UserConfig.clientUserId, UserConfig.currentUser);
+
+            MessagesController.getInstance().users.put(UserConfig.clientUserId, UserConfig.currentUser);
+            ConnectionsManager.getInstance().applyCountryPortNumber(UserConfig.currentUser.phone);
         }
+
+        ApplicationLoader app = (ApplicationLoader)ApplicationLoader.applicationContext;
+        app.initPlayServices();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        lastPauseTime = System.currentTimeMillis();
+        applicationContext = getApplicationContext();
+        NativeLoader.initNativeLibs(this);
+        try {
+            LocaleController.getInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        applicationHandler = new Handler(applicationContext.getMainLooper());
+
+        java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
+        java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
 
         try {
             ViewConfiguration config = ViewConfiguration.get(this);
@@ -97,31 +130,22 @@ public class ApplicationLoader extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        FileLog.d("tmessages", "This version doesn't support Google Play Services");
-
-        lastPauseTime = System.currentTimeMillis();
-        FileLog.e("tmessages", "start application with time " + lastPauseTime);
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Locale newLocale = newConfig.locale;
-        if (newLocale != null) {
-            String d1 = newLocale.getDisplayName();
-            String d2 = currentLocale.getDisplayName();
-            if (d1 != null && d2 != null && !d1.equals(d2)) {
-                Utilities.recreateFormatters();
-            }
-            currentLocale = newLocale;
+        try {
+            LocaleController.getInstance().onDeviceConfigurationChange(newConfig);
+            Utilities.checkDisplaySize();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Utilities.checkDisplaySize();
     }
 
     public static void resetLastPauseTime() {
         lastPauseTime = 0;
-        ConnectionsManager.Instance.applicationMovedToForeground();
+        ConnectionsManager.getInstance().applicationMovedToForeground();
     }
 
     public static int getAppVersion() {

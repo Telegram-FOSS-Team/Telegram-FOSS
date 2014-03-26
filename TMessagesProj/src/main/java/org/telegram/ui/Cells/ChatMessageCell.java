@@ -14,6 +14,7 @@ import android.text.Spannable;
 import android.text.style.ClickableSpan;
 import android.view.MotionEvent;
 
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.Utilities;
 import org.telegram.objects.MessageObject;
 
@@ -22,14 +23,10 @@ public class ChatMessageCell extends ChatBaseCell {
     private int textX, textY;
     private int totalHeight = 0;
     private ClickableSpan pressedLink;
-    private int visibleY = 0;
-    private int visibleHeight = 0;
 
     private int lastVisibleBlockNum = 0;
     private int firstVisibleBlockNum = 0;
     private int totalVisibleBlocksCount = 0;
-
-    private boolean wasLayout = false;
 
     public ChatMessageCell(Context context, boolean isChat) {
         super(context, isChat);
@@ -38,7 +35,7 @@ public class ChatMessageCell extends ChatBaseCell {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (currentMessageObject != null && currentMessageObject.messageText instanceof Spannable && !isPressed) {
+        if (currentMessageObject != null && currentMessageObject.textLayoutBlocks != null && !currentMessageObject.textLayoutBlocks.isEmpty() && currentMessageObject.messageText instanceof Spannable && !isPressed) {
             if (event.getAction() == MotionEvent.ACTION_DOWN || pressedLink != null && event.getAction() == MotionEvent.ACTION_UP) {
                 int x = (int)event.getX();
                 int y = (int)event.getY();
@@ -63,7 +60,11 @@ public class ChatMessageCell extends ChatBaseCell {
                                     return true;
                                 } else {
                                     if (link[0] == pressedLink) {
-                                        pressedLink.onClick(this);
+                                        try {
+                                            pressedLink.onClick(this);
+                                        } catch (Exception e) {
+                                            FileLog.e("tmessages", e);
+                                        }
                                         return true;
                                     }
                                 }
@@ -87,21 +88,21 @@ public class ChatMessageCell extends ChatBaseCell {
     }
 
     public void setVisiblePart(int position, int height) {
-        visibleY = position;
-        visibleHeight = height;
-
+        if (currentMessageObject == null || currentMessageObject.textLayoutBlocks == null) {
+            return;
+        }
         int newFirst = -1, newLast = -1, newCount = 0;
 
-        for (int a = Math.max(0, (visibleY - textY) / currentMessageObject.blockHeight); a < currentMessageObject.textLayoutBlocks.size(); a++) {
+        for (int a = Math.max(0, (position - textY) / currentMessageObject.blockHeight); a < currentMessageObject.textLayoutBlocks.size(); a++) {
             MessageObject.TextLayoutBlock block = currentMessageObject.textLayoutBlocks.get(a);
             float y = textY + block.textYOffset;
-            if (intersect(y, y + currentMessageObject.blockHeight, visibleY, visibleY + visibleHeight)) {
+            if (intersect(y, y + currentMessageObject.blockHeight, position, position + height)) {
                 if (newFirst == -1) {
                     newFirst = a;
                 }
                 newLast = a;
                 newCount++;
-            } else if (y > visibleY) {
+            } else if (y > position) {
                 break;
             }
         }
@@ -124,7 +125,10 @@ public class ChatMessageCell extends ChatBaseCell {
     @Override
     public void setMessageObject(MessageObject messageObject) {
         if (currentMessageObject != messageObject || isUserDataChanged()) {
-            wasLayout = false;
+            if (currentMessageObject != messageObject) {
+                firstVisibleBlockNum = 0;
+                lastVisibleBlockNum = 0;
+            }
             pressedLink = null;
             int maxWidth;
             if (chat) {
@@ -172,36 +176,43 @@ public class ChatMessageCell extends ChatBaseCell {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
-        if (changed || !wasLayout) {
-            if (currentMessageObject.messageOwner.out) {
-                textX = layoutWidth - backgroundWidth + Utilities.dp(10);
-                textY = Utilities.dp(10) + namesOffset;
-            } else {
-                textX = Utilities.dp(19) + (chat ? Utilities.dp(52) : 0);
-                textY = Utilities.dp(10) + namesOffset;
-            }
-            wasLayout = true;
+        if (currentMessageObject.messageOwner.out) {
+            textX = layoutWidth - backgroundWidth + Utilities.dp(10);
+            textY = Utilities.dp(10) + namesOffset;
+        } else {
+            textX = Utilities.dp(19) + (chat ? Utilities.dp(52) : 0);
+            textY = Utilities.dp(10) + namesOffset;
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (currentMessageObject == null || currentMessageObject.textLayoutBlocks == null || currentMessageObject.textLayoutBlocks.isEmpty()) {
+        if (currentMessageObject == null || currentMessageObject.textLayoutBlocks == null || currentMessageObject.textLayoutBlocks.isEmpty() || firstVisibleBlockNum < 0) {
             return;
         }
 
-        for (int a = Math.max(0, (visibleY - textY) / currentMessageObject.blockHeight); a < currentMessageObject.textLayoutBlocks.size(); a++) {
-            MessageObject.TextLayoutBlock block = currentMessageObject.textLayoutBlocks.get(a);
-            float y = textY + block.textYOffset;
-            if (intersect(y, y + currentMessageObject.blockHeight, visibleY, visibleY + visibleHeight)) {
-                canvas.save();
-                canvas.translate(textX - (int)Math.ceil(block.textXOffset), textY + block.textYOffset);
-                block.textLayout.draw(canvas);
-                canvas.restore();
-            } else {
+        if (currentMessageObject.messageOwner.out) {
+            textX = layoutWidth - backgroundWidth + Utilities.dp(10);
+            textY = Utilities.dp(10) + namesOffset;
+        } else {
+            textX = Utilities.dp(19) + (chat ? Utilities.dp(52) : 0);
+            textY = Utilities.dp(10) + namesOffset;
+        }
+
+        for (int a = firstVisibleBlockNum; a <= lastVisibleBlockNum; a++) {
+            if (a >= currentMessageObject.textLayoutBlocks.size()) {
                 break;
             }
+            MessageObject.TextLayoutBlock block = currentMessageObject.textLayoutBlocks.get(a);
+            canvas.save();
+            canvas.translate(textX - (int)Math.ceil(block.textXOffset), textY + block.textYOffset);
+            try {
+                block.textLayout.draw(canvas);
+            } catch (Exception e) {
+                FileLog.e("tmessages", e);
+            }
+            canvas.restore();
         }
     }
 }

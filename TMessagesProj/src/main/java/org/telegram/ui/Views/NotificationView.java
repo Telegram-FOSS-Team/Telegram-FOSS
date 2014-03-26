@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.MessagesController;
@@ -106,15 +107,15 @@ public class NotificationView extends LinearLayout {
                 hide(true);
 
                 if (currentChatId != 0) {
-                    NotificationCenter.Instance.addToMemCache("push_chat_id", currentChatId);
+                    NotificationCenter.getInstance().addToMemCache("push_chat_id", currentChatId);
                 }
                 if (currentUserId != 0) {
-                    NotificationCenter.Instance.addToMemCache("push_user_id", currentUserId);
+                    NotificationCenter.getInstance().addToMemCache("push_user_id", currentUserId);
                 }
                 if (currentEncId != 0) {
-                    NotificationCenter.Instance.addToMemCache("push_enc_id", currentEncId);
+                    NotificationCenter.getInstance().addToMemCache("push_enc_id", currentEncId);
                 }
-                NotificationCenter.Instance.postNotificationName(658);
+                NotificationCenter.getInstance().postNotificationName(658);
             }
         });
 
@@ -170,11 +171,11 @@ public class NotificationView extends LinearLayout {
     }
 
     public void show(MessageObject object) {
-        TLRPC.User user = MessagesController.Instance.users.get(object.messageOwner.from_id);
+        TLRPC.User user = MessagesController.getInstance().users.get(object.messageOwner.from_id);
         TLRPC.Chat chat = null;
         long dialog_id = object.messageOwner.dialog_id;
         if (object.messageOwner.to_id.chat_id != 0) {
-            chat = MessagesController.Instance.chats.get(object.messageOwner.to_id.chat_id);
+            chat = MessagesController.getInstance().chats.get(object.messageOwner.to_id.chat_id);
             if (chat == null) {
                 return;
             }
@@ -305,7 +306,7 @@ public class NotificationView extends LinearLayout {
             messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             nameTextView.setPadding(0, Utilities.dp(2), 0, 0);
             messageTextView.setPadding(0, Utilities.dp(18), 0, 0);
-            if (Utilities.isRTL) {
+            if (LocaleController.isRTL) {
                 params1.setMargins(Utilities.dp(40), 0, height + Utilities.dp(6), 0);
             } else {
                 params1.setMargins(height + Utilities.dp(6), 0, Utilities.dp(40), 0);
@@ -315,7 +316,7 @@ public class NotificationView extends LinearLayout {
             messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
             nameTextView.setPadding(0, Utilities.dp(4), 0, 0);
             messageTextView.setPadding(0, Utilities.dp(24), 0, 0);
-            if (Utilities.isRTL) {
+            if (LocaleController.isRTL) {
                 params1.setMargins(Utilities.dp(40), 0, height + Utilities.dp(8), 0);
             } else {
                 params1.setMargins(height + Utilities.dp(8), 0, Utilities.dp(40), 0);

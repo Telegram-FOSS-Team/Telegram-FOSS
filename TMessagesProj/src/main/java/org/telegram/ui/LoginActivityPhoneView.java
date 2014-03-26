@@ -26,6 +26,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.telegram.PhoneFormat.PhoneFormat;
+import org.telegram.messenger.BuildVars;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.TLObject;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.ConnectionsManager;
@@ -47,6 +49,8 @@ public class LoginActivityPhoneView extends SlideView implements AdapterView.OnI
     private EditText codeField;
     private EditText phoneField;
     private TextView countryButton;
+
+    private int countryState = 0;
 
     private ArrayList<String> countriesArray = new ArrayList<String>();
     private HashMap<String, String> countriesMap = new HashMap<String, String>();
@@ -72,6 +76,9 @@ public class LoginActivityPhoneView extends SlideView implements AdapterView.OnI
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+
+        TextView textView = (TextView)findViewById(R.id.login_confirm_text);
+        textView.setText(LocaleController.getString("StartText", R.string.StartText));
 
         countryButton = (TextView)findViewById(R.id.login_coutry_textview);
         countryButton.setOnClickListener(new OnClickListener() {
@@ -104,17 +111,29 @@ public class LoginActivityPhoneView extends SlideView implements AdapterView.OnI
                 ignoreOnTextChange = true;
                 String text = PhoneFormat.stripExceptNumbers(codeField.getText().toString());
                 codeField.setText(text);
-                String country = codesMap.get(text);
-                if (country != null) {
-                    int index = countriesArray.indexOf(country);
-                    if (index != -1) {
-                        ignoreSelection = true;
-                        countryButton.setText(countriesArray.get(index));
+                if (text.length() == 0) {
+                    countryButton.setText(LocaleController.getString("ChooseCountry", R.string.ChooseCountry));
+                    countryState = 1;
+                } else {
+                    String country = codesMap.get(text);
+                    if (country != null) {
+                        int index = countriesArray.indexOf(country);
+                        if (index != -1) {
+                            ignoreSelection = true;
+                            countryButton.setText(countriesArray.get(index));
 
-                        updatePhoneField();
+                            updatePhoneField();
+                            countryState = 0;
+                        } else {
+                            countryButton.setText(LocaleController.getString("WrongCountry", R.string.WrongCountry));
+                            countryState = 2;
+                        }
+                    } else {
+                        countryButton.setText(LocaleController.getString("WrongCountry", R.string.WrongCountry));
+                        countryState = 2;
                     }
+                    codeField.setSelection(codeField.getText().length());
                 }
-                codeField.setSelection(codeField.getText().length());
             }
         });
         codeField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -198,56 +217,50 @@ public class LoginActivityPhoneView extends SlideView implements AdapterView.OnI
                 }
             });
 
-            boolean codeProceed = false;
+            String country = null;
 
-            if (!codeProceed) {
-                String country = "RU";
-
-                try {
-                    TelephonyManager telephonyManager = (TelephonyManager)ApplicationLoader.applicationContext.getSystemService(Context.TELEPHONY_SERVICE);
-                    if (telephonyManager != null) {
-                        country = telephonyManager.getSimCountryIso().toUpperCase();
-                    }
-                } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+            try {
+                TelephonyManager telephonyManager = (TelephonyManager)ApplicationLoader.applicationContext.getSystemService(Context.TELEPHONY_SERVICE);
+                if (telephonyManager != null) {
+                    country = telephonyManager.getSimCountryIso().toUpperCase();
                 }
-
-                if (country == null || country.length() == 0) {
-                    try {
-                        Locale current = ApplicationLoader.applicationContext.getResources().getConfiguration().locale;
-                        country = current.getCountry().toUpperCase();
-                    } catch (Exception e) {
-                        FileLog.e("tmessages", e);
-                    }
-                }
-                if (country == null || country.length() == 0) {
-                    country = "RU";
-                }
-
-                String countryName = languageMap.get(country);
-                if (countryName == null) {
-                    countryName = "Russia";
-                }
-
-                int index = countriesArray.indexOf(countryName);
-                if (index != -1) {
-                    codeField.setText(countriesMap.get(countryName));
-                }
+            } catch (Exception e) {
+                FileLog.e("tmessages", e);
             }
 
+            if (country != null) {
+                String countryName = languageMap.get(country);
+                if (countryName != null) {
+                    int index = countriesArray.indexOf(countryName);
+                    if (index != -1) {
+                        codeField.setText(countriesMap.get(countryName));
+                        countryState = 0;
+                    }
+                }
+            }
+            if (codeField.length() == 0) {
+                countryButton.setText(LocaleController.getString("ChooseCountry", R.string.ChooseCountry));
+                countryState = 1;
+            }
+        }
+
+        if (codeField.length() != 0) {
             Utilities.showKeyboard(phoneField);
             phoneField.requestFocus();
-            phoneField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                    if (i == EditorInfo.IME_ACTION_NEXT) {
-                        delegate.onNextAction();
-                        return true;
-                    }
-                    return false;
-                }
-            });
+        } else {
+            Utilities.showKeyboard(codeField);
+            codeField.requestFocus();
         }
+        phoneField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_NEXT) {
+                    delegate.onNextAction();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     public void selectCountry(String name) {
@@ -256,18 +269,19 @@ public class LoginActivityPhoneView extends SlideView implements AdapterView.OnI
             ignoreOnTextChange = true;
             codeField.setText(countriesMap.get(name));
             countryButton.setText(name);
+            countryState = 0;
         }
     }
 
     private void updatePhoneField() {
         ignoreOnPhoneChange = true;
         String codeText = codeField.getText().toString();
-        String phone = PhoneFormat.Instance.format("+" + codeText + phoneField.getText().toString());
+        String phone = PhoneFormat.getInstance().format("+" + codeText + phoneField.getText().toString());
         int idx = phone.indexOf(" ");
         if (idx != -1) {
             String resultCode = PhoneFormat.stripExceptNumbers(phone.substring(0, idx));
             if (!codeText.equals(resultCode)) {
-                phone = PhoneFormat.Instance.format(phoneField.getText().toString()).trim();
+                phone = PhoneFormat.getInstance().format(phoneField.getText().toString()).trim();
                 phoneField.setText(phone);
                 int len = phoneField.length();
                 phoneField.setSelection(phoneField.length());
@@ -301,14 +315,22 @@ public class LoginActivityPhoneView extends SlideView implements AdapterView.OnI
 
     @Override
     public void onNextPressed() {
+        if (countryState == 1) {
+            delegate.needShowAlert(LocaleController.getString("ChooseCountry", R.string.ChooseCountry));
+            return;
+        } else if (countryState == 2) {
+            delegate.needShowAlert(LocaleController.getString("WrongCountry", R.string.WrongCountry));
+            return;
+        }
         if (codeField.length() == 0 || phoneField.length() == 0) {
-            delegate.needShowAlert(ApplicationLoader.applicationContext.getString(R.string.InvalidPhoneNumber));
+            delegate.needShowAlert(LocaleController.getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
             return;
         }
         TLRPC.TL_auth_sendCode req = new TLRPC.TL_auth_sendCode();
         String phone = PhoneFormat.stripExceptNumbers("" + codeField.getText() + phoneField.getText());
-        req.api_hash = ConnectionsManager.APP_HASH;
-        req.api_id = ConnectionsManager.APP_ID;
+        ConnectionsManager.getInstance().applyCountryPortNumber(phone);
+        req.api_hash = BuildVars.APP_HASH;
+        req.api_id = BuildVars.APP_ID;
         req.sms_type = 0;
         req.phone_number = phone;
         req.lang_code = Locale.getDefault().getCountry();
@@ -321,7 +343,7 @@ public class LoginActivityPhoneView extends SlideView implements AdapterView.OnI
         params.putString("phoneFormated", phone);
 
         delegate.needShowProgress();
-        ConnectionsManager.Instance.performRpc(req, new RPCRequest.RPCRequestDelegate() {
+        ConnectionsManager.getInstance().performRpc(req, new RPCRequest.RPCRequestDelegate() {
             @Override
             public void run(TLObject response, TLRPC.TL_error error) {
                 if (error == null) {
@@ -343,13 +365,13 @@ public class LoginActivityPhoneView extends SlideView implements AdapterView.OnI
                     if (delegate != null) {
                         if (error.text != null) {
                             if (error.text.contains("PHONE_NUMBER_INVALID")) {
-                                delegate.needShowAlert(ApplicationLoader.applicationContext.getString(R.string.InvalidPhoneNumber));
+                                delegate.needShowAlert(LocaleController.getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
                             } else if (error.text.contains("PHONE_CODE_EMPTY") || error.text.contains("PHONE_CODE_INVALID")) {
-                                delegate.needShowAlert(ApplicationLoader.applicationContext.getString(R.string.InvalidCode));
+                                delegate.needShowAlert(LocaleController.getString("InvalidCode", R.string.InvalidCode));
                             } else if (error.text.contains("PHONE_CODE_EXPIRED")) {
-                                delegate.needShowAlert(ApplicationLoader.applicationContext.getString(R.string.CodeExpired));
+                                delegate.needShowAlert(LocaleController.getString("CodeExpired", R.string.CodeExpired));
                             } else if (error.text.contains("FLOOD_WAIT")) {
-                                delegate.needShowAlert(ApplicationLoader.applicationContext.getString(R.string.FloodWait));
+                                delegate.needShowAlert(LocaleController.getString("FloodWait", R.string.FloodWait));
                             } else {
                                 delegate.needShowAlert(error.text);
                             }
