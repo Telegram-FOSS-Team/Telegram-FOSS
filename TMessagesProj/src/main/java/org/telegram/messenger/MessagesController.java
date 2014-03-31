@@ -3420,7 +3420,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
             }
         } else if (updates instanceof TLRPC.TL_updateShortMessage) {
             boolean missingData = users.get(updates.from_id) == null;
-            if (MessagesStorage.lastSeqValue + 1 == updates.seq && !missingData) {
+            if (MessagesStorage.lastSeqValue + 1 == updates.seq /*&& !missingData*/) {
                 TLRPC.TL_message message = new TLRPC.TL_message();
                 message.from_id = updates.from_id;
                 message.id = updates.id;
@@ -4326,12 +4326,12 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     intent.putExtra("userId", user_id);
                 }
 
-                if (chat_id == 0 && user_id != 0) {
+                TLRPC.User u = null;
+                if (user_id != 0) {
+                    u = users.get(user_id);
+                }
 
-                    TLRPC.User u = users.get(user_id);
-                    if (u == null) {
-                        return;
-                    }
+                if (chat_id == 0 && u != null) {
 
                     if (u.photo != null && u.photo.photo_small != null && u.photo.photo_small.volume_id != 0 && u.photo.photo_small.local_id != 0) {
                         photoPath = u.photo.photo_small;
@@ -4376,7 +4376,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     if (chat == null) {
                         return;
                     }
-                    TLRPC.User u = users.get(messageObject.messageOwner.from_id);
+                    u = users.get(messageObject.messageOwner.from_id);
                     if (u == null) {
                         return;
                     }
@@ -4438,6 +4438,10 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     } else {
                         msg = LocaleController.formatString("NotificationMessageGroupNoText", R.string.NotificationMessageGroupNoText, Utilities.formatName(u.first_name, u.last_name), chat.title);
                     }
+                } else {
+                    msg = LocaleController.getString("YouHaveNewMessage", R.string.YouHaveNewMessage);
+                    int enc_id = (int)(dialog_id >> 32);
+                    intent.putExtra("encId", enc_id);
                 }
             } else {
                 msg = LocaleController.getString("YouHaveNewMessage", R.string.YouHaveNewMessage);

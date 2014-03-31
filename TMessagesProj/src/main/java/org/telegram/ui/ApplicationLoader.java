@@ -127,6 +127,8 @@ public class ApplicationLoader extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        startService(new Intent(this, BackgroundService.class));
     }
 
     @Override

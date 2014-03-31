@@ -15,6 +15,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
+import org.telegram.ui.ApplicationLoader;
+
 public class BackgroundService extends Service {
 
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -43,14 +45,13 @@ public class BackgroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        ApplicationLoader.postInitApplication();
         Log.e("tmessages", "onStartCommand");
         return START_STICKY;
     }
 
     private void check() {
-        handler.removeCallbacks(checkRunnable);
-        handler.postDelayed(checkRunnable, 1500);
-        ConnectionsManager connectionsManager = ConnectionsManager.Instance;
+        ConnectionsManager connectionsManager = ConnectionsManager.getInstance();
     }
 
     @Override
