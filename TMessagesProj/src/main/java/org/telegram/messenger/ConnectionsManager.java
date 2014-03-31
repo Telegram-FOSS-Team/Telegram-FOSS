@@ -67,7 +67,7 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
     private Runnable stageRunnable;
     private Runnable pingRunnable;
     private long lastPingTime = System.currentTimeMillis();
-    private int nextWakeUpTimeout = 60000;
+    private int nextWakeUpTimeout = 15000;
     private int nextSleepTimeout = 60000;
 
     public static volatile ConnectionsManager Instance = null;
@@ -137,11 +137,8 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
                                     paused = true;
                                     if (ApplicationLoader.lastPauseTime < currentTime - nextSleepTimeout - nextWakeUpTimeout) {
                                         ApplicationLoader.lastPauseTime = currentTime;
-                                        nextSleepTimeout = 30000;
+                                        nextSleepTimeout = 15000;
                                         FileLog.e("tmessages", "wakeup network in background by wakeup time = " + nextWakeUpTimeout);
-                                        if (nextWakeUpTimeout < 30 * 60 * 1000) {
-                                            nextWakeUpTimeout *= 2;
-                                        }
                                     } else {
                                         Thread.sleep(500);
                                         return;
@@ -175,7 +172,7 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
                     }
                 });
             }
-        }, 1000, 1000);
+        }, 1000, 5000);
     }
 
     public void resumeNetworkMaybe() {
@@ -184,7 +181,6 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
             public void run() {
                 if (paused) {
                     ApplicationLoader.lastPauseTime = System.currentTimeMillis();
-                    nextWakeUpTimeout = 60000;
                     nextSleepTimeout = 30000;
                     FileLog.e("tmessages", "wakeup network in background by recieved push");
                 } else if (ApplicationLoader.lastPauseTime != 0) {
@@ -201,7 +197,6 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
             public void run() {
                 if (paused) {
                     nextSleepTimeout = 60000;
-                    nextWakeUpTimeout = 60000;
                     FileLog.e("tmessages", "reset timers by application moved to foreground");
                 }
             }
