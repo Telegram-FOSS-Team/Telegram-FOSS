@@ -20,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.view.ViewConfiguration;
 
 import org.telegram.messenger.BackgroundService;
@@ -45,6 +46,7 @@ public class ApplicationLoader extends Application {
     public static volatile Context applicationContext = null;
     public static volatile Handler applicationHandler = null;
     private static volatile boolean applicationInited = false;
+    public static volatile boolean isScreenOn = false;
 
     public static ArrayList<BaseFragment> fragmentsStack = new ArrayList<BaseFragment>();
 
@@ -52,9 +54,16 @@ public class ApplicationLoader extends Application {
         if (applicationInited) {
             return;
         }
+
         applicationInited = true;
 
         NativeLoader.initNativeLibs(applicationContext);
+
+        try {
+            LocaleController.getInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         try {
             final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
@@ -63,6 +72,14 @@ public class ApplicationLoader extends Application {
             applicationContext.registerReceiver(mReceiver, filter);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        try {
+            PowerManager pm = (PowerManager)ApplicationLoader.applicationContext.getSystemService(Context.POWER_SERVICE);
+            isScreenOn = pm.isScreenOn();
+            FileLog.e("tmessages", "screen state = " + isScreenOn);
+        } catch (Exception e) {
+            FileLog.e("tmessages", e);
         }
 
         UserConfig.loadConfig();
@@ -105,12 +122,6 @@ public class ApplicationLoader extends Application {
         super.onCreate();
         lastPauseTime = System.currentTimeMillis();
         applicationContext = getApplicationContext();
-        NativeLoader.initNativeLibs(this);
-        try {
-            LocaleController.getInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
