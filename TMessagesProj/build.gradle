@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.11.+'
     }
 }
 apply plugin: 'android'
@@ -32,13 +32,12 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     compile 'com.android.support:support-v4:19.0.+'
-    compile 'com.android.support:appcompat-v7:19.0.+'
     compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.0.3'
+    buildToolsVersion '19.1.0'
 
     aaptOptions.useAaptPngCruncher = true
 
@@ -78,7 +77,7 @@ android {
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 19
-        versionCode 212
-        versionName "1.4.9"
+        versionCode 250
+        versionName "1.5.0"
     }
 }

@@ -14,7 +14,9 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -26,6 +28,7 @@ import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.util.Base64;
 import android.view.Display;
+import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -38,6 +41,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -45,6 +50,7 @@ import java.nio.channels.FileChannel;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.spec.RSAPublicKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,7 +69,9 @@ public class Utilities {
     public static float density = 1;
     public static Point displaySize = new Point();
     public static Pattern pattern = Pattern.compile("[0-9]+");
+    public static SecureRandom random = new SecureRandom();
     private final static Integer lock = 1;
+    private static int prevOrientation = -10;
 
     private static boolean waitingForSms = false;
     private static final Integer smsLock = 2;
@@ -76,9 +84,6 @@ public class Utilities {
 
     public static volatile DispatchQueue stageQueue = new DispatchQueue("stageQueue");
     public static volatile DispatchQueue globalQueue = new DispatchQueue("globalQueue");
-    public static volatile DispatchQueue cacheOutQueue = new DispatchQueue("cacheOutQueue");
-    public static volatile DispatchQueue imageLoadQueue = new DispatchQueue("imageLoadQueue");
-    public static volatile DispatchQueue fileUploadQueue = new DispatchQueue("fileUploadQueue");
 
     public static int[] arrColors = {0xffee4928, 0xff41a903, 0xffe09602, 0xff0f94ed, 0xff8f3bf7, 0xfffc4380, 0xff00a1c4, 0xffeb7002};
     public static int[] arrUsersAvatars = {
@@ -106,6 +111,17 @@ public class Utilities {
     public static ProgressDialog progressDialog;
 
     static {
+        try {
+            File URANDOM_FILE = new File("/dev/urandom");
+            FileInputStream sUrandomIn = new FileInputStream(URANDOM_FILE);
+            byte[] buffer = new byte[1024];
+            sUrandomIn.read(buffer);
+            sUrandomIn.close();
+            random.setSeed(buffer);
+        } catch (Exception e) {
+            FileLog.e("tmessages", e);
+        }
+
         density = ApplicationLoader.applicationContext.getResources().getDisplayMetrics().density;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("primes", Context.MODE_PRIVATE);
         String primes = preferences.getString("primes", null);
@@ -134,6 +150,48 @@ public class Utilities {
     public native static long doPQNative(long _what);
     public native static byte[] aesIgeEncryption(byte[] _what, byte[] _key, byte[] _iv, boolean encrypt, boolean changeIv, int len);
     public native static void aesIgeEncryption2(ByteBuffer _what, byte[] _key, byte[] _iv, boolean encrypt, boolean changeIv, int len);
+    public native static void loadBitmap(String path, Bitmap bitmap, int scale);
+
+    public static void lockOrientation(Activity activity) {
+        if (prevOrientation != -10) {
+            return;
+        }
+        try {
+            prevOrientation = activity.getRequestedOrientation();
+            WindowManager manager = (WindowManager)activity.getSystemService(Activity.WINDOW_SERVICE);
+            if (manager != null && manager.getDefaultDisplay() != null) {
+                int rotation = manager.getDefaultDisplay().getRotation();
+                if (rotation == Surface.ROTATION_270) {
+                    if (Build.VERSION.SDK_INT >= 9) {
+                        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+                    } else {
+                        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    }
+                } else if (rotation == Surface.ROTATION_90) {
+                    activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                } else if (rotation == Surface.ROTATION_0) {
+                    activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                } else {
+                    if (Build.VERSION.SDK_INT >= 9) {
+                        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            FileLog.e("tmessages", e);
+        }
+    }
+
+    public static void unlockOrientation(Activity activity) {
+        try {
+            if (prevOrientation != -10) {
+                activity.setRequestedOrientation(prevOrientation);
+                prevOrientation = -10;
+            }
+        } catch (Exception e) {
+            FileLog.e("tmessages", e);
+        }
+    }
 
     public static boolean isWaitingForSms() {
         boolean value = false;
@@ -188,7 +246,7 @@ public class Utilities {
     }
 
     public static int dp(int value) {
-        return (int)(density * value);
+        return (int)(Math.max(1, density * value));
     }
 
     public static int dpf(float value) {
@@ -202,13 +260,6 @@ public class Utilities {
 
         if (prime.length != 256 || prime[0] >= 0) {
             return false;
-        }
-
-        String hex = bytesToHex(prime);
-        for (String cached : goodPrimes) {
-            if (cached.equals(hex)) {
-                return true;
-            }
         }
 
         BigInteger dhBI = new BigInteger(1, prime);
@@ -240,6 +291,13 @@ public class Utilities {
             int val = res.intValue();
             if (val != 3 && val != 5 && val != 6) {
                 return false;
+            }
+        }
+
+        String hex = bytesToHex(prime);
+        for (String cached : goodPrimes) {
+            if (cached.equals(hex)) {
+                return true;
             }
         }
 
@@ -555,20 +613,31 @@ public class Utilities {
         });
     }
 
+    public static boolean copyFile(InputStream sourceFile, File destFile) throws IOException {
+        OutputStream out = new FileOutputStream(destFile);
+        byte[] buf = new byte[4096];
+        int len;
+        while ((len = sourceFile.read(buf)) > 0) {
+            Thread.yield();
+            out.write(buf, 0, len);
+        }
+        out.close();
+        return true;
+    }
+
     public static boolean copyFile(File sourceFile, File destFile) throws IOException {
         if(!destFile.exists()) {
             destFile.createNewFile();
         }
         FileChannel source = null;
         FileChannel destination = null;
-        boolean result = true;
         try {
             source = new FileInputStream(sourceFile).getChannel();
             destination = new FileOutputStream(destFile).getChannel();
             destination.transferFrom(source, 0, source.size());
         } catch (Exception e) {
             FileLog.e("tmessages", e);
-            result = false;
+            return false;
         } finally {
             if(source != null) {
                 source.close();
@@ -577,7 +646,7 @@ public class Utilities {
                 destination.close();
             }
         }
-        return result;
+        return true;
     }
 
     public static void RunOnUIThread(Runnable runnable) {
@@ -670,7 +739,7 @@ public class Utilities {
     private static File getAlbumDir() {
         File storageDir = null;
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), ApplicationLoader.applicationContext.getResources().getString(R.string.AppName));
+            storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), LocaleController.getString("AppName", R.string.AppName));
             if (storageDir != null) {
                 if (! storageDir.mkdirs()) {
                     if (! storageDir.exists()){
@@ -687,46 +756,49 @@ public class Utilities {
     }
 
     public static String getPath(final Uri uri) {
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-        if (isKitKat && DocumentsContract.isDocumentUri(ApplicationLoader.applicationContext, uri)) {
-            if (isExternalStorageDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-                if ("primary".equalsIgnoreCase(type)) {
-                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+        try {
+            final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+            if (isKitKat && DocumentsContract.isDocumentUri(ApplicationLoader.applicationContext, uri)) {
+                if (isExternalStorageDocument(uri)) {
+                    final String docId = DocumentsContract.getDocumentId(uri);
+                    final String[] split = docId.split(":");
+                    final String type = split[0];
+                    if ("primary".equalsIgnoreCase(type)) {
+                        return Environment.getExternalStorageDirectory() + "/" + split[1];
+                    }
+                } else if (isDownloadsDocument(uri)) {
+                    final String id = DocumentsContract.getDocumentId(uri);
+                    final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                    return getDataColumn(ApplicationLoader.applicationContext, contentUri, null, null);
+                } else if (isMediaDocument(uri)) {
+                    final String docId = DocumentsContract.getDocumentId(uri);
+                    final String[] split = docId.split(":");
+                    final String type = split[0];
+
+                    Uri contentUri = null;
+                    if ("image".equals(type)) {
+                        contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                    } else if ("video".equals(type)) {
+                        contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                    } else if ("audio".equals(type)) {
+                        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                    }
+
+                    final String selection = "_id=?";
+                    final String[] selectionArgs = new String[] {
+                            split[1]
+                    };
+
+                    return getDataColumn(ApplicationLoader.applicationContext, contentUri, selection, selectionArgs);
                 }
-            } else if (isDownloadsDocument(uri)) {
-                final String id = DocumentsContract.getDocumentId(uri);
-                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-                return getDataColumn(ApplicationLoader.applicationContext, contentUri, null, null);
-            } else if (isMediaDocument(uri)) {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-
-                Uri contentUri = null;
-                if ("image".equals(type)) {
-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                } else if ("video".equals(type)) {
-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                } else if ("audio".equals(type)) {
-                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                }
-
-                final String selection = "_id=?";
-                final String[] selectionArgs = new String[] {
-                        split[1]
-                };
-
-                return getDataColumn(ApplicationLoader.applicationContext, contentUri, selection, selectionArgs);
+            } else if ("content".equalsIgnoreCase(uri.getScheme())) {
+                return getDataColumn(ApplicationLoader.applicationContext, uri, null, null);
+            } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+                return uri.getPath();
             }
-        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
-            return getDataColumn(ApplicationLoader.applicationContext, uri, null, null);
-        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
+        } catch (Exception e) {
+            FileLog.e("tmessages", e);
         }
-
         return null;
     }
 
@@ -871,5 +943,13 @@ public class Utilities {
             }
         }
         return buffer.toByteArray();
+    }
+
+    public static void checkForCrashes(Activity context) {
+	/* Telegram-FOSS doesn't include HockeySDK */
+    }
+
+    public static void checkForUpdates(Activity context) {
+	/* Telegram-FOSS doesn't include HockeySDK */
     }
 }

@@ -23,6 +23,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.LaunchActivity;
 import org.telegram.ui.PhotoCropActivity;
+import org.telegram.ui.Views.ActionBar.BaseFragment;
 
 import java.io.File;
 
@@ -58,7 +59,7 @@ public class AvatarUpdater implements NotificationCenter.NotificationCenterDeleg
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(image));
                 currentPicturePath = image.getAbsolutePath();
             }
-            parentFragment.startActivityForResult(takePictureIntent, 0);
+            parentFragment.getParentActivity().startActivityForResult(takePictureIntent, 13);
         } catch (Exception e) {
             FileLog.e("tmessages", e);
         }
@@ -68,7 +69,7 @@ public class AvatarUpdater implements NotificationCenter.NotificationCenterDeleg
         try {
             Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
             photoPickerIntent.setType("image/*");
-            parentFragment.startActivityForResult(photoPickerIntent, 1);
+            parentFragment.getParentActivity().startActivityForResult(photoPickerIntent, 14);
         } catch (Exception e) {
             FileLog.e("tmessages", e);
         }
@@ -76,23 +77,19 @@ public class AvatarUpdater implements NotificationCenter.NotificationCenterDeleg
 
     private void startCrop(String path, Uri uri) {
         try {
-            LaunchActivity activity = (LaunchActivity)parentFragment.parentActivity;
-            if (activity == null) {
-                activity = (LaunchActivity)parentFragment.getActivity();
-            }
+            LaunchActivity activity = (LaunchActivity)parentFragment.getParentActivity();
             if (activity == null) {
                 return;
             }
-            Bundle params = new Bundle();
+            Bundle args = new Bundle();
             if (path != null) {
-                params.putString("photoPath", path);
+                args.putString("photoPath", path);
             } else if (uri != null) {
-                params.putParcelable("photoUri", uri);
+                args.putParcelable("photoUri", uri);
             }
-            PhotoCropActivity photoCropActivity = new PhotoCropActivity();
-            photoCropActivity.delegate = this;
-            photoCropActivity.setArguments(params);
-            activity.presentFragment(photoCropActivity, "crop", false);
+            PhotoCropActivity photoCropActivity = new PhotoCropActivity(args);
+            photoCropActivity.setDelegate(this);
+            activity.presentFragment(photoCropActivity);
         } catch (Exception e) {
             FileLog.e("tmessages", e);
             Bitmap bitmap = FileLoader.loadBitmap(path, uri, 800, 800);
@@ -102,12 +99,12 @@ public class AvatarUpdater implements NotificationCenter.NotificationCenterDeleg
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == 0) {
+            if (requestCode == 13) {
                 Utilities.addMediaToGallery(currentPicturePath);
                 startCrop(currentPicturePath, null);
 
                 currentPicturePath = null;
-            } else if (requestCode == 1) {
+            } else if (requestCode == 14) {
                 if (data == null || data.getData() == null) {
                     return;
                 }
