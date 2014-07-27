@@ -41,7 +41,6 @@ import org.telegram.messenger.Utilities;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApplicationLoader extends Application {
-    private GoogleCloudMessaging gcm;
     private AtomicInteger msgId = new AtomicInteger();
     private String regid;
     public static final String EXTRA_MESSAGE = "message";
