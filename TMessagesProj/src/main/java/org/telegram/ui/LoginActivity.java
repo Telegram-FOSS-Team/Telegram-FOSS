@@ -10,6 +10,7 @@ package org.telegram.ui;
 
 import android.animation.Animator;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,10 +18,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.FrameLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.telegram.android.AndroidUtilities;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.LocaleController;
+import org.telegram.android.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.Views.ActionBar.ActionBarLayer;
@@ -34,6 +38,7 @@ import java.util.Set;
 public class LoginActivity extends BaseFragment implements SlideView.SlideViewDelegate {
     private int currentViewNum = 0;
     private SlideView[] views = new SlideView[3];
+    private ProgressDialog progressDialog;
 
     private final static int done_button = 1;
 
@@ -78,6 +83,19 @@ public class LoginActivity extends BaseFragment implements SlideView.SlideViewDe
             views[0] = (SlideView)fragmentView.findViewById(R.id.login_page1);
             views[1] = (SlideView)fragmentView.findViewById(R.id.login_page2);
             views[2] = (SlideView)fragmentView.findViewById(R.id.login_page3);
+
+            try {
+                if (views[0] == null || views[1] == null || views[2] == null) {
+                    FrameLayout parent = (FrameLayout)((ScrollView) fragmentView).getChildAt(0);
+                    for (int a = 0; a < views.length; a++) {
+                        if (views[a] == null) {
+                            views[a] = (SlideView)parent.getChildAt(a);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                FileLog.e("tmessages", e);
+            }
 
             actionBarLayer.setTitle(views[0].getHeaderName());
 
@@ -205,29 +223,38 @@ public class LoginActivity extends BaseFragment implements SlideView.SlideViewDe
 
     @Override
     public void needShowAlert(final String text) {
-        if (text == null) {
+        if (text == null || getParentActivity() == null) {
             return;
         }
-        getParentActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-                builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
-                builder.setMessage(text);
-                builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
-                showAlertDialog(builder);
-            }
-        });
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+        builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
+        builder.setMessage(text);
+        builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
+        showAlertDialog(builder);
     }
 
     @Override
     public void needShowProgress() {
-        Utilities.ShowProgressDialog(getParentActivity(), LocaleController.getString("Loading", R.string.Loading));
+        if (getParentActivity() == null || getParentActivity().isFinishing() || progressDialog != null) {
+            return;
+        }
+        progressDialog = new ProgressDialog(getParentActivity());
+        progressDialog.setMessage(LocaleController.getString("Loading", R.string.Loading));
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
     }
 
     @Override
     public void needHideProgress() {
-        Utilities.HideProgressDialog(getParentActivity());
+        if (progressDialog == null) {
+            return;
+        }
+        try {
+            progressDialog.dismiss();
+        } catch (Exception e) {
+            FileLog.e("tmessages", e);
+        }
     }
 
     public void setPage(int page, boolean animated, Bundle params, boolean back) {
@@ -239,7 +266,7 @@ public class LoginActivity extends BaseFragment implements SlideView.SlideViewDe
             newView.setParams(params);
             actionBarLayer.setTitle(newView.getHeaderName());
             newView.onShow();
-            newView.setX(back ? -Utilities.displaySize.x : Utilities.displaySize.x);
+            newView.setX(back ? -AndroidUtilities.displaySize.x : AndroidUtilities.displaySize.x);
             outView.animate().setInterpolator(new AccelerateDecelerateInterpolator()).setListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {
@@ -258,7 +285,7 @@ public class LoginActivity extends BaseFragment implements SlideView.SlideViewDe
                 @Override
                 public void onAnimationRepeat(Animator animator) {
                 }
-            }).setDuration(300).translationX(back ? Utilities.displaySize.x : -Utilities.displaySize.x).start();
+            }).setDuration(300).translationX(back ? AndroidUtilities.displaySize.x : -AndroidUtilities.displaySize.x).start();
             newView.animate().setInterpolator(new AccelerateDecelerateInterpolator()).setListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {

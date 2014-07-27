@@ -13,9 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.telegram.messenger.TLRPC;
-import org.telegram.messenger.ContactsController;
+import org.telegram.android.ContactsController;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.MessagesController;
+import org.telegram.android.MessagesController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.Cells.ChatOrUserCell;
@@ -72,7 +72,7 @@ public class ContactsActivitySearchAdapter extends BaseFragmentAdapter {
             public void run() {
                 final ArrayList<TLRPC.TL_contact> contactsCopy = new ArrayList<TLRPC.TL_contact>();
                 contactsCopy.addAll(ContactsController.getInstance().contacts);
-                Utilities.globalQueue.postRunnable(new Runnable() {
+                Utilities.searchQueue.postRunnable(new Runnable() {
                     @Override
                     public void run() {
                         String q = query.trim().toLowerCase();
@@ -87,7 +87,7 @@ public class ContactsActivitySearchAdapter extends BaseFragmentAdapter {
                         for (TLRPC.TL_contact contact : contactsCopy) {
                             TLRPC.User user = MessagesController.getInstance().users.get(contact.user_id);
                             if (user.first_name != null && user.first_name.toLowerCase().startsWith(q) || user.last_name != null && user.last_name.toLowerCase().startsWith(q)) {
-                                if (user.id == UserConfig.clientUserId) {
+                                if (user.id == UserConfig.getClientUserId()) {
                                     continue;
                                 }
                                 resultArrayNames.add(Utilities.generateSearchName(user.first_name, user.last_name, q));

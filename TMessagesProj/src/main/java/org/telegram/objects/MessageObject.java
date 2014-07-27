@@ -16,12 +16,13 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.util.Linkify;
 
+import org.telegram.android.AndroidUtilities;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.LocaleController;
+import org.telegram.android.LocaleController;
 import org.telegram.messenger.TLObject;
 import org.telegram.messenger.TLRPC;
-import org.telegram.messenger.Emoji;
-import org.telegram.messenger.MessagesController;
+import org.telegram.android.Emoji;
+import org.telegram.android.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
@@ -68,7 +69,7 @@ public class MessageObject {
             textPaint.linkColor = 0xff316f9f;
         }
 
-        textPaint.setTextSize(Utilities.dp(MessagesController.getInstance().fontSize));
+        textPaint.setTextSize(AndroidUtilities.dp(MessagesController.getInstance().fontSize));
 
         messageOwner = message;
 
@@ -107,7 +108,7 @@ public class MessageObject {
                         if (who != null && fromUser != null) {
                             if (isFromMe()) {
                                 messageText = LocaleController.getString("ActionYouKickUser", R.string.ActionYouKickUser).replace("un2", Utilities.formatName(who.first_name, who.last_name));
-                            } else if (message.action.user_id == UserConfig.clientUserId) {
+                            } else if (message.action.user_id == UserConfig.getClientUserId()) {
                                 messageText = LocaleController.getString("ActionKickUserYou", R.string.ActionKickUserYou).replace("un1", Utilities.formatName(fromUser.first_name, fromUser.last_name));
                             } else {
                                 messageText = LocaleController.getString("ActionKickUser", R.string.ActionKickUser).replace("un2", Utilities.formatName(who.first_name, who.last_name)).replace("un1", Utilities.formatName(fromUser.first_name, fromUser.last_name));
@@ -124,7 +125,7 @@ public class MessageObject {
                     if (whoUser != null && fromUser != null) {
                         if (isFromMe()) {
                             messageText = LocaleController.getString("ActionYouAddUser", R.string.ActionYouAddUser).replace("un2", Utilities.formatName(whoUser.first_name, whoUser.last_name));
-                        } else if (message.action.user_id == UserConfig.clientUserId) {
+                        } else if (message.action.user_id == UserConfig.getClientUserId()) {
                             messageText = LocaleController.getString("ActionAddUserYou", R.string.ActionAddUserYou).replace("un1", Utilities.formatName(fromUser.first_name, fromUser.last_name));
                         } else {
                             messageText = LocaleController.getString("ActionAddUser", R.string.ActionAddUser).replace("un2", Utilities.formatName(whoUser.first_name, whoUser.last_name)).replace("un1", Utilities.formatName(fromUser.first_name, fromUser.last_name));
@@ -206,7 +207,7 @@ public class MessageObject {
                     }
                 } else if (message.action instanceof TLRPC.TL_messageActionLoginUnknownLocation) {
                     String date = String.format("%s %s %s", LocaleController.formatterYear.format(((long)message.date) * 1000), LocaleController.getString("OtherAt", R.string.OtherAt), LocaleController.formatterDay.format(((long)message.date) * 1000));
-                    messageText = LocaleController.formatString("NotificationUnrecognizedDevice", R.string.NotificationUnrecognizedDevice, UserConfig.currentUser.first_name, date, message.action.title, message.action.address);
+                    messageText = LocaleController.formatString("NotificationUnrecognizedDevice", R.string.NotificationUnrecognizedDevice, UserConfig.getCurrentUser().first_name, date, message.action.title, message.action.address);
                 } else if (message.action instanceof TLRPC.TL_messageActionUserJoined) {
                     if (fromUser != null) {
                         messageText = LocaleController.formatString("NotificationContactJoined", R.string.NotificationContactJoined, Utilities.formatName(fromUser.first_name, fromUser.last_name));
@@ -271,7 +272,7 @@ public class MessageObject {
         } else {
             messageText = message.message;
         }
-        messageText = Emoji.replaceEmoji(messageText, textPaint.getFontMetricsInt(), Utilities.dp(20));
+        messageText = Emoji.replaceEmoji(messageText, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20));
 
         if (message instanceof TLRPC.TL_message || (message instanceof TLRPC.TL_messageForwarded && (message.media == null || !(message.media instanceof TLRPC.TL_messageMediaEmpty)))) {
             if (message.media == null || message.media instanceof TLRPC.TL_messageMediaEmpty) {
@@ -397,9 +398,9 @@ public class MessageObject {
 
         int maxWidth;
         if (messageOwner.to_id.chat_id != 0) {
-            maxWidth = Math.min(Utilities.displaySize.x, Utilities.displaySize.y) - Utilities.dp(122);
+            maxWidth = Math.min(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y) - AndroidUtilities.dp(122);
         } else {
-            maxWidth = Math.min(Utilities.displaySize.x, Utilities.displaySize.y) - Utilities.dp(80);
+            maxWidth = Math.min(AndroidUtilities.displaySize.x, AndroidUtilities.displaySize.y) - AndroidUtilities.dp(80);
         }
 
         StaticLayout textLayout = null;
@@ -467,12 +468,10 @@ public class MessageObject {
                 FileLog.e("tmessages", e);
             }
 
-            int linesMaxWidth;
+            int linesMaxWidth = (int)Math.ceil(lastLine);
             int lastLineWidthWithLeft;
             int linesMaxWidthWithLeft;
             boolean hasNonRTL = false;
-
-            linesMaxWidth = (int)Math.ceil(lastLine);
 
             if (a == blocksCount - 1) {
                 lastLineWidth = linesMaxWidth;
@@ -491,6 +490,13 @@ public class MessageObject {
                     } catch (Exception e) {
                         FileLog.e("tmessages", e);
                         lineWidth = 0;
+                    }
+
+                    if (lineWidth > maxWidth + 100) {
+                        int start = block.textLayout.getLineStart(n);
+                        int end = block.textLayout.getLineEnd(n);
+                        CharSequence text = block.textLayout.getText().subSequence(start, end);
+                        continue;
                     }
 
                     try {
@@ -537,6 +543,24 @@ public class MessageObject {
     }
 
     public boolean isFromMe() {
-        return messageOwner.from_id == UserConfig.clientUserId;
+        return messageOwner.from_id == UserConfig.getClientUserId();
+    }
+
+    public boolean isUnread () {
+        return messageOwner.unread;
+    }
+
+    public long getDialogId() {
+        if (messageOwner.dialog_id != 0) {
+            return messageOwner.dialog_id;
+        } else {
+            if (messageOwner.to_id.chat_id != 0) {
+                return -messageOwner.to_id.chat_id;
+            } else if (isFromMe()) {
+                return messageOwner.to_id.user_id;
+            } else {
+                return messageOwner.from_id;
+            }
+        }
     }
 }

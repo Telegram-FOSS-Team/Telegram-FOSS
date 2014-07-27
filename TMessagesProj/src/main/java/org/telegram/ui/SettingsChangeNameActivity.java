@@ -19,16 +19,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.telegram.messenger.LocaleController;
+import org.telegram.android.AndroidUtilities;
+import org.telegram.android.LocaleController;
 import org.telegram.messenger.TLObject;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.ConnectionsManager;
-import org.telegram.messenger.MessagesController;
+import org.telegram.android.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.RPCRequest;
 import org.telegram.messenger.UserConfig;
-import org.telegram.messenger.Utilities;
 import org.telegram.ui.Views.ActionBar.BaseFragment;
 
 public class SettingsChangeNameActivity extends BaseFragment {
@@ -65,9 +65,9 @@ public class SettingsChangeNameActivity extends BaseFragment {
 
             fragmentView = inflater.inflate(R.layout.settings_change_name_layout, container, false);
 
-            TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.clientUserId);
+            TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.getClientUserId());
             if (user == null) {
-                user = UserConfig.currentUser;
+                user = UserConfig.getCurrentUser();
             }
 
             firstNameField = (EditText)fragmentView.findViewById(R.id.first_name_field);
@@ -120,18 +120,18 @@ public class SettingsChangeNameActivity extends BaseFragment {
         boolean animations = preferences.getBoolean("view_animations", true);
         if (!animations) {
             firstNameField.requestFocus();
-            Utilities.showKeyboard(firstNameField);
+            AndroidUtilities.showKeyboard(firstNameField);
         }
     }
 
     private void saveName() {
         TLRPC.TL_account_updateProfile req = new TLRPC.TL_account_updateProfile();
-        if (UserConfig.currentUser == null || lastNameField.getText() == null || firstNameField.getText() == null) {
+        if (UserConfig.getCurrentUser() == null || lastNameField.getText() == null || firstNameField.getText() == null) {
             return;
         }
-        UserConfig.currentUser.first_name = req.first_name = firstNameField.getText().toString();
-        UserConfig.currentUser.last_name = req.last_name = lastNameField.getText().toString();
-        TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.clientUserId);
+        UserConfig.getCurrentUser().first_name = req.first_name = firstNameField.getText().toString();
+        UserConfig.getCurrentUser().last_name = req.last_name = lastNameField.getText().toString();
+        TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.getClientUserId());
         if (user != null) {
             user.first_name = req.first_name;
             user.last_name = req.last_name;
@@ -143,12 +143,12 @@ public class SettingsChangeNameActivity extends BaseFragment {
             public void run(TLObject response, TLRPC.TL_error error) {
 
             }
-        }, null, true, RPCRequest.RPCRequestClassGeneric);
+        });
     }
 
     @Override
     public void onOpenAnimationEnd() {
         firstNameField.requestFocus();
-        Utilities.showKeyboard(firstNameField);
+        AndroidUtilities.showKeyboard(firstNameField);
     }
 }

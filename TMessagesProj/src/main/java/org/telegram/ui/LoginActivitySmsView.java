@@ -9,6 +9,9 @@
 package org.telegram.ui;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.AttributeSet;
@@ -18,15 +21,16 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.telegram.android.AndroidUtilities;
 import org.telegram.PhoneFormat.PhoneFormat;
-import org.telegram.messenger.LocaleController;
+import org.telegram.android.LocaleController;
 import org.telegram.messenger.TLObject;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.ConnectionsManager;
-import org.telegram.messenger.ContactsController;
+import org.telegram.android.ContactsController;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.MessagesController;
-import org.telegram.messenger.MessagesStorage;
+import org.telegram.android.MessagesController;
+import org.telegram.android.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.RPCRequest;
@@ -35,6 +39,7 @@ import org.telegram.messenger.Utilities;
 import org.telegram.ui.Views.SlideView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -45,13 +50,16 @@ public class LoginActivitySmsView extends SlideView implements NotificationCente
     private EditText codeField;
     private TextView confirmTextView;
     private TextView timeText;
+    private TextView problemText;
     private Bundle currentParams;
 
     private Timer timeTimer;
-    private final Integer timerSync = 1;
+    private static final Integer timerSync = 1;
     private volatile int time = 60000;
     private double lastCurrentTime;
     private boolean waitingForSms = false;
+    private boolean nextPressed = false;
+    private String lastError = "";
 
     public LoginActivitySmsView(Context context) {
         super(context);
@@ -73,14 +81,38 @@ public class LoginActivitySmsView extends SlideView implements NotificationCente
         codeField = (EditText)findViewById(R.id.login_sms_code_field);
         codeField.setHint(LocaleController.getString("Code", R.string.Code));
         timeText = (TextView)findViewById(R.id.login_time_text);
+        problemText = (TextView)findViewById(R.id.login_problem);
         TextView wrongNumber = (TextView) findViewById(R.id.wrong_number);
         wrongNumber.setText(LocaleController.getString("WrongNumber", R.string.WrongNumber));
+        problemText.setText(LocaleController.getString("DidNotGetTheCode", R.string.DidNotGetTheCode));
+        problemText.setVisibility(time < 1000 ? VISIBLE : GONE);
 
         wrongNumber.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 onBackPressed();
                 delegate.setPage(0, true, null, true);
+            }
+        });
+
+        problemText.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
+                    String version = String.format(Locale.US, "%s (%d)", pInfo.versionName, pInfo.versionCode);
+
+                    Intent mailer = new Intent(Intent.ACTION_SEND);
+                    mailer.setType("message/rfc822");
+                    mailer.putExtra(Intent.EXTRA_EMAIL, new String[]{"sms@telegram.org"});
+                    mailer.putExtra(Intent.EXTRA_SUBJECT, "Android registration/login issue " + version + " " + requestPhone);
+                    mailer.putExtra(Intent.EXTRA_TEXT, "Phone: " + requestPhone + "\nApp version: " + version + "\nOS version: SDK " + Build.VERSION.SDK_INT + "\nDevice Name: " + Build.MANUFACTURER + Build.MODEL + "\nLocale: " + Locale.getDefault() + "\nError: " + lastError);
+                    getContext().startActivity(Intent.createChooser(mailer, "Send email..."));
+                } catch (Exception e) {
+                    if (delegate != null) {
+                        delegate.needShowAlert(LocaleController.getString("NoMailInstalled", R.string.NoMailInstalled));
+                    }
+                }
             }
         });
 
@@ -109,7 +141,7 @@ public class LoginActivitySmsView extends SlideView implements NotificationCente
             return;
         }
         codeField.setText("");
-        Utilities.setWaitingForSms(true);
+        AndroidUtilities.setWaitingForSms(true);
         NotificationCenter.getInstance().addObserver(this, 998);
         currentParams = params;
         waitingForSms = true;
@@ -126,21 +158,21 @@ public class LoginActivitySmsView extends SlideView implements NotificationCente
         String number = PhoneFormat.getInstance().format(phone);
         confirmTextView.setText(Html.fromHtml(String.format(LocaleController.getString("SentSmsCode", R.string.SentSmsCode) + " <b>%s</b>", number)));
 
-        Utilities.showKeyboard(codeField);
+        AndroidUtilities.showKeyboard(codeField);
         codeField.requestFocus();
 
-        try {
-            synchronized(timerSync) {
-                if (timeTimer != null) {
-                    timeTimer.cancel();
-                    timeTimer = null;
-                }
-            }
-        } catch (Exception e) {
-            FileLog.e("tmessages", e);
-        }
+        destroyTimer();
         timeText.setText(String.format("%s 1:00", LocaleController.getString("CallText", R.string.CallText)));
         lastCurrentTime = System.currentTimeMillis();
+        problemText.setVisibility(time < 1000 ? VISIBLE : GONE);
+
+        createTimer();
+    }
+
+    private void createTimer() {
+        if (timeTimer != null) {
+            return;
+        }
         timeTimer = new Timer();
         timeTimer.schedule(new TimerTask() {
             @Override
@@ -157,21 +189,25 @@ public class LoginActivitySmsView extends SlideView implements NotificationCente
                             int seconds = time / 1000 - minutes * 60;
                             timeText.setText(String.format("%s %d:%02d", LocaleController.getString("CallText", R.string.CallText), minutes, seconds));
                         } else {
+                            problemText.setVisibility(VISIBLE);
                             timeText.setText(LocaleController.getString("Calling", R.string.Calling));
-                            synchronized(timerSync) {
-                                if (timeTimer != null) {
-                                    timeTimer.cancel();
-                                    timeTimer = null;
-                                }
-                            }
+                            destroyTimer();
                             TLRPC.TL_auth_sendCall req = new TLRPC.TL_auth_sendCall();
                             req.phone_number = requestPhone;
                             req.phone_code_hash = phoneHash;
                             ConnectionsManager.getInstance().performRpc(req, new RPCRequest.RPCRequestDelegate() {
                                 @Override
-                                public void run(TLObject response, TLRPC.TL_error error) {
+                                public void run(TLObject response, final TLRPC.TL_error error) {
+                                    if (error != null && error.text != null) {
+                                        Utilities.RunOnUIThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                lastError = error.text;
+                                            }
+                                        });
+                                    }
                                 }
-                            }, null, true, RPCRequest.RPCRequestClassGeneric | RPCRequest.RPCRequestClassFailOnServerErrors);
+                            }, true, RPCRequest.RPCRequestClassGeneric | RPCRequest.RPCRequestClassFailOnServerErrors | RPCRequest.RPCRequestClassWithoutLogin);
                         }
                     }
                 });
@@ -179,163 +215,97 @@ public class LoginActivitySmsView extends SlideView implements NotificationCente
         }, 0, 1000);
     }
 
+    private void destroyTimer() {
+        try {
+            synchronized(timerSync) {
+                if (timeTimer != null) {
+                    timeTimer.cancel();
+                    timeTimer = null;
+                }
+            }
+        } catch (Exception e) {
+            FileLog.e("tmessages", e);
+        }
+    }
+
     @Override
     public void onNextPressed() {
+        if (nextPressed) {
+            return;
+        }
+        nextPressed = true;
         waitingForSms = false;
-        Utilities.setWaitingForSms(false);
+        AndroidUtilities.setWaitingForSms(false);
         NotificationCenter.getInstance().removeObserver(this, 998);
         final TLRPC.TL_auth_signIn req = new TLRPC.TL_auth_signIn();
         req.phone_number = requestPhone;
         req.phone_code = codeField.getText().toString();
         req.phone_code_hash = phoneHash;
-        try {
-            synchronized(timerSync) {
-                if (timeTimer != null) {
-                    timeTimer.cancel();
-                    timeTimer = null;
-                }
-            }
-        } catch (Exception e) {
-            FileLog.e("tmessages", e);
-        }
+        destroyTimer();
         if (delegate != null) {
             delegate.needShowProgress();
         }
         ConnectionsManager.getInstance().performRpc(req, new RPCRequest.RPCRequestDelegate() {
             @Override
-            public void run(TLObject response, TLRPC.TL_error error) {
-                if (delegate != null) {
-                    delegate.needHideProgress();
-                }
-                if (error == null) {
-                    final TLRPC.TL_auth_authorization res = (TLRPC.TL_auth_authorization)response;
-                    Utilities.RunOnUIThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (delegate == null) {
-                                return;
-                            }
-                            try {
-                                synchronized(timerSync) {
-                                    if (timeTimer != null) {
-                                        timeTimer.cancel();
-                                        timeTimer = null;
-                                    }
-                                }
-                            } catch (Exception e) {
-                                FileLog.e("tmessages", e);
-                            }
+            public void run(final TLObject response, final TLRPC.TL_error error) {
+                Utilities.RunOnUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (delegate == null) {
+                            return;
+                        }
+                        delegate.needHideProgress();
+                        nextPressed = false;
+                        if (error == null) {
+                            TLRPC.TL_auth_authorization res = (TLRPC.TL_auth_authorization)response;
+                            destroyTimer();
                             UserConfig.clearConfig();
                             MessagesStorage.getInstance().cleanUp();
                             MessagesController.getInstance().cleanUp();
-                            ConnectionsManager.getInstance().cleanUp();
-                            UserConfig.currentUser = res.user;
-                            UserConfig.clientActivated = true;
-                            UserConfig.clientUserId = res.user.id;
+                            UserConfig.setCurrentUser(res.user);
                             UserConfig.saveConfig(true);
                             ArrayList<TLRPC.User> users = new ArrayList<TLRPC.User>();
-                            users.add(UserConfig.currentUser);
+                            users.add(res.user);
                             MessagesStorage.getInstance().putUsersAndChats(users, null, true, true);
                             MessagesController.getInstance().users.put(res.user.id, res.user);
                             ContactsController.getInstance().checkAppAccount();
-                            if (delegate != null) {
-                                delegate.needFinishActivity();
-                            }
+                            delegate.needFinishActivity();
                             ConnectionsManager.getInstance().initPushConnection();
-                        }
-                    });
-                } else {
-                    if (error.text.contains("PHONE_NUMBER_UNOCCUPIED") && registered == null) {
-                        Utilities.RunOnUIThread(new Runnable() {
-                            @Override
-                            public void run() {
+                        } else {
+                            lastError = error.text;
+                            if (error.text.contains("PHONE_NUMBER_UNOCCUPIED") && registered == null) {
                                 Bundle params = new Bundle();
                                 params.putString("phoneFormated", requestPhone);
                                 params.putString("phoneHash", phoneHash);
                                 params.putString("code", req.phone_code);
                                 delegate.setPage(2, true, params, false);
-                                try {
-                                    synchronized(timerSync) {
-                                        if (timeTimer != null) {
-                                            timeTimer.cancel();
-                                            timeTimer = null;
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    FileLog.e("tmessages", e);
-                                }
-                            }
-                        });
-                    } else {
-                        if (timeTimer == null) {
-                            timeTimer = new Timer();
-                            timeTimer.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    double currentTime = System.currentTimeMillis();
-                                    double diff = currentTime - lastCurrentTime;
-                                    time -= diff;
-                                    lastCurrentTime = currentTime;
-                                    Utilities.RunOnUIThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (time >= 1000) {
-                                                int minutes = time / 1000 / 60;
-                                                int seconds = time / 1000 - minutes * 60;
-                                                timeText.setText(String.format("%s %d:%02d", LocaleController.getString("CallText", R.string.CallText), minutes, seconds));
-                                            } else {
-                                                timeText.setText(LocaleController.getString("Calling", R.string.Calling));
-                                                synchronized(timerSync) {
-                                                    if (timeTimer != null) {
-                                                        timeTimer.cancel();
-                                                        timeTimer = null;
-                                                    }
-                                                }
-                                                TLRPC.TL_auth_sendCall req = new TLRPC.TL_auth_sendCall();
-                                                req.phone_number = requestPhone;
-                                                req.phone_code_hash = phoneHash;
-                                                ConnectionsManager.getInstance().performRpc(req, new RPCRequest.RPCRequestDelegate() {
-                                                    @Override
-                                                    public void run(TLObject response, TLRPC.TL_error error) {
-                                                    }
-                                                }, null, true, RPCRequest.RPCRequestClassGeneric | RPCRequest.RPCRequestClassFailOnServerErrors);
-                                            }
-                                        }
-                                    });
-                                }
-                            }, 0, 1000);
-                        }
-                        if (delegate != null) {
-                            if (error.text.contains("PHONE_NUMBER_INVALID")) {
-                                delegate.needShowAlert(LocaleController.getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
-                            } else if (error.text.contains("PHONE_CODE_EMPTY") || error.text.contains("PHONE_CODE_INVALID")) {
-                                delegate.needShowAlert(LocaleController.getString("InvalidCode", R.string.InvalidCode));
-                            } else if (error.text.contains("PHONE_CODE_EXPIRED")) {
-                                delegate.needShowAlert(LocaleController.getString("CodeExpired", R.string.CodeExpired));
+                                destroyTimer();
                             } else {
-                                delegate.needShowAlert(error.text);
+                                createTimer();
+                                if (error.text.contains("PHONE_NUMBER_INVALID")) {
+                                    delegate.needShowAlert(LocaleController.getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
+                                } else if (error.text.contains("PHONE_CODE_EMPTY") || error.text.contains("PHONE_CODE_INVALID")) {
+                                    delegate.needShowAlert(LocaleController.getString("InvalidCode", R.string.InvalidCode));
+                                } else if (error.text.contains("PHONE_CODE_EXPIRED")) {
+                                    delegate.needShowAlert(LocaleController.getString("CodeExpired", R.string.CodeExpired));
+                                } else if (error.text.startsWith("FLOOD_WAIT")) {
+                                    delegate.needShowAlert(LocaleController.getString("FloodWait", R.string.FloodWait));
+                                } else {
+                                    delegate.needShowAlert(error.text);
+                                }
                             }
                         }
                     }
-                }
+                });
             }
-        }, null, true, RPCRequest.RPCRequestClassGeneric | RPCRequest.RPCRequestClassFailOnServerErrors);
+        }, true, RPCRequest.RPCRequestClassGeneric | RPCRequest.RPCRequestClassFailOnServerErrors | RPCRequest.RPCRequestClassWithoutLogin);
     }
 
     @Override
     public void onBackPressed() {
-        try {
-            synchronized(timerSync) {
-                if (timeTimer != null) {
-                    timeTimer.cancel();
-                    timeTimer = null;
-                }
-            }
-        } catch (Exception e) {
-            FileLog.e("tmessages", e);
-        }
+        destroyTimer();
         currentParams = null;
-        Utilities.setWaitingForSms(false);
+        AndroidUtilities.setWaitingForSms(false);
         NotificationCenter.getInstance().removeObserver(this, 998);
         waitingForSms = false;
     }
@@ -343,18 +313,9 @@ public class LoginActivitySmsView extends SlideView implements NotificationCente
     @Override
     public void onDestroyActivity() {
         super.onDestroyActivity();
-        Utilities.setWaitingForSms(false);
+        AndroidUtilities.setWaitingForSms(false);
         NotificationCenter.getInstance().removeObserver(this, 998);
-        try {
-            synchronized(timerSync) {
-                if (timeTimer != null) {
-                    timeTimer.cancel();
-                    timeTimer = null;
-                }
-            }
-        } catch (Exception e) {
-            FileLog.e("tmessages", e);
-        }
+        destroyTimer();
         waitingForSms = false;
     }
 

@@ -22,11 +22,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import org.telegram.messenger.ConnectionsManager;
-import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.MessagesStorage;
+import org.telegram.android.LocaleController;
+import org.telegram.android.MessagesStorage;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.MessagesController;
+import org.telegram.android.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
@@ -176,7 +176,9 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
             button2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    if (getParentActivity() == null) {
+                        return;
+                    }
                     AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
 
                     CharSequence[] items;
@@ -206,6 +208,7 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
             });
 
             avatarImage = (BackupImageView)fragmentView.findViewById(R.id.settings_avatar_image);
+            avatarImage.setImageResource(R.drawable.group_blue);
 
             nameTextView = (EditText)fragmentView.findViewById(R.id.bubble_input_text);
             nameTextView.setHint(LocaleController.getString("EnterGroupNamePlaceholder", R.string.EnterGroupNamePlaceholder));
@@ -302,7 +305,7 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
                     }
                     Bundle args2 = new Bundle();
                     args2.putInt("chat_id", (Integer)args[0]);
-                    presentFragment(new ChatActivity(args2));
+                    presentFragment(new ChatActivity(args2), true);
                 }
             });
         }
@@ -404,11 +407,7 @@ public class GroupCreateFinalActivity extends BaseFragment implements Notificati
                 convertView.setBackgroundColor(0xffffffff);
             }
             TextView textView = (TextView)convertView.findViewById(R.id.settings_section_text);
-            if (selectedContacts.size() == 1) {
-                textView.setText(selectedContacts.size() + " " + LocaleController.getString("MEMBER", R.string.MEMBER));
-            } else {
-                textView.setText(selectedContacts.size() + " " + LocaleController.getString("MEMBERS", R.string.MEMBERS));
-            }
+            textView.setText(LocaleController.formatPluralString("Members", selectedContacts.size()).toUpperCase());
             return convertView;
         }
     }

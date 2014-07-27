@@ -20,33 +20,42 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.PowerManager;
 
-import org.telegram.messenger.ContactsController;
-import org.telegram.messenger.NotificationsService;
+import org.telegram.android.AndroidUtilities;
+import org.telegram.android.ContactsController;
+import org.telegram.android.NotificationsService;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ConnectionsManager;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.MessagesController;
-import org.telegram.messenger.NativeLoader;
-import org.telegram.messenger.ScreenReceiver;
+import org.telegram.android.LocaleController;
+import org.telegram.android.MessagesController;
+import org.telegram.android.NativeLoader;
+import org.telegram.android.ScreenReceiver;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 
-import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApplicationLoader extends Application {
-    public static long lastPauseTime;
-    public static Bitmap cachedWallpaper = null;
+    private GoogleCloudMessaging gcm;
+    private AtomicInteger msgId = new AtomicInteger();
+    private String regid;
+    public static final String EXTRA_MESSAGE = "message";
+    public static final String PROPERTY_REG_ID = "registration_id";
+    private static final String PROPERTY_APP_VERSION = "appVersion";
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    public static Drawable cachedWallpaper = null;
 
     public static volatile Context applicationContext = null;
     public static volatile Handler applicationHandler = null;
     private static volatile boolean applicationInited = false;
+
     public static volatile boolean isScreenOn = false;
+    public static volatile boolean mainInterfacePaused = true;
 
     public static void postInitApplication() {
         if (applicationInited) {
@@ -54,8 +63,6 @@ public class ApplicationLoader extends Application {
         }
 
         applicationInited = true;
-
-        NativeLoader.initNativeLibs(applicationContext);
 
         try {
             LocaleController.getInstance();
@@ -81,7 +88,7 @@ public class ApplicationLoader extends Application {
         }
 
         UserConfig.loadConfig();
-        if (UserConfig.currentUser != null) {
+        if (UserConfig.getCurrentUser() != null) {
             boolean changed = false;
             SharedPreferences preferences = applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
             int v = preferences.getInt("v", 0);
@@ -110,20 +117,22 @@ public class ApplicationLoader extends Application {
                 editor.commit();
             }
 
-            MessagesController.getInstance().users.put(UserConfig.clientUserId, UserConfig.currentUser);
-            ConnectionsManager.getInstance().applyCountryPortNumber(UserConfig.currentUser.phone);
+            MessagesController.getInstance().users.put(UserConfig.getClientUserId(), UserConfig.getCurrentUser());
+            ConnectionsManager.getInstance().applyCountryPortNumber(UserConfig.getCurrentUser().phone);
             ConnectionsManager.getInstance().initPushConnection();
         }
 
         ApplicationLoader app = (ApplicationLoader)ApplicationLoader.applicationContext;
         FileLog.e("tmessages", "app initied");
+
+        ContactsController.getInstance().checkAppAccount();
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        lastPauseTime = System.currentTimeMillis();
         applicationContext = getApplicationContext();
+        NativeLoader.initNativeLibs(ApplicationLoader.applicationContext);
 
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
@@ -140,10 +149,14 @@ public class ApplicationLoader extends Application {
             applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
 
             if (android.os.Build.VERSION.SDK_INT >= 19) {
-                Calendar cal = Calendar.getInstance();
+//                Calendar cal = Calendar.getInstance();
+//                PendingIntent pintent = PendingIntent.getService(applicationContext, 0, new Intent(applicationContext, NotificationsService.class), 0);
+//                AlarmManager alarm = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
+//                alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 30000, pintent);
+
                 PendingIntent pintent = PendingIntent.getService(applicationContext, 0, new Intent(applicationContext, NotificationsService.class), 0);
-                AlarmManager alarm = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
-                alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 30000, pintent);
+                AlarmManager alarm = (AlarmManager)applicationContext.getSystemService(Context.ALARM_SERVICE);
+                alarm.cancel(pintent);
             }
         } else {
             stopPushService();
@@ -163,18 +176,10 @@ public class ApplicationLoader extends Application {
         super.onConfigurationChanged(newConfig);
         try {
             LocaleController.getInstance().onDeviceConfigurationChange(newConfig);
-            Utilities.checkDisplaySize();
+            AndroidUtilities.checkDisplaySize();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static void resetLastPauseTime() {
-        if (lastPauseTime != 0 && System.currentTimeMillis() - lastPauseTime > 5000) {
-            ContactsController.getInstance().checkContacts();
-        }
-        lastPauseTime = 0;
-        ConnectionsManager.getInstance().applicationMovedToForeground();
     }
 
     public static int getAppVersion() {

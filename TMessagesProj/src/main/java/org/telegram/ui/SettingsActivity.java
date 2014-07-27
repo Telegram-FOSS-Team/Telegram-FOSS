@@ -28,24 +28,25 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.telegram.android.AndroidUtilities;
+import org.telegram.android.ContactsController;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.BuildVars;
-import org.telegram.messenger.LocaleController;
+import org.telegram.android.LocaleController;
 import org.telegram.messenger.SerializedData;
 import org.telegram.messenger.TLClassStore;
 import org.telegram.messenger.TLObject;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.ConnectionsManager;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.MessagesController;
-import org.telegram.messenger.MessagesStorage;
+import org.telegram.android.MessagesController;
+import org.telegram.android.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.RPCRequest;
@@ -53,6 +54,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.objects.MessageObject;
 import org.telegram.objects.PhotoObject;
+import org.telegram.ui.Adapters.BaseFragmentAdapter;
 import org.telegram.ui.Views.ActionBar.ActionBarLayer;
 import org.telegram.ui.Views.AvatarUpdater;
 import org.telegram.ui.Views.BackupImageView;
@@ -127,15 +129,15 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     @Override
                     public void run(TLObject response, TLRPC.TL_error error) {
                         if (error == null) {
-                            TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.clientUserId);
+                            TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.getClientUserId());
                             if (user == null) {
-                                user = UserConfig.currentUser;
+                                user = UserConfig.getCurrentUser();
                                 if (user == null) {
                                     return;
                                 }
                                 MessagesController.getInstance().users.put(user.id, user);
                             } else {
-                                UserConfig.currentUser = user;
+                                UserConfig.setCurrentUser(user);
                             }
                             if (user == null) {
                                 return;
@@ -167,7 +169,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                             });
                         }
                     }
-                }, null, true, RPCRequest.RPCRequestClassGeneric);
+                });
             }
         };
         NotificationCenter.getInstance().addObserver(this, MessagesController.updateInterfaces);
@@ -240,9 +242,31 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
                     if (i == textSizeRow) {
+                        if (getParentActivity() == null) {
+                            return;
+                        }
                         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                         builder.setTitle(LocaleController.getString("TextSize", R.string.TextSize));
-                        builder.setItems(new CharSequence[]{String.format("%d", 12), String.format("%d", 13), String.format("%d", 14), String.format("%d", 15), String.format("%d", 16), String.format("%d", 17), String.format("%d", 18), String.format("%d", 19), String.format("%d", 20), String.format("%d", 21), String.format("%d", 22), String.format("%d", 23), String.format("%d", 24)}, new DialogInterface.OnClickListener() {
+                        builder.setItems(new CharSequence[] {
+                                String.format("%d", 12),
+                                String.format("%d", 13),
+                                String.format("%d", 14),
+                                String.format("%d", 15),
+                                String.format("%d", 16),
+                                String.format("%d", 17),
+                                String.format("%d", 18),
+                                String.format("%d", 19),
+                                String.format("%d", 20),
+                                String.format("%d", 21),
+                                String.format("%d", 22),
+                                String.format("%d", 23),
+                                String.format("%d", 24),
+                                String.format("%d", 25),
+                                String.format("%d", 26),
+                                String.format("%d", 27),
+                                String.format("%d", 28),
+                                String.format("%d", 29),
+                                String.format("%d", 30)}, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
@@ -269,14 +293,17 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     } else if (i == notificationRow) {
                         presentFragment(new SettingsNotificationsActivity());
                     } else if (i == blockedRow) {
-                        presentFragment(new SettingsBlockedUsers());
+                        presentFragment(new SettingsBlockedUsersActivity());
                     } else if (i == backgroundRow) {
                         presentFragment(new SettingsWallpapersActivity());
                     } else if (i == askQuestionRow) {
+                        if (getParentActivity() == null) {
+                            return;
+                        }
                         final TextView message = new TextView(getParentActivity());
                         message.setText(Html.fromHtml(LocaleController.getString("AskAQuestionInfo", R.string.AskAQuestionInfo)));
                         message.setTextSize(18);
-                        message.setPadding(Utilities.dp(8), Utilities.dp(5), Utilities.dp(8), Utilities.dp(6));
+                        message.setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(5), AndroidUtilities.dp(8), AndroidUtilities.dp(6));
                         message.setMovementMethod(new LinkMovementMethodMy());
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
@@ -303,8 +330,11 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                             listView.invalidateViews();
                         }
                     } else if (i == terminateSessionsRow) {
+                        if (getParentActivity() == null) {
+                            return;
+                        }
                         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-                        builder.setMessage(LocaleController.getString("AreYouSure", R.string.AreYouSure));
+                        builder.setMessage(LocaleController.getString("AreYouSureSessions", R.string.AreYouSureSessions));
                         builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                         builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
                             @Override
@@ -312,18 +342,29 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                                 TLRPC.TL_auth_resetAuthorizations req = new TLRPC.TL_auth_resetAuthorizations();
                                 ConnectionsManager.getInstance().performRpc(req, new RPCRequest.RPCRequestDelegate() {
                                     @Override
-                                    public void run(TLObject response, TLRPC.TL_error error) {
-                                        if (error == null && response instanceof TLRPC.TL_boolTrue) {
-                                            Toast toast = Toast.makeText(getParentActivity(), R.string.TerminateAllSessions, Toast.LENGTH_SHORT);
-                                            toast.show();
-                                        } else {
-                                            Toast toast = Toast.makeText(getParentActivity(), R.string.UnknownError, Toast.LENGTH_SHORT);
-                                            toast.show();
-                                        }
+                                    public void run(final TLObject response, final TLRPC.TL_error error) {
+                                        Utilities.RunOnUIThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (getParentActivity() == null) {
+                                                    return;
+                                                }
+                                                if (error == null && response instanceof TLRPC.TL_boolTrue) {
+                                                    Toast toast = Toast.makeText(getParentActivity(), LocaleController.getString("TerminateAllSessions", R.string.TerminateAllSessions), Toast.LENGTH_SHORT);
+                                                    toast.show();
+                                                } else {
+                                                    Toast toast = Toast.makeText(getParentActivity(), LocaleController.getString("UnknownError", R.string.UnknownError), Toast.LENGTH_SHORT);
+                                                    toast.show();
+                                                }
+                                            }
+                                        });
                                         UserConfig.registeredForPush = false;
+                                        UserConfig.registeredForInternalPush = false;
+                                        UserConfig.saveConfig(false);
                                         MessagesController.getInstance().registerForPush(UserConfig.pushString);
+                                        ConnectionsManager.getInstance().initPushConnection();
                                     }
-                                }, null, true, RPCRequest.RPCRequestClassGeneric);
+                                });
                             }
                         });
                         builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
@@ -331,6 +372,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     } else if (i == languageRow) {
                         presentFragment(new LanguageSelectActivity());
                     } else if (i == switchBackendButtonRow) {
+                        if (getParentActivity() == null) {
+                            return;
+                        }
                         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                         builder.setMessage(LocaleController.getString("AreYouSure", R.string.AreYouSure));
                         builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
@@ -352,6 +396,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     } else if (i == contactsReimportRow) {
 
                     } else if (i == contactsSortRow) {
+                        if (getParentActivity() == null) {
+                            return;
+                        }
                         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                         builder.setTitle(LocaleController.getString("SortBy", R.string.SortBy));
                         builder.setItems(new CharSequence[] {
@@ -373,6 +420,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                         builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
                         showAlertDialog(builder);
                     } else if (i == photoDownloadChatRow || i == photoDownloadPrivateRow || i == audioDownloadChatRow || i == audioDownloadPrivateRow) {
+                        if (getParentActivity() == null) {
+                            return;
+                        }
                         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                         builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                         builder.setItems(new CharSequence[] {
@@ -418,7 +468,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         if (fileLocation == null) {
             return null;
         }
-        TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.clientUserId);
+        TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.getClientUserId());
         if (user != null && user.photo != null && user.photo.photo_big != null) {
             TLRPC.FileLocation photoBig = user.photo.photo_big;
             if (photoBig.local_id == fileLocation.local_id && photoBig.volume_id == fileLocation.volume_id && photoBig.dc_id == fileLocation.dc_id) {
@@ -431,10 +481,10 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                         avatarImage.getLocationInWindow(coords);
                         PhotoViewer.PlaceProviderObject object = new PhotoViewer.PlaceProviderObject();
                         object.viewX = coords[0];
-                        object.viewY = coords[1] - Utilities.statusBarHeight;
+                        object.viewY = coords[1] - AndroidUtilities.statusBarHeight;
                         object.parentView = listView;
                         object.imageReceiver = avatarImage.imageReceiver;
-                        object.user_id = UserConfig.clientUserId;
+                        object.user_id = UserConfig.getClientUserId();
                         object.thumb = object.imageReceiver.getBitmap();
                         object.size = -1;
                         return object;
@@ -480,7 +530,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                         if (datacentersBytes != null) {
                             SerializedData data = new SerializedData(datacentersBytes);
                             supportUser = (TLRPC.User)TLClassStore.Instance().TLdeserialize(data, data.readInt32());
-
+                            if (supportUser != null && supportUser.id == 333000) {
+                                supportUser = null;
+                            }
                         }
                     } catch (Exception e) {
                         FileLog.e("tmessages", e);
@@ -535,7 +587,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                         });
                     }
                 }
-            }, null, true, RPCRequest.RPCRequestClassGeneric);
+            });
         } else {
             MessagesController.getInstance().users.putIfAbsent(supportUser.id, supportUser);
             Bundle args = new Bundle();
@@ -607,7 +659,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         }
     }
 
-    private class ListAdapter extends BaseAdapter {
+    private class ListAdapter extends BaseFragmentAdapter {
         private Context mContext;
 
         public ListAdapter(Context context) {
@@ -667,13 +719,16 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     button2.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+                            if (getParentActivity() == null) {
+                                return;
+                            }
                             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
 
                             CharSequence[] items;
 
-                            TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.clientUserId);
+                            TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.getClientUserId());
                             if (user == null) {
-                                user = UserConfig.currentUser;
+                                user = UserConfig.getCurrentUser();
                             }
                             if (user == null) {
                                 return;
@@ -691,8 +746,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     if (i == 0 && full) {
-                                        TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.clientUserId);
+                                        TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.getClientUserId());
                                         if (user != null && user.photo != null && user.photo.photo_big != null) {
+                                            PhotoViewer.getInstance().setParentActivity(getParentActivity());
                                             PhotoViewer.getInstance().openPhoto(user.photo.photo_big, SettingsActivity.this);
                                         }
                                     } else if (i == 0 && !full || i == 1 && full) {
@@ -703,28 +759,28 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                                         TLRPC.TL_photos_updateProfilePhoto req = new TLRPC.TL_photos_updateProfilePhoto();
                                         req.id = new TLRPC.TL_inputPhotoEmpty();
                                         req.crop = new TLRPC.TL_inputPhotoCropAuto();
-                                        UserConfig.currentUser.photo = new TLRPC.TL_userProfilePhotoEmpty();
-                                        TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.clientUserId);
+                                        UserConfig.getCurrentUser().photo = new TLRPC.TL_userProfilePhotoEmpty();
+                                        TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.getClientUserId());
                                         if (user == null) {
-                                            user = UserConfig.currentUser;
+                                            user = UserConfig.getCurrentUser();
                                         }
                                         if (user == null) {
                                             return;
                                         }
                                         if (user != null) {
-                                            user.photo = UserConfig.currentUser.photo;
+                                            user.photo = UserConfig.getCurrentUser().photo;
                                         }
                                         NotificationCenter.getInstance().postNotificationName(MessagesController.updateInterfaces, MessagesController.UPDATE_MASK_ALL);
                                         ConnectionsManager.getInstance().performRpc(req, new RPCRequest.RPCRequestDelegate() {
                                             @Override
                                             public void run(TLObject response, TLRPC.TL_error error) {
                                                 if (error == null) {
-                                                    TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.clientUserId);
+                                                    TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.getClientUserId());
                                                     if (user == null) {
-                                                        user = UserConfig.currentUser;
+                                                        user = UserConfig.getCurrentUser();
                                                         MessagesController.getInstance().users.put(user.id, user);
                                                     } else {
-                                                        UserConfig.currentUser = user;
+                                                        UserConfig.setCurrentUser(user);
                                                     }
                                                     if (user == null) {
                                                         return;
@@ -743,7 +799,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                                                     });
                                                 }
                                             }
-                                        }, null, true, RPCRequest.RPCRequestClassGeneric);
+                                        });
                                     }
                                 }
                             });
@@ -755,11 +811,11 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 textView.setText(LocaleController.getString("Online", R.string.Online));
 
                 textView = (TextView)view.findViewById(R.id.settings_name);
-                Typeface typeface = Utilities.getTypeface("fonts/rmedium.ttf");
+                Typeface typeface = AndroidUtilities.getTypeface("fonts/rmedium.ttf");
                 textView.setTypeface(typeface);
-                TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.clientUserId);
+                TLRPC.User user = MessagesController.getInstance().users.get(UserConfig.getClientUserId());
                 if (user == null) {
-                    user = UserConfig.currentUser;
+                    user = UserConfig.getCurrentUser();
                 }
                 if (user != null) {
                     textView.setText(Utilities.formatName(user.first_name, user.last_name));
@@ -804,7 +860,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 TextView textView = (TextView)view.findViewById(R.id.settings_row_text);
                 View divider = view.findViewById(R.id.settings_row_divider);
                 if (i == numberRow) {
-                    TLRPC.User user = UserConfig.currentUser;
+                    TLRPC.User user = UserConfig.getCurrentUser();
                     if (user != null && user.phone != null && user.phone.length() != 0) {
                         textView.setText(PhoneFormat.getInstance().format("+" + user.phone));
                     } else {
@@ -890,18 +946,25 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     textView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+                            if (getParentActivity() == null) {
+                                return;
+                            }
                             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-                            builder.setMessage(LocaleController.getString("AreYouSure", R.string.AreYouSure));
+                            builder.setMessage(LocaleController.getString("AreYouSureLogout", R.string.AreYouSureLogout));
                             builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                             builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
+                                    SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Activity.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = preferences.edit();
+                                    editor.clear().commit();
                                     NotificationCenter.getInstance().postNotificationName(1234);
                                     MessagesController.getInstance().unregistedPush();
+                                    MessagesController.getInstance().logOut();
+                                    UserConfig.clearConfig();
                                     MessagesStorage.getInstance().cleanUp();
                                     MessagesController.getInstance().cleanUp();
-                                    ConnectionsManager.getInstance().cleanUp();
-                                    UserConfig.clearConfig();
+                                    ContactsController.getInstance().deleteAllAppAccounts();
                                 }
                             });
                             builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
