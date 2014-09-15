@@ -92,7 +92,7 @@ import java.util.concurrent.Semaphore;
 
 public class ChatActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, MessagesActivity.MessagesActivityDelegate,
         DocumentSelectActivity.DocumentSelectActivityDelegate, PhotoViewer.PhotoViewerProvider, PhotoPickerActivity.PhotoPickerActivityDelegate,
-        VideoEditorActivity.VideoEditorActivityDelegate, LocationActivity.LocationActivityDelegate {
+        VideoEditorActivity.VideoEditorActivityDelegate {
 
     private TLRPC.Chat currentChat;
     private TLRPC.User currentUser;
@@ -2448,17 +2448,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     @Override
     public void didSelectPhotos(ArrayList<String> photos) {
         processSendingPhotos(photos, null);
-    }
-
-    @Override
-    public void didSelectLocation(double latitude, double longitude) {
-        SendMessagesHelper.getInstance().sendMessage(latitude, longitude, dialog_id);
-        if (chatListView != null) {
-            chatListView.setSelectionFromTop(messages.size() - 1, -100000 - chatListView.getPaddingTop());
-        }
-        if (paused) {
-            scrollToTopOnResume = true;
-        }
     }
 
     @Override
