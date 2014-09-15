@@ -170,13 +170,13 @@ LOCAL_SRC_FILES     += \
 ./sqlite/sqlite3.c
 
 LOCAL_C_INCLUDES    := \
-./opus/include \
-./opus/silk \
-./opus/silk/fixed \
-./opus/celt \
-./opus/ \
-./opus/opusfile \
-./libyuv/include
+$(LOCAL_PATH)/opus/include \
+$(LOCAL_PATH)/opus/silk \
+$(LOCAL_PATH)/opus/silk/fixed \
+$(LOCAL_PATH)/opus/celt \
+$(LOCAL_PATH)/opus/ \
+$(LOCAL_PATH)/opus/opusfile \
+$(LOCAL_PATH)/libyuv/include
 
 LOCAL_SRC_FILES     += \
 ./libjpeg/jcapimin.c \
