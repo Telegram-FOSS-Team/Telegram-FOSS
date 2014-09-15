@@ -30,6 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.telegram.android.AndroidUtilities;
+import org.telegram.android.ImageLoader;
 import org.telegram.android.LocaleController;
 import org.telegram.messenger.TLObject;
 import org.telegram.messenger.TLRPC;
@@ -37,11 +38,11 @@ import org.telegram.messenger.ConnectionsManager;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.android.MessagesStorage;
-import org.telegram.messenger.NotificationCenter;
+import org.telegram.android.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.RPCRequest;
 import org.telegram.messenger.Utilities;
-import org.telegram.objects.PhotoObject;
+import org.telegram.android.PhotoObject;
 import org.telegram.ui.Adapters.BaseFragmentAdapter;
 import org.telegram.ui.Views.BackupImageView;
 import org.telegram.ui.Views.ActionBar.BaseFragment;
@@ -71,10 +72,10 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
     public boolean onFragmentCreate() {
         super.onFragmentCreate();
 
-        NotificationCenter.getInstance().addObserver(this, FileLoader.FileDidFailedLoad);
-        NotificationCenter.getInstance().addObserver(this, FileLoader.FileDidLoaded);
-        NotificationCenter.getInstance().addObserver(this, FileLoader.FileLoadProgressChanged);
-        NotificationCenter.getInstance().addObserver(this, MessagesStorage.wallpapersDidLoaded);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.FileDidFailedLoad);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.FileDidLoaded);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.FileLoadProgressChanged);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.wallpapersDidLoaded);
 
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
         selectedBackground = preferences.getInt("selectedBackground", 1000001);
@@ -88,10 +89,10 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
-        NotificationCenter.getInstance().removeObserver(this, FileLoader.FileDidFailedLoad);
-        NotificationCenter.getInstance().removeObserver(this, FileLoader.FileDidLoaded);
-        NotificationCenter.getInstance().removeObserver(this, FileLoader.FileLoadProgressChanged);
-        NotificationCenter.getInstance().removeObserver(this, MessagesStorage.wallpapersDidLoaded);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.FileDidFailedLoad);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.FileDidLoaded);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.FileLoadProgressChanged);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.wallpapersDidLoaded);
     }
 
     @Override
@@ -176,18 +177,22 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
                         builder.setItems(items, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if (i == 0) {
-                                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                    File image = Utilities.generatePicturePath();
-                                    if (image != null) {
-                                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(image));
-                                        currentPicturePath = image.getAbsolutePath();
+                                try {
+                                    if (i == 0) {
+                                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                        File image = Utilities.generatePicturePath();
+                                        if (image != null) {
+                                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(image));
+                                            currentPicturePath = image.getAbsolutePath();
+                                        }
+                                        getParentActivity().startActivityForResult(takePictureIntent, 10);
+                                    } else if (i == 1) {
+                                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                                        photoPickerIntent.setType("image/*");
+                                        getParentActivity().startActivityForResult(photoPickerIntent, 11);
                                     }
-                                    getParentActivity().startActivityForResult(takePictureIntent, 10);
-                                } else if (i == 1) {
-                                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-                                    photoPickerIntent.setType("image/*");
-                                    getParentActivity().startActivityForResult(photoPickerIntent, 11);
+                                } catch (Exception e) {
+                                    FileLog.e("tmessages", e);
                                 }
                             }
                         });
@@ -217,7 +222,7 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
             if (requestCode == 10) {
                 Utilities.addMediaToGallery(currentPicturePath);
                 try {
-                    Bitmap bitmap = FileLoader.loadBitmap(currentPicturePath, null, AndroidUtilities.dp(320), AndroidUtilities.dp(480));
+                    Bitmap bitmap = ImageLoader.loadBitmap(currentPicturePath, null, AndroidUtilities.dp(320), AndroidUtilities.dp(480));
                     File toFile = new File(ApplicationLoader.applicationContext.getFilesDir(), "wallpaper-temp.jpg");
                     FileOutputStream stream = new FileOutputStream(toFile);
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 87, stream);
@@ -233,7 +238,7 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
                     return;
                 }
                 try {
-                    Bitmap bitmap = FileLoader.loadBitmap(null, data.getData(), AndroidUtilities.dp(320), AndroidUtilities.dp(480));
+                    Bitmap bitmap = ImageLoader.loadBitmap(null, data.getData(), AndroidUtilities.dp(320), AndroidUtilities.dp(480));
                     File toFile = new File(ApplicationLoader.applicationContext.getFilesDir(), "wallpaper-temp.jpg");
                     FileOutputStream stream = new FileOutputStream(toFile);
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 87, stream);
@@ -280,11 +285,11 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
                 progressBar.setVisibility(View.VISIBLE);
                 loadingSize = size;
                 selectedColor = 0;
-                FileLoader.getInstance().loadFile(null, size, null, null);
+                FileLoader.getInstance().loadFile(size);
                 backgroundImage.setBackgroundColor(0);
             } else {
                 if (loadingFile != null) {
-                    FileLoader.getInstance().cancelLoadFile(null, loadingSize, null, null);
+                    FileLoader.getInstance().cancelLoadFile(loadingSize);
                 }
                 loadingFileObject = null;
                 loadingFile = null;
@@ -297,7 +302,7 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
             }
         } else {
             if (loadingFile != null) {
-                FileLoader.getInstance().cancelLoadFile(null, loadingSize, null, null);
+                FileLoader.getInstance().cancelLoadFile(loadingSize);
             }
             if (selectedBackground == 1000001) {
                 backgroundImage.setImageResource(R.drawable.background_hd);
@@ -335,7 +340,7 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
     @SuppressWarnings("unchecked")
     @Override
     public void didReceivedNotification(int id, final Object... args) {
-        if (id == FileLoader.FileDidFailedLoad) {
+        if (id == NotificationCenter.FileDidFailedLoad) {
             String location = (String)args[0];
             if (loadingFile != null && loadingFile.equals(location)) {
                 loadingFileObject = null;
@@ -344,7 +349,7 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
                 progressBar.setVisibility(View.GONE);
                 doneButton.setEnabled(false);
             }
-        } else if (id == FileLoader.FileDidLoaded) {
+        } else if (id == NotificationCenter.FileDidLoaded) {
             String location = (String)args[0];
             if (loadingFile != null && loadingFile.equals(location)) {
                 backgroundImage.setImageURI(Uri.fromFile(loadingFileObject));
@@ -355,14 +360,14 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
                 loadingFile = null;
                 loadingSize = null;
             }
-        } else if (id == FileLoader.FileLoadProgressChanged) {
+        } else if (id == NotificationCenter.FileLoadProgressChanged) {
             String location = (String)args[0];
             if (loadingFile != null && loadingFile.equals(location)) {
                 Float progress = (Float)args[1];
                 progressBar.setProgress((int)(progress * 100));
             }
-        } else if (id == MessagesStorage.wallpapersDidLoaded) {
-            Utilities.RunOnUIThread(new Runnable() {
+        } else if (id == NotificationCenter.wallpapersDidLoaded) {
+            AndroidUtilities.RunOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     wallPapers = (ArrayList<TLRPC.WallPaper>)args[0];
@@ -396,7 +401,7 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
                 if (error != null) {
                     return;
                 }
-                Utilities.RunOnUIThread(new Runnable() {
+                AndroidUtilities.RunOnUIThread(new Runnable() {
                     @Override
                     public void run() {
                         wallPapers.clear();
@@ -520,7 +525,6 @@ public class SettingsWallpapersActivity extends BaseFragment implements Notifica
                         selection.setVisibility(View.INVISIBLE);
                     }
                 }
-
             } else if (type == 1) {
                 if (view == null) {
                     LayoutInflater li = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 
 import org.telegram.android.AndroidUtilities;
 import org.telegram.messenger.FileLog;
-import org.telegram.objects.MessageObject;
+import org.telegram.android.MessageObject;
 
 public class ChatMessageCell extends ChatBaseCell {
 
@@ -29,7 +29,7 @@ public class ChatMessageCell extends ChatBaseCell {
     private int totalVisibleBlocksCount = 0;
 
     public ChatMessageCell(Context context) {
-        super(context, false);
+        super(context);
         drawForwardedName = true;
     }
 

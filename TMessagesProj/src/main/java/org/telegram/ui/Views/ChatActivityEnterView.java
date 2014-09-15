@@ -37,9 +37,10 @@ import org.telegram.android.Emoji;
 import org.telegram.android.LocaleController;
 import org.telegram.android.MediaController;
 import org.telegram.android.MessagesController;
+import org.telegram.android.SendMessagesHelper;
 import org.telegram.messenger.ConnectionsManager;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.NotificationCenter;
+import org.telegram.android.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.TLRPC;
 import org.telegram.ui.ApplicationLoader;
@@ -79,25 +80,25 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
     private ChatActivityEnterViewDelegate delegate;
 
     public ChatActivityEnterView() {
-        NotificationCenter.getInstance().addObserver(this, MediaController.recordStarted);
-        NotificationCenter.getInstance().addObserver(this, MediaController.recordStartError);
-        NotificationCenter.getInstance().addObserver(this, MediaController.recordStopped);
-        NotificationCenter.getInstance().addObserver(this, MediaController.recordProgressChanged);
-        NotificationCenter.getInstance().addObserver(this, MessagesController.closeChats);
-        NotificationCenter.getInstance().addObserver(this, MediaController.audioDidSent);
-        NotificationCenter.getInstance().addObserver(this, 999);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStarted);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStartError);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordStopped);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.recordProgressChanged);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.closeChats);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioDidSent);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.emojiDidLoaded);
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
         sendByEnter = preferences.getBoolean("send_by_enter", false);
     }
 
     public void onDestroy() {
-        NotificationCenter.getInstance().removeObserver(this, MediaController.recordStarted);
-        NotificationCenter.getInstance().removeObserver(this, MediaController.recordStartError);
-        NotificationCenter.getInstance().removeObserver(this, MediaController.recordStopped);
-        NotificationCenter.getInstance().removeObserver(this, MediaController.recordProgressChanged);
-        NotificationCenter.getInstance().removeObserver(this, MessagesController.closeChats);
-        NotificationCenter.getInstance().removeObserver(this, MediaController.audioDidSent);
-        NotificationCenter.getInstance().removeObserver(this, 999);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStarted);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStartError);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordStopped);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recordProgressChanged);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.closeChats);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioDidSent);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.emojiDidLoaded);
         if (mWakeLock != null) {
             try {
                 mWakeLock.release();
@@ -108,7 +109,6 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
         }
         if (sizeNotifierRelativeLayout != null) {
             sizeNotifierRelativeLayout.delegate = null;
-            sizeNotifierRelativeLayout = null;
         }
     }
 
@@ -266,7 +266,7 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
                     int currentTime = ConnectionsManager.getInstance().getCurrentTime();
                     TLRPC.User currentUser = null;
                     if ((int)dialog_id > 0) {
-                        currentUser = MessagesController.getInstance().users.get((int)dialog_id);
+                        currentUser = MessagesController.getInstance().getUser((int)dialog_id);
                     }
                     if (currentUser != null && currentUser.status != null && currentUser.status.expires < currentTime) {
                         return;
@@ -316,7 +316,7 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
             int count = (int)Math.ceil(text.length() / 2048.0f);
             for (int a = 0; a < count; a++) {
                 String mess = text.substring(a * 2048, Math.min((a + 1) * 2048, text.length()));
-                MessagesController.getInstance().sendMessage(mess, dialog_id);
+                SendMessagesHelper.getInstance().sendMessage(mess, dialog_id);
             }
             return true;
         }
@@ -450,12 +450,16 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
                 currentHeight = keyboardHeight;
             }
             emojiPopup.setHeight(View.MeasureSpec.makeMeasureSpec(currentHeight, View.MeasureSpec.EXACTLY));
-            emojiPopup.setWidth(View.MeasureSpec.makeMeasureSpec(sizeNotifierRelativeLayout.getWidth(), View.MeasureSpec.EXACTLY));
+            if (sizeNotifierRelativeLayout != null) {
+                emojiPopup.setWidth(View.MeasureSpec.makeMeasureSpec(sizeNotifierRelativeLayout.getWidth(), View.MeasureSpec.EXACTLY));
+            }
 
             emojiPopup.showAtLocation(parentActivity.getWindow().getDecorView(), 83, 0, 0);
             if (!keyboardVisible) {
-                sizeNotifierRelativeLayout.setPadding(0, 0, 0, currentHeight);
-                emojiButton.setImageResource(R.drawable.ic_msg_panel_hide);
+                if (sizeNotifierRelativeLayout != null) {
+                    sizeNotifierRelativeLayout.setPadding(0, 0, 0, currentHeight);
+                    emojiButton.setImageResource(R.drawable.ic_msg_panel_hide);
+                }
                 return;
             }
             emojiButton.setImageResource(R.drawable.ic_msg_panel_kb);
@@ -612,11 +616,11 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
 
     @Override
     public void didReceivedNotification(int id, Object... args) {
-        if (id == 999) {
+        if (id == NotificationCenter.emojiDidLoaded) {
             if (emojiView != null) {
                 emojiView.invalidateViews();
             }
-        } else if (id == MediaController.recordProgressChanged) {
+        } else if (id == NotificationCenter.recordProgressChanged) {
             Long time = (Long)args[0] / 1000;
             String str = String.format("%02d:%02d", time / 60, time % 60);
             if (lastTimeString == null || !lastTimeString.equals(str)) {
@@ -624,21 +628,21 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
                     recordTimeText.setText(str);
                 }
             }
-        } else if (id == MessagesController.closeChats) {
+        } else if (id == NotificationCenter.closeChats) {
             if (messsageEditText != null && messsageEditText.isFocused()) {
                 AndroidUtilities.hideKeyboard(messsageEditText);
             }
-        } else if (id == MediaController.recordStartError || id == MediaController.recordStopped) {
+        } else if (id == NotificationCenter.recordStartError || id == NotificationCenter.recordStopped) {
             if (recordingAudio) {
                 recordingAudio = false;
                 updateAudioRecordIntefrace();
             }
-        } else if (id == MediaController.recordStarted) {
+        } else if (id == NotificationCenter.recordStarted) {
             if (!recordingAudio) {
                 recordingAudio = true;
                 updateAudioRecordIntefrace();
             }
-        } else if (id == MediaController.audioDidSent) {
+        } else if (id == NotificationCenter.audioDidSent) {
             if (delegate != null) {
                 delegate.onMessageSend();
             }

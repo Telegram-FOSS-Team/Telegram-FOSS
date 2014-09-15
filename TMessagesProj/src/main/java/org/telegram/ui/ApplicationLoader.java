@@ -26,7 +26,9 @@ import android.os.PowerManager;
 
 import org.telegram.android.AndroidUtilities;
 import org.telegram.android.ContactsController;
+import org.telegram.android.MediaController;
 import org.telegram.android.NotificationsService;
+import org.telegram.android.SendMessagesHelper;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ConnectionsManager;
 import org.telegram.messenger.FileLog;
@@ -87,15 +89,18 @@ public class ApplicationLoader extends Application {
 
         UserConfig.loadConfig();
         if (UserConfig.getCurrentUser() != null) {
-            MessagesController.getInstance().users.put(UserConfig.getClientUserId(), UserConfig.getCurrentUser());
+            MessagesController.getInstance().putUser(UserConfig.getCurrentUser(), true);
             ConnectionsManager.getInstance().applyCountryPortNumber(UserConfig.getCurrentUser().phone);
             ConnectionsManager.getInstance().initPushConnection();
+            MessagesController.getInstance().getBlockedUsers(true);
+            SendMessagesHelper.getInstance().checkUnsentMessages();
         }
 
         ApplicationLoader app = (ApplicationLoader)ApplicationLoader.applicationContext;
         FileLog.e("tmessages", "app initied");
 
         ContactsController.getInstance().checkAppAccount();
+        MediaController.getInstance();
     }
 
     @Override

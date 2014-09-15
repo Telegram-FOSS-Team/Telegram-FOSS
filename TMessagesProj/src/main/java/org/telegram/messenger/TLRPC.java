@@ -1988,17 +1988,6 @@ public class TLRPC {
         }
     }
 
-    public static class User extends TLObject {
-        public int id;
-        public String first_name;
-        public String last_name;
-        public long access_hash;
-        public String phone;
-        public UserProfilePhoto photo;
-        public UserStatus status;
-        public boolean inactive;
-    }
-
     public static class TL_userContact extends User {
         public static int constructor = 0xf2fb8319;
 
@@ -4156,7 +4145,10 @@ public class TLRPC {
             stream.readInt32();
             int count = stream.readInt32();
             for (int a = 0; a < count; a++) {
-                sizes.add((PhotoSize)TLClassStore.Instance().TLdeserialize(stream, stream.readInt32()));
+                PhotoSize size = (PhotoSize)TLClassStore.Instance().TLdeserialize(stream, stream.readInt32());
+                if (size != null) {
+                    sizes.add(size);
+                }
             }
         }
 
@@ -7443,6 +7435,32 @@ public class TLRPC {
         }
     }
 
+    public static class TL_photos_deletePhotos extends TLObject {
+        public static int constructor = 0x87cf7f2f;
+
+        public ArrayList<InputPhoto> id = new ArrayList<InputPhoto>();
+
+        public Class responseClass () {
+            return Vector.class;
+        }
+
+        public void parseVector(Vector vector, AbsSerializedData data) {
+            int size = data.readInt32();
+            for (int a = 0; a < size; a++) {
+                vector.objects.add(data.readInt64());
+            }
+        }
+
+        public void serializeToStream(AbsSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(0x1cb5c415);
+            stream.writeInt32(id.size());
+            for (InputPhoto inputPhoto : id) {
+                inputPhoto.serializeToStream(stream);
+            }
+        }
+    }
+
     public static class TL_photos_uploadProfilePhoto extends TLObject {
         public static int constructor = 0xd50f9c88;
 
@@ -8697,6 +8715,17 @@ public class TLRPC {
         public ArrayList<Object> objects = new ArrayList<Object>();
     }
 
+    public static class User extends TLObject {
+        public int id;
+        public String first_name;
+        public String last_name;
+        public long access_hash;
+        public String phone;
+        public UserProfilePhoto photo;
+        public UserStatus status;
+        public boolean inactive;
+    }
+
     public static class TL_userEmpty extends User {
         public static int constructor = 0x200250ba;
 
@@ -8941,6 +8970,7 @@ public class TLRPC {
         public String path;
         public byte[] key;
         public byte[] iv;
+        public boolean estimatedSize;
     }
 
     public static class Document extends TLObject {

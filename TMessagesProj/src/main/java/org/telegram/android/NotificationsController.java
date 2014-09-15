@@ -8,50 +8,50 @@
 
 package org.telegram.android;
 
-import android.app.NotificationManager;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.telegram.messenger.ConnectionsManager;
-import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
-import org.telegram.objects.MessageObject;
 import org.telegram.ui.ApplicationLoader;
 import org.telegram.ui.LaunchActivity;
 import org.telegram.ui.PopupNotificationActivity;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
 public class NotificationsController {
 
+    public static final String EXTRA_VOICE_REPLY = "extra_voice_reply";
+
     private ArrayList<MessageObject> pushMessages = new ArrayList<MessageObject>();
     private HashMap<Integer, MessageObject> pushMessagesDict = new HashMap<Integer, MessageObject>();
-    private NotificationManager notificationManager = null;
+    private NotificationManagerCompat notificationManager = null;
     private HashMap<Long, Integer> pushDialogs = new HashMap<Long, Integer>();
     public ArrayList<MessageObject> popupMessages = new ArrayList<MessageObject>();
     private long openned_dialog_id = 0;
     private int total_unread_count = 0;
     private boolean notifyCheck = false;
-
-    public static final int pushMessagesUpdated = 27;
 
     private static volatile NotificationsController Instance = null;
     public static NotificationsController getInstance() {
@@ -68,7 +68,7 @@ public class NotificationsController {
     }
 
     public NotificationsController() {
-        notificationManager = (NotificationManager)ApplicationLoader.applicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager = NotificationManagerCompat.from(ApplicationLoader.applicationContext);
     }
 
     public void cleanup() {
@@ -79,6 +79,10 @@ public class NotificationsController {
         pushDialogs.clear();
         popupMessages.clear();
         notifyCheck = false;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
     }
 
     public void setOpennedDialogId(long dialog_id) {
@@ -103,13 +107,13 @@ public class NotificationsController {
             }
         }
 
-        TLRPC.User user = MessagesController.getInstance().users.get(user_id);
+        TLRPC.User user = MessagesController.getInstance().getUser(user_id);
         if (user == null) {
             return null;
         }
         TLRPC.Chat chat = null;
         if (chat_id != 0) {
-            chat = MessagesController.getInstance().chats.get(chat_id);
+            chat = MessagesController.getInstance().getChat(chat_id);
             if (chat == null) {
                 return null;
             }
@@ -161,7 +165,7 @@ public class NotificationsController {
                             if (messageObject.messageOwner.action.user_id == UserConfig.getClientUserId()) {
                                 msg = LocaleController.formatString("NotificationInvitedToGroup", R.string.NotificationInvitedToGroup, Utilities.formatName(user.first_name, user.last_name), chat.title);
                             } else {
-                                TLRPC.User u2 = MessagesController.getInstance().users.get(messageObject.messageOwner.action.user_id);
+                                TLRPC.User u2 = MessagesController.getInstance().getUser(messageObject.messageOwner.action.user_id);
                                 if (u2 == null) {
                                     return null;
                                 }
@@ -177,7 +181,7 @@ public class NotificationsController {
                             } else if (messageObject.messageOwner.action.user_id == user.id) {
                                 msg = LocaleController.formatString("NotificationGroupLeftMember", R.string.NotificationGroupLeftMember, Utilities.formatName(user.first_name, user.last_name), chat.title);
                             } else {
-                                TLRPC.User u2 = MessagesController.getInstance().users.get(messageObject.messageOwner.action.user_id);
+                                TLRPC.User u2 = MessagesController.getInstance().getUser(messageObject.messageOwner.action.user_id);
                                 if (u2 == null) {
                                     return null;
                                 }
@@ -217,6 +221,22 @@ public class NotificationsController {
         return msg;
     }
 
+    private void scheduleNotificationRepeat() {
+        PendingIntent pintent = PendingIntent.getService(ApplicationLoader.applicationContext, 0, new Intent(ApplicationLoader.applicationContext, NotificationRepeat.class), 0);
+        AlarmManager alarm = (AlarmManager) ApplicationLoader.applicationContext.getSystemService(Context.ALARM_SERVICE);
+        alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60 * 60 * 1000, pintent);
+    }
+
+    protected void repeatNotificationMaybe() {
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        if (hour >= 11 && hour <= 22) {
+            notificationManager.cancel(1);
+            showOrUpdateNotification(true);
+        } else {
+            scheduleNotificationRepeat();
+        }
+    }
+
     private void showOrUpdateNotification(boolean notifyAboutLast) {
         if (!UserConfig.isClientActivated() || pushMessages.isEmpty()) {
             dismissNotification();
@@ -236,15 +256,15 @@ public class NotificationsController {
                 user_id = lastMessageObject.messageOwner.from_id;
             }
 
-            TLRPC.User user = MessagesController.getInstance().users.get(user_id);
+            TLRPC.User user = MessagesController.getInstance().getUser(user_id);
             TLRPC.Chat chat = null;
             if (chat_id != 0) {
-                chat = MessagesController.getInstance().chats.get(chat_id);
+                chat = MessagesController.getInstance().getChat(chat_id);
             }
             TLRPC.FileLocation photoPath = null;
 
             boolean notifyDisabled = false;
-            boolean needVibrate = false;
+            int needVibrate = 0;
             String choosenSoundPath = null;
             int ledColor = 0xff00ff00;
             boolean inAppSounds = false;
@@ -265,7 +285,6 @@ public class NotificationsController {
                 inAppPreview = preferences.getBoolean("EnableInAppPreview", true);
                 vibrate_override = preferences.getInt("vibrate_" + dialog_id, 0);
 
-
                 choosenSoundPath = preferences.getString("sound_path_" + dialog_id, null);
                 if (chat_id != 0) {
                     if (choosenSoundPath != null && choosenSoundPath.equals(defaultPath)) {
@@ -273,7 +292,7 @@ public class NotificationsController {
                     } else if (choosenSoundPath == null) {
                         choosenSoundPath = preferences.getString("GroupSoundPath", defaultPath);
                     }
-                    needVibrate = preferences.getBoolean("EnableVibrateGroup", true);
+                    needVibrate = preferences.getInt("vibrate_group", 0);
                     ledColor = preferences.getInt("GroupLed", 0xff00ff00);
                 } else if (user_id != 0) {
                     if (choosenSoundPath != null && choosenSoundPath.equals(defaultPath)) {
@@ -281,24 +300,22 @@ public class NotificationsController {
                     } else if (choosenSoundPath == null) {
                         choosenSoundPath = preferences.getString("GlobalSoundPath", defaultPath);
                     }
-                    needVibrate = preferences.getBoolean("EnableVibrateAll", true);
+                    needVibrate = preferences.getInt("vibrate_messages", 0);
                     ledColor = preferences.getInt("MessagesLed", 0xff00ff00);
                 }
                 if (preferences.contains("color_" + dialog_id)) {
                     ledColor = preferences.getInt("color_" + dialog_id, 0);
                 }
 
-                if (!needVibrate && vibrate_override == 1) {
-                    needVibrate = true;
-                } else if (needVibrate && vibrate_override == 2) {
-                    needVibrate = false;
+                if (needVibrate == 2 && (vibrate_override == 1 || vibrate_override == 3 || vibrate_override == 5) || needVibrate != 2 && vibrate_override == 2 || vibrate_override != 0) {
+                    needVibrate = vibrate_override;
                 }
                 if (!ApplicationLoader.mainInterfacePaused) {
                     if (!inAppSounds) {
                         choosenSoundPath = null;
                     }
                     if (!inAppVibrate) {
-                        needVibrate = false;
+                        needVibrate = 2;
                     }
                 }
             }
@@ -356,6 +373,7 @@ public class NotificationsController {
                     .setContentTitle(name)
                     .setSmallIcon(R.drawable.notification)
                     .setAutoCancel(true)
+                    .setNumber(total_unread_count)
                     .setContentIntent(contentIntent);
 
             String lastMessage = null;
@@ -402,9 +420,9 @@ public class NotificationsController {
             }
 
             if (photoPath != null) {
-                Bitmap img = FileLoader.getInstance().getImageFromMemory(photoPath, null, null, "50_50");
+                BitmapDrawable img = ImageLoader.getInstance().getImageFromMemory(photoPath, null, "50_50", null);
                 if (img != null) {
-                    mBuilder.setLargeIcon(img);
+                    mBuilder.setLargeIcon(img.getBitmap());
                 }
             }
 
@@ -414,6 +432,11 @@ public class NotificationsController {
                 }
                 if (choosenSoundPath != null && !choosenSoundPath.equals("NoSound")) {
                     if (choosenSoundPath.equals(defaultPath)) {
+                        /*MediaPlayer mediaPlayer = new MediaPlayer();
+                        mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                        mediaPlayer.setDataSource(ApplicationLoader.applicationContext, Settings.System.DEFAULT_NOTIFICATION_URI);
+                        mediaPlayer.prepare();
+                        mediaPlayer.start();*/
                         mBuilder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI, AudioManager.STREAM_NOTIFICATION);
                     } else {
                         mBuilder.setSound(Uri.parse(choosenSoundPath), AudioManager.STREAM_NOTIFICATION);
@@ -422,19 +445,26 @@ public class NotificationsController {
                 if (ledColor != 0) {
                     mBuilder.setLights(ledColor, 1000, 1000);
                 }
-                if (needVibrate) {
-                    mBuilder.setVibrate(new long[]{0, 100, 0, 100});
-                } else {
+                if (needVibrate == 2) {
                     mBuilder.setVibrate(new long[]{0, 0});
+                } else if (needVibrate == 1) {
+                    mBuilder.setVibrate(new long[]{0, 100, 0, 100});
+                } else if (needVibrate == 0 || needVibrate == 4) {
+                    mBuilder.setDefaults(NotificationCompat.DEFAULT_VIBRATE);
+                } else if (needVibrate == 3) {
+                    mBuilder.setVibrate(new long[]{0, 1000});
                 }
             } else {
                 mBuilder.setVibrate(new long[]{0, 0});
             }
 
+            //RemoteInput remoteInput = new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(LocaleController.getString("Reply", R.string.Reply)).build();
+
             notificationManager.notify(1, mBuilder.build());
             if (preferences.getBoolean("EnablePebbleNotifications", false)) {
                 sendAlertToPebble(lastMessage);
             }
+            scheduleNotificationRepeat();
         } catch (Exception e) {
             FileLog.e("tmessages", e);
         }
@@ -445,7 +475,7 @@ public class NotificationsController {
             notificationManager.cancel(1);
             pushMessages.clear();
             pushMessagesDict.clear();
-            NotificationCenter.getInstance().postNotificationName(pushMessagesUpdated);
+            NotificationCenter.getInstance().postNotificationName(NotificationCenter.pushMessagesUpdated);
         } catch (Exception e) {
             FileLog.e("tmessages", e);
         }
@@ -471,7 +501,7 @@ public class NotificationsController {
         }
     }
 
-    public void processReadMessages(ArrayList<Integer> readMessages, long dialog_id, int max_date, int max_id) {
+    public void processReadMessages(ArrayList<Integer> readMessages, long dialog_id, int max_date, int max_id, boolean isPopup) {
         int oldCount = popupMessages.size();
         int oldCount2 = pushMessages.size();
         if (readMessages != null) {
@@ -494,8 +524,14 @@ public class NotificationsController {
                             remove = true;
                         }
                     } else {
-                        if (messageObject.messageOwner.id <= max_id || max_id < 0) {
-                            remove = true;
+                        if (!isPopup) {
+                            if (messageObject.messageOwner.id <= max_id || max_id < 0) {
+                                remove = true;
+                            }
+                        } else {
+                            if (messageObject.messageOwner.id == max_id || max_id < 0) {
+                                remove = true;
+                            }
                         }
                     }
                     if (remove) {
@@ -508,7 +544,7 @@ public class NotificationsController {
             }
         }
         if (oldCount != popupMessages.size()) {
-            NotificationCenter.getInstance().postNotificationName(pushMessagesUpdated);
+            NotificationCenter.getInstance().postNotificationName(NotificationCenter.pushMessagesUpdated);
         }
     }
 
@@ -545,8 +581,8 @@ public class NotificationsController {
                 if (popup != 0) {
                     popupMessages.add(0, messageObject);
                 }
-                pushMessagesDict.put(messageObject.messageOwner.id, messageObject);
                 pushMessages.add(0, messageObject);
+                pushMessagesDict.put(messageObject.messageOwner.id, messageObject);
             }
         }
 
@@ -566,44 +602,42 @@ public class NotificationsController {
         }
     }
 
-    public void processDialogsUpdateRead(final HashMap<Long, Integer> dialogsToUpdate, boolean replace) {
+    public void processDialogsUpdateRead(final HashMap<Long, Integer> dialogsToUpdate) {
         int old_unread_count = total_unread_count;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Context.MODE_PRIVATE);
         for (HashMap.Entry<Long, Integer> entry : dialogsToUpdate.entrySet()) {
             long dialog_id = entry.getKey();
 
             int notify_override = preferences.getInt("notify2_" + dialog_id, 0);
-            boolean isChat = (int)dialog_id < 0;
-            Integer currentCount = pushDialogs.get(dialog_id);
-            boolean canAddValue = !(notify_override == 2 || (!preferences.getBoolean("EnableAll", true) || isChat && !preferences.getBoolean("EnableGroup", true)) && notify_override == 0);
+            boolean canAddValue = !(notify_override == 2 || (!preferences.getBoolean("EnableAll", true) || ((int)dialog_id < 0) && !preferences.getBoolean("EnableGroup", true)) && notify_override == 0);
 
+            Integer currentCount = pushDialogs.get(dialog_id);
             Integer newCount = entry.getValue();
-            if (replace) {
+            if (newCount < 0) {
+                if (currentCount == null) {
+                    continue;
+                }
+                newCount = currentCount + newCount;
+            }
+            if (canAddValue || newCount == 0) {
                 if (currentCount != null) {
                     total_unread_count -= currentCount;
                 }
-                if (newCount == 0) {
-                    pushDialogs.remove(dialog_id);
-                    for (int a = 0; a < pushMessages.size(); a++) {
-                        MessageObject messageObject = pushMessages.get(a);
-                        if (messageObject.getDialogId() == dialog_id) {
-                            pushMessages.remove(a);
-                            a--;
-                            pushMessagesDict.remove(messageObject.messageOwner.id);
-                            popupMessages.remove(messageObject);
-                        }
+            }
+            if (newCount == 0) {
+                pushDialogs.remove(dialog_id);
+                for (int a = 0; a < pushMessages.size(); a++) {
+                    MessageObject messageObject = pushMessages.get(a);
+                    if (messageObject.getDialogId() == dialog_id) {
+                        pushMessages.remove(a);
+                        a--;
+                        pushMessagesDict.remove(messageObject.messageOwner.id);
+                        popupMessages.remove(messageObject);
                     }
-                } else if (canAddValue) {
-                    total_unread_count += newCount;
-                    pushDialogs.put(dialog_id, newCount);
                 }
             } else if (canAddValue) {
-                if (currentCount == null) {
-                    currentCount = 0;
-                }
-                currentCount += newCount;
                 total_unread_count += newCount;
-                pushDialogs.put(dialog_id, currentCount);
+                pushDialogs.put(dialog_id, newCount);
             }
         }
         if (old_unread_count != total_unread_count) {
@@ -615,26 +649,59 @@ public class NotificationsController {
         }
     }
 
-    public void processLoadedUnreadMessages(HashMap<Long, Integer> dialogs) {
+    public void processLoadedUnreadMessages(HashMap<Long, Integer> dialogs, ArrayList<TLRPC.Message> messages, ArrayList<TLRPC.User> users, ArrayList<TLRPC.Chat> chats, ArrayList<TLRPC.EncryptedChat> encryptedChats) {
+        MessagesController.getInstance().putUsers(users, true);
+        MessagesController.getInstance().putChats(chats, true);
+        MessagesController.getInstance().putEncryptedChats(encryptedChats, true);
+
         pushDialogs.clear();
+        pushMessages.clear();
+        pushMessagesDict.clear();
         total_unread_count = 0;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Context.MODE_PRIVATE);
+        HashMap<Long, Boolean> settingsCache = new HashMap<Long, Boolean>();
+
         for (HashMap.Entry<Long, Integer> entry : dialogs.entrySet()) {
             long dialog_id = entry.getKey();
-            int notify_override = preferences.getInt("notify2_" + dialog_id, 0);
-            boolean isChat = (int)dialog_id < 0;
-            if (!(notify_override == 2 || (!preferences.getBoolean("EnableAll", true) || isChat && !preferences.getBoolean("EnableGroup", true)) && notify_override == 0)) {
-                pushDialogs.put(dialog_id, entry.getValue());
-                total_unread_count += entry.getValue();
+            Boolean value = settingsCache.get(dialog_id);
+            if (value == null) {
+                int notify_override = preferences.getInt("notify2_" + dialog_id, 0);
+                value = !(notify_override == 2 || (!preferences.getBoolean("EnableAll", true) || ((int) dialog_id < 0) && !preferences.getBoolean("EnableGroup", true)) && notify_override == 0);
+                settingsCache.put(dialog_id, value);
+            }
+            if (!value) {
+                continue;
+            }
+            int count = entry.getValue();
+            pushDialogs.put(dialog_id, count);
+            total_unread_count += count;
+        }
+        if (messages != null) {
+            for (TLRPC.Message message : messages) {
+                if (pushMessagesDict.containsKey(message.id)) {
+                    continue;
+                }
+                MessageObject messageObject = new MessageObject(message, null, 0);
+                long dialog_id = messageObject.getDialogId();
+                Boolean value = settingsCache.get(dialog_id);
+                if (value == null) {
+                    int notify_override = preferences.getInt("notify2_" + dialog_id, 0);
+                    value = !(notify_override == 2 || (!preferences.getBoolean("EnableAll", true) || ((int) dialog_id < 0) && !preferences.getBoolean("EnableGroup", true)) && notify_override == 0);
+                    settingsCache.put(dialog_id, value);
+                }
+                if (!value || dialog_id == openned_dialog_id && ApplicationLoader.isScreenOn) {
+                    continue;
+                }
+                pushMessagesDict.put(messageObject.messageOwner.id, messageObject);
+                pushMessages.add(0, messageObject);
             }
         }
         if (total_unread_count == 0) {
-            pushMessages.clear();
-            pushMessagesDict.clear();
             popupMessages.clear();
-            showOrUpdateNotification(false);
-            NotificationCenter.getInstance().postNotificationName(pushMessagesUpdated);
+            NotificationCenter.getInstance().postNotificationName(NotificationCenter.pushMessagesUpdated);
         }
+        showOrUpdateNotification(SystemClock.uptimeMillis() / 1000 < 60);
+
         if (preferences.getBoolean("badgeNumber", true)) {
             setBadge(ApplicationLoader.applicationContext, total_unread_count);
         }
