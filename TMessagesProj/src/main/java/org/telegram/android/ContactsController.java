@@ -40,10 +40,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ContactsController {
     private Account currentAccount;
     private boolean loadingContacts = false;
-    private static final Integer loadContactsSync = 1;
+    private static final Object loadContactsSync = new Object();
     private boolean ignoreChanges = false;
     private boolean contactsSyncInProgress = false;
-    private final Integer observerLock = 1;
+    private final Object observerLock = new Object();
     public boolean contactsLoaded = false;
     private boolean contactsBookLoaded = false;
     private String lastContactsVersions = "";
@@ -1465,7 +1465,7 @@ public class ContactsController {
                     MessagesStorage.getInstance().putContacts(arrayList, false);
 
                     if (u.phone != null && u.phone.length() > 0) {
-                        String name = Utilities.formatName(u.first_name, u.last_name);
+                        String name = formatName(u.first_name, u.last_name);
                         MessagesStorage.getInstance().applyPhoneBookUpdates(u.phone, "");
                         Contact contact = contactsBookSPhones.get(u.phone);
                         if (contact != null) {
@@ -1529,7 +1529,7 @@ public class ContactsController {
 
                 for (TLRPC.User user : users) {
                     if (user.phone != null && user.phone.length() > 0) {
-                        String name = Utilities.formatName(user.first_name, user.last_name);
+                        String name = ContactsController.formatName(user.first_name, user.last_name);
                         MessagesStorage.getInstance().applyPhoneBookUpdates(user.phone, "");
                         Contact contact = contactsBookSPhones.get(user.phone);
                         if (contact != null) {
@@ -1562,5 +1562,25 @@ public class ContactsController {
                 });
             }
         }, true, RPCRequest.RPCRequestClassGeneric);
+    }
+
+    public static String formatName(String firstName, String lastName) {
+        String result = null;
+        if (LocaleController.nameDisplayOrder == 1) {
+            result = firstName;
+            if (result == null || result.length() == 0) {
+                result = lastName;
+            } else if (result.length() != 0 && lastName != null && lastName.length() != 0) {
+                result += " " + lastName;
+            }
+        } else {
+            result = lastName;
+            if (result == null || result.length() == 0) {
+                result = firstName;
+            } else if (result.length() != 0 && firstName != null && firstName.length() != 0) {
+                result += " " + firstName;
+            }
+        }
+        return result.trim();
     }
 }

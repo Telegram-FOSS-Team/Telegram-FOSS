@@ -40,6 +40,7 @@ import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.android.MediaController;
 import org.telegram.messenger.BuildVars;
 import org.telegram.android.LocaleController;
+import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.SerializedData;
 import org.telegram.messenger.TLClassStore;
 import org.telegram.messenger.TLObject;
@@ -52,9 +53,7 @@ import org.telegram.android.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.RPCRequest;
 import org.telegram.messenger.UserConfig;
-import org.telegram.messenger.Utilities;
 import org.telegram.android.MessageObject;
-import org.telegram.android.PhotoObject;
 import org.telegram.ui.Adapters.BaseFragmentAdapter;
 import org.telegram.ui.Views.ActionBar.ActionBarLayer;
 import org.telegram.ui.Views.AvatarUpdater;
@@ -92,6 +91,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     private int mobileDownloadRow;
     private int wifiDownloadRow;
     private int roamingDownloadRow;
+    private int saveToGalleryRow;
     private int telegramFaqRow;
     private int languageRow;
     private int versionRow;
@@ -143,8 +143,8 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                             }
                             TLRPC.TL_photos_photo photo = (TLRPC.TL_photos_photo)response;
                             ArrayList<TLRPC.PhotoSize> sizes = photo.photo.sizes;
-                            TLRPC.PhotoSize smallSize = PhotoObject.getClosestPhotoSizeWithSize(sizes, 100, 100);
-                            TLRPC.PhotoSize bigSize = PhotoObject.getClosestPhotoSizeWithSize(sizes, 1000, 1000);
+                            TLRPC.PhotoSize smallSize = FileLoader.getClosestPhotoSizeWithSize(sizes, 100);
+                            TLRPC.PhotoSize bigSize = FileLoader.getClosestPhotoSizeWithSize(sizes, 1000);
                             user.photo = new TLRPC.TL_userProfilePhoto();
                             user.photo.photo_id = photo.photo.id;
                             if (smallSize != null) {
@@ -189,6 +189,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         mobileDownloadRow = rowCount++;
         wifiDownloadRow = rowCount++;
         roamingDownloadRow = rowCount++;
+        saveToGalleryRow = rowCount++;
         messagesSectionRow = rowCount++;
         textSizeRow = rowCount++;
         sendByEnterRow = rowCount++;
@@ -323,6 +324,11 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                         SharedPreferences.Editor editor = preferences.edit();
                         editor.putBoolean("send_by_enter", !send);
                         editor.commit();
+                        if (listView != null) {
+                            listView.invalidateViews();
+                        }
+                    } else if (i == saveToGalleryRow) {
+                        MediaController.getInstance().toggleSaveToGallery();
                         if (listView != null) {
                             listView.invalidateViews();
                         }
@@ -718,7 +724,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             return i == textSizeRow || i == enableAnimationsRow || i == blockedRow || i == notificationRow || i == backgroundRow ||
                     i == askQuestionRow || i == sendLogsRow || i == sendByEnterRow || i == terminateSessionsRow || i == wifiDownloadRow ||
                     i == mobileDownloadRow || i == clearLogsRow || i == roamingDownloadRow || i == languageRow ||
-                    i == switchBackendButtonRow || i == telegramFaqRow || i == contactsSortRow || i == contactsReimportRow;
+                    i == switchBackendButtonRow || i == telegramFaqRow || i == contactsSortRow || i == contactsReimportRow || i == saveToGalleryRow;
         }
 
         @Override
@@ -817,7 +823,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     user = UserConfig.getCurrentUser();
                 }
                 if (user != null) {
-                    textView.setText(Utilities.formatName(user.first_name, user.last_name));
+                    textView.setText(ContactsController.formatName(user.first_name, user.last_name));
                     BackupImageView avatarImage = (BackupImageView)view.findViewById(R.id.settings_avatar_image);
                     avatarImage.processDetach = false;
                     TLRPC.FileLocation photo = null;
@@ -826,7 +832,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                         photo = user.photo.photo_small;
                         photoBig = user.photo.photo_big;
                     }
-                    avatarImage.setImage(photo, "50_50", Utilities.getUserAvatarForId(user.id));
+                    avatarImage.setImage(photo, "50_50", AndroidUtilities.getUserAvatarForId(user.id));
                     avatarImage.imageReceiver.setVisible(!PhotoViewer.getInstance().isShowingImage(photoBig), false);
                 }
                 return view;
@@ -922,18 +928,15 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     } else {
                         checkButton.setImageResource(R.drawable.btn_check_off);
                     }
+                } else if (i == saveToGalleryRow) {
+                    textView.setText(LocaleController.getString("SaveToGallerySettings", R.string.SaveToGallerySettings));
+                    divider.setVisibility(View.INVISIBLE);
+                    if (MediaController.getInstance().canSaveToGallery()) {
+                        checkButton.setImageResource(R.drawable.btn_check_on);
+                    } else {
+                        checkButton.setImageResource(R.drawable.btn_check_off);
+                    }
                 }
-//                if (i == 7) {
-//                    textView.setText(LocaleController.getString(R.string.SaveIncomingPhotos));
-//                    divider.setVisibility(View.INVISIBLE);
-//
-//                    ImageView checkButton = (ImageView)view.findViewById(R.id.settings_row_check_button);
-//                    if (UserConfig.saveIncomingPhotos) {
-//                        checkButton.setImageResource(R.drawable.btn_check_on);
-//                    } else {
-//                        checkButton.setImageResource(R.drawable.btn_check_off);
-//                    }
-//                }
             } else if (type == 4) {
                 if (view == null) {
                     LayoutInflater li = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -979,7 +982,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 View divider = view.findViewById(R.id.settings_row_divider);
                 if (i == textSizeRow) {
                     SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
-                    int size = preferences.getInt("fons_size", 16);
+                    int size = preferences.getInt("fons_size", AndroidUtilities.isTablet() ? 18 : 16);
                     detailTextView.setText(String.format("%d", size));
                     textView.setText(LocaleController.getString("TextSize", R.string.TextSize));
                     divider.setVisibility(View.VISIBLE);
@@ -1033,7 +1036,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     mask = MediaController.getInstance().wifiDownloadMask;
                 } else if (i == roamingDownloadRow) {
                     textView.setText(LocaleController.getString("WhenRoaming", R.string.WhenRoaming));
-                    divider.setVisibility(View.GONE);
+                    divider.setVisibility(View.VISIBLE);
                     mask = MediaController.getInstance().roamingDownloadMask;
                 }
                 String text = "";
@@ -1074,7 +1077,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 return 1;
             } else if (i == textSizeRow || i == languageRow || i == contactsSortRow) {
                 return 5;
-            } else if (i == enableAnimationsRow || i == sendByEnterRow) {
+            } else if (i == enableAnimationsRow || i == sendByEnterRow || i == saveToGalleryRow) {
                 return 3;
             } else if (i == numberRow || i == notificationRow || i == blockedRow || i == backgroundRow || i == askQuestionRow || i == sendLogsRow || i == terminateSessionsRow || i == clearLogsRow || i == switchBackendButtonRow || i == telegramFaqRow || i == contactsReimportRow) {
                 return 2;

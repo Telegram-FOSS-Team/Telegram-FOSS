@@ -97,8 +97,7 @@
         </activity>
         <activity
             android:name="org.telegram.ui.IntroActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait">
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize">
         </activity>
         <activity
             android:name="org.telegram.ui.PopupNotificationActivity"
@@ -132,6 +131,7 @@
 
         <service android:name="org.telegram.android.NotificationsService" android:enabled="true"/>
         <service android:name="org.telegram.android.NotificationRepeat" android:exported="false"/>
+        <service android:name="org.telegram.android.VideoEncodingService" android:enabled="true"/>
 
         <receiver android:name="org.telegram.android.AppStartReceiver" android:enabled="true">
             <intent-filter>
@@ -139,6 +139,8 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name="org.telegram.android.WearReplyReceiver" android:enabled="true"/>
 
         <uses-library android:name="com.sec.android.app.multiwindow" android:required="false" />
         <meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />

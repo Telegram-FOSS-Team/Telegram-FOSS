@@ -9,7 +9,10 @@
 package org.telegram.android;
 
 import android.app.ActivityManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -18,12 +21,14 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
 import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
+import org.telegram.messenger.R;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
@@ -61,6 +66,8 @@ public class ImageLoader {
     private volatile long lastCacheOutTime = 0;
     private int lastImageNum = 0;
     private long lastProgressUpdateTime = 0;
+
+    private File telegramPath = null;
 
     private class HttpTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -154,7 +161,7 @@ public class ImageLoader {
 
     private class CacheOutTask implements Runnable {
         private Thread runningThread = null;
-        private final Integer sync = 1;
+        private final Object sync = new Object();
 
         private CacheImage cacheImage = null;
         private boolean isCancelled = false;
@@ -546,6 +553,13 @@ public class ImageLoader {
                 AndroidUtilities.RunOnUIThread(new Runnable() {
                     @Override
                     public void run() {
+                        if (location != null) {
+                            if (MediaController.getInstance().canSaveToGallery() && telegramPath != null && finalFile != null && finalFile.exists() && (location.endsWith(".mp4") || location.endsWith(".jpg"))) {
+                                if (finalFile.toString().startsWith(telegramPath.toString())) {
+                                    Utilities.addMediaToGallery(finalFile.toString());
+                                }
+                            }
+                        }
                         ImageLoader.this.fileDidLoaded(location, finalFile, tempFile);
                         NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileDidLoaded, location);
                     }
@@ -553,12 +567,12 @@ public class ImageLoader {
             }
 
             @Override
-            public void fileDidFailedLoad(final String location, final boolean canceled) {
+            public void fileDidFailedLoad(final String location, final int state) {
                 AndroidUtilities.RunOnUIThread(new Runnable() {
                     @Override
                     public void run() {
                         ImageLoader.this.fileDidFailedLoad(location);
-                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileDidFailedLoad, location, canceled);
+                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.FileDidFailedLoad, location, state);
                     }
                 });
             }
@@ -576,12 +590,112 @@ public class ImageLoader {
                     });
                 }
             }
-
-            @Override
-            public File getCacheDir() {
-                return AndroidUtilities.getCacheDir();
-            }
         });
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context arg0, Intent intent) {
+                FileLog.e("tmessages", "file system changed");
+                Runnable r = new Runnable() {
+                    public void run() {
+                        FileLoader.getInstance().setMediaDirs(createMediaPaths());
+                    }
+                };
+                if (Intent.ACTION_MEDIA_UNMOUNTED.equals(intent.getAction())) {
+                    AndroidUtilities.RunOnUIThread(r, 1000);
+                } else {
+                    r.run();
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_MEDIA_BAD_REMOVAL);
+        filter.addAction(Intent.ACTION_MEDIA_CHECKING);
+        filter.addAction(Intent.ACTION_MEDIA_EJECT);
+        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+        filter.addAction(Intent.ACTION_MEDIA_NOFS);
+        filter.addAction(Intent.ACTION_MEDIA_REMOVED);
+        filter.addAction(Intent.ACTION_MEDIA_SHARED);
+        filter.addAction(Intent.ACTION_MEDIA_UNMOUNTABLE);
+        filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+        filter.addDataScheme("file");
+        ApplicationLoader.applicationContext.registerReceiver(receiver, filter);
+
+        FileLoader.getInstance().setMediaDirs(createMediaPaths());
+    }
+
+    private HashMap<Integer, File> createMediaPaths() {
+        HashMap<Integer, File> mediaDirs = new HashMap<Integer, File>();
+        File cachePath = AndroidUtilities.getCacheDir();
+        if (!cachePath.isDirectory()) {
+            try {
+                cachePath.mkdirs();
+            } catch (Exception e) {
+                FileLog.e("tmessages", e);
+            }
+        }
+        mediaDirs.put(FileLoader.MEDIA_DIR_CACHE, cachePath);
+        FileLog.e("tmessages", "cache path = " + cachePath);
+
+        try {
+            if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                telegramPath = new File(Environment.getExternalStorageDirectory(), LocaleController.getString("AppName", R.string.AppName));
+                telegramPath.mkdirs();
+                if (telegramPath.isDirectory()) {
+                    try {
+                        File imagePath = new File(telegramPath, LocaleController.getString("AppName", R.string.AppName) + " Images");
+                        imagePath.mkdir();
+                        if (imagePath.isDirectory()) {
+                            mediaDirs.put(FileLoader.MEDIA_DIR_IMAGE, imagePath);
+                            FileLog.e("tmessages", "image path = " + imagePath);
+                        }
+                    } catch (Exception e) {
+                        FileLog.e("tmessages", e);
+                    }
+
+                    try {
+                        File videoPath = new File(telegramPath, LocaleController.getString("AppName", R.string.AppName) + " Video");
+                        videoPath.mkdir();
+                        if (videoPath.isDirectory()) {
+                            mediaDirs.put(FileLoader.MEDIA_DIR_VIDEO, videoPath);
+                            FileLog.e("tmessages", "video path = " + videoPath);
+                        }
+                    } catch (Exception e) {
+                        FileLog.e("tmessages", e);
+                    }
+
+                    try {
+                        File audioPath = new File(telegramPath, LocaleController.getString("AppName", R.string.AppName) + " Audio");
+                        audioPath.mkdir();
+                        if (audioPath.isDirectory()) {
+                            new File(audioPath, ".nomedia").createNewFile();
+                            mediaDirs.put(FileLoader.MEDIA_DIR_AUDIO, audioPath);
+                            FileLog.e("tmessages", "audio path = " + audioPath);
+                        }
+                    } catch (Exception e) {
+                        FileLog.e("tmessages", e);
+                    }
+
+                    try {
+                        File documentPath = new File(telegramPath, LocaleController.getString("AppName", R.string.AppName) + " Documents");
+                        documentPath.mkdir();
+                        if (documentPath.isDirectory()) {
+                            new File(documentPath, ".nomedia").createNewFile();
+                            mediaDirs.put(FileLoader.MEDIA_DIR_DOCUMENT, documentPath);
+                            FileLog.e("tmessages", "documents path = " + documentPath);
+                        }
+                    } catch (Exception e) {
+                        FileLog.e("tmessages", e);
+                    }
+                }
+            }
+            MediaController.getInstance().checkSaveToGalleryFiles();
+        } catch (Exception e) {
+            FileLog.e("tmessages", e);
+        }
+
+        return mediaDirs;
     }
 
     private void performReplace(String oldKey, String newKey) {
@@ -746,7 +860,12 @@ public class ImageLoader {
 
         if (!added) {
             boolean onlyCache = false;
-            File cacheFile = new File(AndroidUtilities.getCacheDir(), url);
+            File cacheFile = null;
+            if (size == 0 || httpUrl != null || fileLocation != null && (fileLocation.key != null || fileLocation.volume_id == Integer.MIN_VALUE && fileLocation.local_id < 0)) {
+                cacheFile = new File(FileLoader.getInstance().getDirectory(FileLoader.MEDIA_DIR_CACHE), url);
+            } else {
+                cacheFile = new File(FileLoader.getInstance().getDirectory(FileLoader.MEDIA_DIR_IMAGE), url);
+            }
             if (httpUrl != null) {
                 if (!httpUrl.startsWith("http")) {
                     onlyCache = true;
@@ -779,11 +898,12 @@ public class ImageLoader {
                 img.addImageView(imageView);
                 imageLoadingByUrl.put(url, img);
                 if (httpUrl == null) {
-                    FileLoader.getInstance().loadFile(fileLocation, size);
+                    FileLoader.getInstance().loadFile(fileLocation, size, size == 0 || fileLocation.key != null);
                 } else {
                     String file = Utilities.MD5(httpUrl);
-                    img.tempFilePath = new File(AndroidUtilities.getCacheDir(), file + "_temp.jpg");
-                    img.finalFilePath = new File(AndroidUtilities.getCacheDir(), file + ".jpg");
+                    File cacheDir = FileLoader.getInstance().getDirectory(FileLoader.MEDIA_DIR_CACHE);
+                    img.tempFilePath = new File(cacheDir, file + "_temp.jpg");
+                    img.finalFilePath = cacheFile;
                     img.httpTask = new HttpTask(img);
                     httpTasks.add(img.httpTask);
                     runHttpTasks(false);
@@ -938,11 +1058,15 @@ public class ImageLoader {
             } catch (Throwable e) {
                 FileLog.e("tmessages", e);
                 ImageLoader.getInstance().clearMemory();
-                if (b == null) {
-                    b = BitmapFactory.decodeFile(path, bmOptions);
-                }
-                if (b != null) {
-                    b = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
+                try {
+                    if (b == null) {
+                        b = BitmapFactory.decodeFile(path, bmOptions);
+                    }
+                    if (b != null) {
+                        b = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
+                    }
+                } catch (Throwable e2) {
+                    FileLog.e("tmessages", e2);
                 }
             }
         } else if (uri != null) {
@@ -967,6 +1091,59 @@ public class ImageLoader {
         return b;
     }
 
+    private static TLRPC.PhotoSize scaleAndSaveImageInternal(Bitmap bitmap, int w, int h, float photoW, float photoH, float scaleFactor, int quality, boolean cache) throws Exception {
+        Bitmap scaledBitmap = null;
+        if (scaleFactor > 1) {
+            scaledBitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
+        } else {
+            scaledBitmap = bitmap;
+        }
+
+        TLRPC.TL_fileLocation location = new TLRPC.TL_fileLocation();
+        location.volume_id = Integer.MIN_VALUE;
+        location.dc_id = Integer.MIN_VALUE;
+        location.local_id = UserConfig.lastLocalId;
+        UserConfig.lastLocalId--;
+        TLRPC.PhotoSize size;
+        if (!cache) {
+            size = new TLRPC.TL_photoSize();
+        } else {
+            size = new TLRPC.TL_photoCachedSize();
+        }
+        size.location = location;
+        size.w = scaledBitmap.getWidth();
+        size.h = scaledBitmap.getHeight();
+        if (size.w <= 100 && size.h <= 100) {
+            size.type = "s";
+        } else if (size.w <= 320 && size.h <= 320) {
+            size.type = "m";
+        } else if (size.w <= 800 && size.h <= 800) {
+            size.type = "x";
+        } else if (size.w <= 1280 && size.h <= 1280) {
+            size.type = "y";
+        } else {
+            size.type = "w";
+        }
+
+        if (!cache) {
+            String fileName = location.volume_id + "_" + location.local_id + ".jpg";
+            final File cacheFile = new File(FileLoader.getInstance().getDirectory(FileLoader.MEDIA_DIR_CACHE), fileName);
+            FileOutputStream stream = new FileOutputStream(cacheFile);
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
+            size.size = (int)stream.getChannel().size();
+        } else {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
+            size.bytes = stream.toByteArray();
+            size.size = size.bytes.length;
+        }
+        if (scaledBitmap != bitmap) {
+            scaledBitmap.recycle();
+        }
+
+        return size;
+    }
+
     public static TLRPC.PhotoSize scaleAndSaveImage(Bitmap bitmap, float maxWidth, float maxHeight, int quality, boolean cache) {
         if (bitmap == null) {
             return null;
@@ -983,41 +1160,18 @@ public class ImageLoader {
             return null;
         }
 
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
-
-        TLRPC.TL_fileLocation location = new TLRPC.TL_fileLocation();
-        location.volume_id = Integer.MIN_VALUE;
-        location.dc_id = Integer.MIN_VALUE;
-        location.local_id = UserConfig.lastLocalId;
-        UserConfig.lastLocalId--;
-        TLRPC.PhotoSize size;
-        if (!cache) {
-            size = new TLRPC.TL_photoSize();
-        } else {
-            size = new TLRPC.TL_photoCachedSize();
-        }
-        size.location = location;
-        size.w = (int)(photoW / scaleFactor);
-        size.h = (int)(photoH / scaleFactor);
         try {
-            if (!cache) {
-                String fileName = location.volume_id + "_" + location.local_id + ".jpg";
-                final File cacheFile = new File(AndroidUtilities.getCacheDir(), fileName);
-                FileOutputStream stream = new FileOutputStream(cacheFile);
-                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
-                size.size = (int)stream.getChannel().size();
-            } else {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
-                size.bytes = stream.toByteArray();
-                size.size = size.bytes.length;
-            }
-            if (scaledBitmap != bitmap) {
-                scaledBitmap.recycle();
-            }
-            return size;
+            return scaleAndSaveImageInternal(bitmap, w, h, photoW, photoH, scaleFactor, quality, cache);
         } catch (Throwable e) {
-            return null;
+            FileLog.e("tmessages", e);
+            ImageLoader.getInstance().clearMemory();
+            System.gc();
+            try {
+                return scaleAndSaveImageInternal(bitmap, w, h, photoW, photoH, scaleFactor, quality, cache);
+            } catch (Throwable e2) {
+                FileLog.e("tmessages", e2);
+                return null;
+            }
         }
     }
 }

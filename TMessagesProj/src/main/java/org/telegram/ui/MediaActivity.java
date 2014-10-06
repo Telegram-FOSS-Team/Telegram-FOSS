@@ -25,12 +25,12 @@ import android.widget.TextView;
 
 import org.telegram.android.AndroidUtilities;
 import org.telegram.android.LocaleController;
+import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.TLRPC;
 import org.telegram.android.MessageObject;
 import org.telegram.android.MessagesController;
 import org.telegram.android.NotificationCenter;
 import org.telegram.messenger.R;
-import org.telegram.android.PhotoObject;
 import org.telegram.ui.Adapters.BaseFragmentAdapter;
 import org.telegram.ui.Views.ActionBar.ActionBarLayer;
 import org.telegram.ui.Views.BackupImageView;
@@ -326,14 +326,20 @@ public class MediaActivity extends BaseFragment implements NotificationCenter.No
                     WindowManager manager = (WindowManager)ApplicationLoader.applicationContext.getSystemService(Activity.WINDOW_SERVICE);
                     int rotation = manager.getDefaultDisplay().getRotation();
 
-                    if (rotation == Surface.ROTATION_270 || rotation == Surface.ROTATION_90) {
-                        listView.setNumColumns(6);
-                        itemWidth = getParentActivity().getResources().getDisplayMetrics().widthPixels / 6 - AndroidUtilities.dp(2) * 5;
+                    if (AndroidUtilities.isTablet()) {
+                        listView.setNumColumns(4);
+                        itemWidth = AndroidUtilities.dp(490) / 4 - AndroidUtilities.dp(2) * 3;
                         listView.setColumnWidth(itemWidth);
                     } else {
-                        listView.setNumColumns(4);
-                        itemWidth = getParentActivity().getResources().getDisplayMetrics().widthPixels / 4 - AndroidUtilities.dp(2) * 3;
-                        listView.setColumnWidth(itemWidth);
+                        if (rotation == Surface.ROTATION_270 || rotation == Surface.ROTATION_90) {
+                            listView.setNumColumns(6);
+                            itemWidth = AndroidUtilities.displaySize.x / 6 - AndroidUtilities.dp(2) * 5;
+                            listView.setColumnWidth(itemWidth);
+                        } else {
+                            listView.setNumColumns(4);
+                            itemWidth = AndroidUtilities.displaySize.x / 4 - AndroidUtilities.dp(2) * 3;
+                            listView.setColumnWidth(itemWidth);
+                        }
                     }
                     listView.setPadding(listView.getPaddingLeft(), AndroidUtilities.dp(4), listView.getPaddingRight(), listView.getPaddingBottom());
                     listAdapter.notifyDataSetChanged();
@@ -407,7 +413,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenter.No
                     if (message.imagePreview != null) {
                         imageView.setImageBitmap(message.imagePreview);
                     } else {
-                        TLRPC.PhotoSize photoSize = PhotoObject.getClosestPhotoSizeWithSize(message.messageOwner.media.photo.sizes, 80, 80);
+                        TLRPC.PhotoSize photoSize = FileLoader.getClosestPhotoSizeWithSize(message.messageOwner.media.photo.sizes, 80);
                         imageView.setImage(photoSize.location, null, R.drawable.photo_placeholder_in);
                     }
                 } else {

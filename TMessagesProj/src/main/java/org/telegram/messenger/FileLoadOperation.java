@@ -50,10 +50,13 @@ public class FileLoadOperation {
     private String ext;
     private RandomAccessFile fileOutputStream;
     private RandomAccessFile fiv;
+    private File storePath = null;
+    private File tempPath = null;
+    private boolean isForceRequest = false;
 
     public static interface FileLoadOperationDelegate {
         public abstract void didFinishLoadingFile(FileLoadOperation operation, File finalFile, File tempFile);
-        public abstract void didFailedLoadingFile(FileLoadOperation operation, boolean canceled);
+        public abstract void didFailedLoadingFile(FileLoadOperation operation, int state);
         public abstract void didChangedLoadProgress(FileLoadOperation operation, float progress);
     }
 
@@ -113,7 +116,7 @@ public class FileLoadOperation {
             location.access_hash = audioLocation.access_hash;
         }
         totalBytesCount = audioLocation.size;
-        ext = ".m4a";
+        ext = ".ogg";
     }
 
     public FileLoadOperation(TLRPC.Document documentLocation) {
@@ -144,6 +147,19 @@ public class FileLoadOperation {
         }
     }
 
+    public void setForceRequest(boolean forceRequest) {
+        isForceRequest = forceRequest;
+    }
+
+    public boolean isForceRequest() {
+        return isForceRequest;
+    }
+
+    public void setPaths(File store, File temp) {
+        storePath = store;
+        tempPath = temp;
+    }
+
     public void start() {
         if (state != stateIdle) {
             return;
@@ -153,7 +169,7 @@ public class FileLoadOperation {
             Utilities.stageQueue.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.didFailedLoadingFile(FileLoadOperation.this, false);
+                    delegate.didFailedLoadingFile(FileLoadOperation.this, 0);
                 }
             });
             return;
@@ -173,7 +189,7 @@ public class FileLoadOperation {
                 Utilities.stageQueue.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        delegate.didFailedLoadingFile(FileLoadOperation.this, false);
+                        delegate.didFailedLoadingFile(FileLoadOperation.this, 0);
                     }
                 });
                 return;
@@ -186,7 +202,7 @@ public class FileLoadOperation {
             }
         }
 
-        cacheFileFinal = new File(FileLoader.getInstance().getCacheDir(), fileNameFinal);
+        cacheFileFinal = new File(storePath, fileNameFinal);
         boolean exist = cacheFileFinal.exists();
         if (exist && totalBytesCount != 0 && totalBytesCount != cacheFileFinal.length()) {
             exist = false;
@@ -194,13 +210,13 @@ public class FileLoadOperation {
         }
 
         if (!cacheFileFinal.exists()) {
-            cacheFileTemp = new File(FileLoader.getInstance().getCacheDir(), fileNameTemp);
+            cacheFileTemp = new File(tempPath, fileNameTemp);
             if (cacheFileTemp.exists()) {
                 downloadedBytes = (int)cacheFileTemp.length();
                 nextDownloadOffset = downloadedBytes = downloadedBytes / 1024 * 1024;
             }
             if (fileNameIv != null) {
-                cacheIvTemp = new File(FileLoader.getInstance().getCacheDir(), fileNameIv);
+                cacheIvTemp = new File(tempPath, fileNameIv);
                 try {
                     fiv = new RandomAccessFile(cacheIvTemp, "rws");
                     long len = cacheIvTemp.length();
@@ -227,7 +243,7 @@ public class FileLoadOperation {
                 Utilities.stageQueue.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        delegate.didFailedLoadingFile(FileLoadOperation.this, false);
+                        delegate.didFailedLoadingFile(FileLoadOperation.this, 0);
                     }
                 });
                 return;
@@ -239,7 +255,7 @@ public class FileLoadOperation {
                         try {
                             onFinishLoadingFile();
                         } catch (Exception e) {
-                            delegate.didFailedLoadingFile(FileLoadOperation.this, false);
+                            delegate.didFailedLoadingFile(FileLoadOperation.this, 0);
                         }
                     } else {
                         startDownloadRequest();
@@ -250,7 +266,7 @@ public class FileLoadOperation {
             try {
                 onFinishLoadingFile();
             } catch (Exception e) {
-                delegate.didFailedLoadingFile(FileLoadOperation.this, false);
+                delegate.didFailedLoadingFile(FileLoadOperation.this, 0);
             }
         }
     }
@@ -269,7 +285,7 @@ public class FileLoadOperation {
                         ConnectionsManager.getInstance().cancelRpc(requestInfo.requestToken, true, true);
                     }
                 }
-                delegate.didFailedLoadingFile(FileLoadOperation.this, true);
+                delegate.didFailedLoadingFile(FileLoadOperation.this, 1);
             }
         });
     }
@@ -367,7 +383,7 @@ public class FileLoadOperation {
                 }
             } catch (Exception e) {
                 cleanup();
-                delegate.didFailedLoadingFile(FileLoadOperation.this, false);
+                delegate.didFailedLoadingFile(FileLoadOperation.this, 0);
                 FileLog.e("tmessages", e);
             }
         } else {
@@ -383,7 +399,7 @@ public class FileLoadOperation {
                 }
                 if (val == null) {
                     cleanup();
-                    delegate.didFailedLoadingFile(FileLoadOperation.this, false);
+                    delegate.didFailedLoadingFile(FileLoadOperation.this, 0);
                 } else {
                     datacenter_id = val;
                     nextDownloadOffset = 0;
@@ -396,18 +412,21 @@ public class FileLoadOperation {
                     } catch (Exception e) {
                         FileLog.e("tmessages", e);
                         cleanup();
-                        delegate.didFailedLoadingFile(FileLoadOperation.this, false);
+                        delegate.didFailedLoadingFile(FileLoadOperation.this, 0);
                     }
                 } else {
                     cleanup();
-                    delegate.didFailedLoadingFile(FileLoadOperation.this, false);
+                    delegate.didFailedLoadingFile(FileLoadOperation.this, 0);
                 }
+            } else if (error.text.contains("RETRY_LIMIT")) {
+                cleanup();
+                delegate.didFailedLoadingFile(FileLoadOperation.this, 2);
             } else {
                 if (location != null) {
                     FileLog.e("tmessages", "" + location + " id = " + location.id + " access_hash = " + location.access_hash + " volume_id = " + location.local_id + " secret = " + location.secret);
                 }
                 cleanup();
-                delegate.didFailedLoadingFile(FileLoadOperation.this, false);
+                delegate.didFailedLoadingFile(FileLoadOperation.this, 0);
             }
         }
     }
@@ -441,7 +460,7 @@ public class FileLoadOperation {
                     requestInfo.response = (TLRPC.TL_upload_file) response;
                     processRequestResult(requestInfo, error);
                 }
-            }, null, true, RPCRequest.RPCRequestClassDownloadMedia, datacenter_id, isLast);
+            }, null, true, RPCRequest.RPCRequestClassDownloadMedia | (isForceRequest ? RPCRequest.RPCRequestClassForceDownload : 0), datacenter_id, isLast);
         }
     }
 

@@ -27,7 +27,6 @@ import org.telegram.android.Emoji;
 import org.telegram.android.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
-import org.telegram.messenger.Utilities;
 import org.telegram.android.MessageObject;
 import org.telegram.android.ImageReceiver;
 
@@ -155,6 +154,10 @@ public class DialogCell extends BaseCell {
         update(0);
     }
 
+    public TLRPC.TL_dialog getDialog() {
+        return currentDialog;
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -249,12 +252,16 @@ public class DialogCell extends BaseCell {
             if (user.photo != null) {
                 photo = user.photo.photo_small;
             }
-            placeHolderId = Utilities.getUserAvatarForId(user.id);
+            placeHolderId = AndroidUtilities.getUserAvatarForId(user.id);
         } else if (chat != null) {
             if (chat.photo != null) {
                 photo = chat.photo.photo_small;
             }
-            placeHolderId = Utilities.getGroupAvatarForId(chat.id);
+            if (chat.id > 0) {
+                placeHolderId = AndroidUtilities.getGroupAvatarForId(chat.id);
+            } else {
+                placeHolderId = AndroidUtilities.getBroadcastAvatarForId(chat.id);
+            }
         }
         avatarImage.setImage(photo, "50_50", placeHolderId == 0 ? null : getResources().getDrawable(placeHolderId));
 
@@ -521,18 +528,18 @@ public class DialogCell extends BaseCell {
                 }
 
                 if (message.isFromMe() && message.isOut()) {
-                    if (message.messageOwner.send_state == MessageObject.MESSAGE_SEND_STATE_SENDING) {
+                    if (message.isSending()) {
                         drawCheck1 = false;
                         drawCheck2 = false;
                         drawClock = true;
                         drawError = false;
-                    } else if (message.messageOwner.send_state == MessageObject.MESSAGE_SEND_STATE_SEND_ERROR) {
+                    } else if (message.isSendError()) {
                         drawCheck1 = false;
                         drawCheck2 = false;
                         drawClock = false;
                         drawError = true;
                         drawCount = false;
-                    } else if (message.messageOwner.send_state == MessageObject.MESSAGE_SEND_STATE_SENT) {
+                    } else if (message.isSent()) {
                         if (!message.isUnread()) {
                             drawCheck1 = true;
                             drawCheck2 = true;
@@ -564,17 +571,17 @@ public class DialogCell extends BaseCell {
             } else if (user != null) {
                 if (user.id / 1000 != 777 && user.id / 1000 != 333 && ContactsController.getInstance().contactsDict.get(user.id) == null) {
                     if (ContactsController.getInstance().contactsDict.size() == 0 && (!ContactsController.getInstance().contactsLoaded || ContactsController.getInstance().isLoadingContacts())) {
-                        nameString = Utilities.formatName(user.first_name, user.last_name);
+                        nameString = ContactsController.formatName(user.first_name, user.last_name);
                     } else {
                         if (user.phone != null && user.phone.length() != 0) {
                             nameString = PhoneFormat.getInstance().format("+" + user.phone);
                         } else {
                             currentNamePaint = nameUnknownPaint;
-                            nameString = Utilities.formatName(user.first_name, user.last_name);
+                            nameString = ContactsController.formatName(user.first_name, user.last_name);
                         }
                     }
                 } else {
-                    nameString = Utilities.formatName(user.first_name, user.last_name);
+                    nameString = ContactsController.formatName(user.first_name, user.last_name);
                 }
                 if (encryptedChat != null) {
                     currentNamePaint = nameEncryptedPaint;

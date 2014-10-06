@@ -14,7 +14,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -47,7 +46,6 @@ import java.security.spec.RSAPublicKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -69,23 +67,6 @@ public class Utilities {
     public static volatile DispatchQueue globalQueue = new DispatchQueue("globalQueue");
     public static volatile DispatchQueue searchQueue = new DispatchQueue("searchQueue");
     public static volatile DispatchQueue photoBookQueue = new DispatchQueue("photoBookQueue");
-
-    public static int[] arrColors = {0xffee4928, 0xff41a903, 0xffe09602, 0xff0f94ed, 0xff8f3bf7, 0xfffc4380, 0xff00a1c4, 0xffeb7002};
-    public static int[] arrUsersAvatars = {
-            R.drawable.user_red,
-            R.drawable.user_green,
-            R.drawable.user_yellow,
-            R.drawable.user_blue,
-            R.drawable.user_violet,
-            R.drawable.user_pink,
-            R.drawable.user_aqua,
-            R.drawable.user_orange};
-
-    public static int[] arrGroupsAvatars = {
-            R.drawable.group_green,
-            R.drawable.group_red,
-            R.drawable.group_blue,
-            R.drawable.group_yellow};
 
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
@@ -128,6 +109,7 @@ public class Utilities {
     public native static long doPQNative(long _what);
     public native static void loadBitmap(String path, int[] bitmap, int scale, int format, int width, int height);
     public native static void blurBitmap(Object bitmap);
+    public native static int convertVideoFrame(ByteBuffer src, ByteBuffer dest, int destFormat, int width, int height, int padding, int swap);
     private native static void aesIgeEncryption(ByteBuffer buffer, byte[] key, byte[] iv, boolean encrypt, int offset, int length);
 
     public static void aesIgeEncryption(ByteBuffer buffer, byte[] key, byte[] iv, boolean encrypt, boolean changeIv, int offset, int length) {
@@ -505,54 +487,6 @@ public class Utilities {
         return true;
     }
 
-    public static int getColorIndex(int id) {
-        int[] arr;
-        if (id >= 0) {
-            arr = arrUsersAvatars;
-        } else {
-            arr = arrGroupsAvatars;
-        }
-        try {
-            String str;
-            if (id >= 0) {
-                str = String.format(Locale.US, "%d%d", id, UserConfig.getClientUserId());
-            } else {
-                str = String.format(Locale.US, "%d", id);
-            }
-            if (str.length() > 15) {
-                str = str.substring(0, 15);
-            }
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-            byte[] digest = md.digest(str.getBytes());
-            int b = digest[Math.abs(id % 16)];
-            if (b < 0) {
-                b += 256;
-            }
-            return Math.abs(b) % arr.length;
-        } catch (Exception e) {
-            FileLog.e("tmessages", e);
-        }
-        return id % arr.length;
-    }
-
-    public static int getColorForId(int id) {
-        if (id / 1000 == 333) {
-            return 0xff0f94ed;
-        }
-        return arrColors[getColorIndex(id)];
-    }
-
-    public static int getUserAvatarForId(int id) {
-        if (id / 1000 == 333 || id / 1000 == 777) {
-            return R.drawable.telegram_avatar;
-        }
-        return arrUsersAvatars[getColorIndex(id)];
-    }
-
-    public static int getGroupAvatarForId(int id) {
-        return arrGroupsAvatars[getColorIndex(-Math.abs(id))];
-    }
-
     public static String MD5(String md5) {
         if (md5 == null) {
             return null;
@@ -594,8 +528,8 @@ public class Utilities {
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), LocaleController.getString("AppName", R.string.AppName));
             if (storageDir != null) {
-                if (! storageDir.mkdirs()) {
-                    if (! storageDir.exists()){
+                if (!storageDir.mkdirs()) {
+                    if (!storageDir.exists()){
                         FileLog.d("tmessages", "failed to create directory");
                         return null;
                     }
@@ -695,8 +629,7 @@ public class Utilities {
         try {
             File storageDir = getAlbumDir();
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "IMG_" + timeStamp + "_";
-            return File.createTempFile(imageFileName, ".jpg", storageDir);
+            return new File(storageDir, "IMG_" + timeStamp + ".jpg");
         } catch (Exception e) {
             FileLog.e("tmessages", e);
         }
@@ -745,22 +678,11 @@ public class Utilities {
         try {
             File storageDir = getAlbumDir();
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "VID_" + timeStamp + "_";
-            return File.createTempFile(imageFileName, ".mp4", storageDir);
+            return new File(storageDir, "VID_" + timeStamp + ".mp4");
         } catch (Exception e) {
             FileLog.e("tmessages", e);
         }
         return null;
-    }
-
-    public static String formatName(String firstName, String lastName) {
-        String result = firstName;
-        if (result == null || result.length() == 0) {
-            result = lastName;
-        } else if (result.length() != 0 && lastName != null && lastName.length() != 0) {
-            result += " " + lastName;
-        }
-        return result.trim();
     }
 
     public static String formatFileSize(long size) {
@@ -804,9 +726,5 @@ public class Utilities {
 
     public static void checkForUpdates(Activity context) {
 	/* Telegram-FOSS doesn't include HockeySDK */
-    }
-
-    public static boolean isTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 }

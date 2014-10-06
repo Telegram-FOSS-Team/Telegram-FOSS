@@ -87,6 +87,7 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.closeChats);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioDidSent);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.emojiDidLoaded);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.hideEmojiKeyboard);
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
         sendByEnter = preferences.getBoolean("send_by_enter", false);
     }
@@ -99,6 +100,7 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.closeChats);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioDidSent);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.emojiDidLoaded);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.hideEmojiKeyboard);
         if (mWakeLock != null) {
             try {
                 mWakeLock.release();
@@ -451,7 +453,7 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
             }
             emojiPopup.setHeight(View.MeasureSpec.makeMeasureSpec(currentHeight, View.MeasureSpec.EXACTLY));
             if (sizeNotifierRelativeLayout != null) {
-                emojiPopup.setWidth(View.MeasureSpec.makeMeasureSpec(sizeNotifierRelativeLayout.getWidth(), View.MeasureSpec.EXACTLY));
+                emojiPopup.setWidth(View.MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, View.MeasureSpec.EXACTLY));
             }
 
             emojiPopup.showAtLocation(parentActivity.getWindow().getDecorView(), 83, 0, 0);
@@ -507,6 +509,15 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
             }
         });
         emojiPopup = new PopupWindow(emojiView);
+
+        /*try {
+            Method method = emojiPopup.getClass().getMethod("setWindowLayoutType", int.class);
+            if (method != null) {
+                method.invoke(emojiPopup, WindowManager.LayoutParams.LAST_SUB_WINDOW);
+            }
+        } catch (Exception e) {
+            //don't promt
+        }*/
     }
 
     public void setDelegate(ChatActivityEnterViewDelegate delegate) {
@@ -534,7 +545,11 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
                     @Override
                     public void run() {
                         if (messsageEditText != null) {
-                            messsageEditText.requestFocus();
+                            try {
+                                messsageEditText.requestFocus();
+                            } catch (Exception e) {
+                                FileLog.e("tmessages", e);
+                            }
                         }
                     }
                 }, 600);
@@ -585,7 +600,7 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
         if (emojiPopup != null && emojiPopup.isShowing()) {
             WindowManager wm = (WindowManager) ApplicationLoader.applicationContext.getSystemService(Context.WINDOW_SERVICE);
             final WindowManager.LayoutParams layoutParams = (WindowManager.LayoutParams)emojiPopup.getContentView().getLayoutParams();
-            layoutParams.width = sizeNotifierRelativeLayout.getWidth();
+            layoutParams.width = AndroidUtilities.displaySize.x;
             if (rotation == Surface.ROTATION_270 || rotation == Surface.ROTATION_90) {
                 layoutParams.height = keyboardHeightLand;
             } else {
@@ -646,6 +661,8 @@ public class ChatActivityEnterView implements NotificationCenter.NotificationCen
             if (delegate != null) {
                 delegate.onMessageSend();
             }
+        } else if (id == NotificationCenter.hideEmojiKeyboard) {
+            hideEmojiPopup();
         }
     }
 }

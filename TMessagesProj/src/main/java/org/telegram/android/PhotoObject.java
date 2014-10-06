@@ -46,45 +46,21 @@ public class PhotoObject {
         }
     }
 
-    public static PhotoObject getClosestImageWithSize(ArrayList<PhotoObject> arr, int width, int height) {
+    public static PhotoObject getClosestImageWithSize(ArrayList<PhotoObject> arr, int side) {
         if (arr == null) {
             return null;
         }
-        int closestWidth = 9999;
-        int closestHeight = 9999;
+
+        int lastSide = 0;
         PhotoObject closestObject = null;
         for (PhotoObject obj : arr) {
             if (obj == null || obj.photoOwner == null) {
                 continue;
             }
-            int diffW = Math.abs(obj.photoOwner.w - width);
-            int diffH = Math.abs(obj.photoOwner.h - height);
-            if (closestObject == null || closestWidth > diffW || closestHeight > diffH || closestObject.photoOwner instanceof TLRPC.TL_photoCachedSize) {
+            int currentSide = obj.photoOwner.w >= obj.photoOwner.h ? obj.photoOwner.w : obj.photoOwner.h;
+            if (closestObject == null || closestObject.photoOwner instanceof TLRPC.TL_photoCachedSize || currentSide <= side && lastSide < currentSide) {
                 closestObject = obj;
-                closestWidth = diffW;
-                closestHeight = diffH;
-            }
-        }
-        return closestObject;
-    }
-
-    public static TLRPC.PhotoSize getClosestPhotoSizeWithSize(ArrayList<TLRPC.PhotoSize> sizes, int width, int height) {
-        if (sizes == null) {
-            return null;
-        }
-        int closestWidth = 9999;
-        int closestHeight = 9999;
-        TLRPC.PhotoSize closestObject = null;
-        for (TLRPC.PhotoSize obj : sizes) {
-            if (obj == null) {
-                continue;
-            }
-            int diffW = Math.abs(obj.w - width);
-            int diffH = Math.abs(obj.h - height);
-            if (closestObject == null || closestObject instanceof TLRPC.TL_photoCachedSize || closestWidth > diffW || closestHeight > diffH) {
-                closestObject = obj;
-                closestWidth = diffW;
-                closestHeight = diffH;
+                lastSide = currentSide;
             }
         }
         return closestObject;

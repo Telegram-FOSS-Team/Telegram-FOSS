@@ -39,7 +39,6 @@ import org.telegram.android.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.RPCRequest;
 import org.telegram.messenger.UserConfig;
-import org.telegram.messenger.Utilities;
 import org.telegram.ui.Adapters.ContactsActivityAdapter;
 import org.telegram.ui.Adapters.ContactsActivitySearchAdapter;
 import org.telegram.ui.Cells.ChatOrUserCell;
@@ -349,7 +348,7 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
-            builder.setMessage(LocaleController.formatStringSimple(selectAlertString, Utilities.formatName(user.first_name, user.last_name)));
+            builder.setMessage(LocaleController.formatStringSimple(selectAlertString, ContactsController.formatName(user.first_name, user.last_name)));
             final EditText editText = new EditText(getParentActivity());
             if (android.os.Build.VERSION.SDK_INT < 11) {
                 editText.setBackgroundResource(android.R.drawable.editbox_background_normal);

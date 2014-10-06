@@ -629,8 +629,8 @@ public class ChatProfileActivity extends BaseFragment implements NotificationCen
                     count = info.participants.size();
                 }
 
-                if (count != 0 && onlineCount > 0) {
-                    onlineText.setText(Html.fromHtml(String.format("%s, <font color='#357aa8'>%d %s</font>", LocaleController.formatPluralString("Members", count), onlineCount, LocaleController.getString("Online", R.string.Online))));
+                if (count != 0 && onlineCount > 1) {
+                    onlineText.setText(Html.fromHtml(String.format("%s, <font color='#357aa8'>%d %s</font>", LocaleController.formatPluralString("Members", count), onlineCount, LocaleController.formatPluralString("Online", onlineCount))));
                 } else {
                     onlineText.setText(LocaleController.formatPluralString("Members", count));
                 }
@@ -641,7 +641,7 @@ public class ChatProfileActivity extends BaseFragment implements NotificationCen
                     photo = chat.photo.photo_small;
                     photoBig = chat.photo.photo_big;
                 }
-                avatarImage.setImage(photo, "50_50", Utilities.getGroupAvatarForId(chat.id));
+                avatarImage.setImage(photo, "50_50", chat_id > 0 ? AndroidUtilities.getGroupAvatarForId(chat.id) : AndroidUtilities.getBroadcastAvatarForId(chat.id));
                 avatarImage.imageReceiver.setVisible(!PhotoViewer.getInstance().isShowingImage(photoBig), false);
                 return view;
             } else if (type == 1) {
