@@ -32,7 +32,7 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     compile 'com.android.support:support-v4:20.0.+'
-    compile 'com.googlecode.mp4parser:isoparser:1.0.+'
+    compile 'com.googlecode.mp4parser:isoparser:1.0.2'
     compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
