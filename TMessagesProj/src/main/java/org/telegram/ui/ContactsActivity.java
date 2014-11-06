@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 
 import org.telegram.android.AndroidUtilities;
 import org.telegram.android.LocaleController;
+import org.telegram.android.MessagesStorage;
 import org.telegram.messenger.TLObject;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.ConnectionsManager;
@@ -71,6 +73,7 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
 
     private String inviteText;
     private boolean updatingInviteText = false;
+    private boolean allowUsernameSearch = true;
     private ContactsActivityDelegate delegate;
 
     public static interface ContactsActivityDelegate {
@@ -90,11 +93,12 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.encryptedChatCreated);
         if (arguments != null) {
             onlyUsers = getArguments().getBoolean("onlyUsers", false);
-            destroyAfterSelect = getArguments().getBoolean("destroyAfterSelect", false);
-            usersAsSections = getArguments().getBoolean("usersAsSections", false);
-            returnAsResult = getArguments().getBoolean("returnAsResult", false);
-            createSecretChat = getArguments().getBoolean("createSecretChat", false);
+            destroyAfterSelect = arguments.getBoolean("destroyAfterSelect", false);
+            usersAsSections = arguments.getBoolean("usersAsSections", false);
+            returnAsResult = arguments.getBoolean("returnAsResult", false);
+            createSecretChat = arguments.getBoolean("createSecretChat", false);
             selectAlertString = arguments.getString("selectAlertString");
+            allowUsernameSearch = arguments.getBoolean("allowUsernameSearch", true);
         }
 
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
@@ -198,10 +202,16 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
 
             emptyTextView = (TextView)fragmentView.findViewById(R.id.searchEmptyView);
             emptyTextView.setText(LocaleController.getString("NoContacts", R.string.NoContacts));
-            searchListViewAdapter = new ContactsActivitySearchAdapter(getParentActivity(), ignoreUsers);
+            searchListViewAdapter = new ContactsActivitySearchAdapter(getParentActivity(), ignoreUsers, allowUsernameSearch);
 
             listView = (PinnedHeaderListView)fragmentView.findViewById(R.id.listView);
             listView.setEmptyView(emptyTextView);
+            emptyTextView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return true;
+                }
+            });
             listView.setVerticalScrollBarEnabled(false);
 
             listViewAdapter = new ContactsActivityAdapter(getParentActivity(), onlyUsers, usersAsSections, ignoreUsers);
@@ -213,6 +223,12 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
                         TLRPC.User user = searchListViewAdapter.getItem(i);
                         if (user == null || user.id == UserConfig.getClientUserId()) {
                             return;
+                        }
+                        if (searchListViewAdapter.isGlobalSearch(i)) {
+                            ArrayList<TLRPC.User> users = new ArrayList<TLRPC.User>();
+                            users.add(user);
+                            MessagesController.getInstance().putUsers(users, false);
+                            MessagesStorage.getInstance().putUsersAndChats(users, null, false, true);
                         }
                         if (returnAsResult) {
                             if (ignoreUsers != null && ignoreUsers.containsKey(user.id)) {

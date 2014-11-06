@@ -1,6 +1,7 @@
 ## Telegram-FOSS
 
 [Telegram](http://telegram.org) is a messaging app with a focus on speed and security. It’s superfast, simple and free.
+This repo contains the official source code for [Telegram App for Android](https://play.google.com/store/apps/details?id=org.telegram.messenger).
 
 This is an unofficial, FOSS friendly fork of the original [Telegram App for Android](https://github.com/DrKLO/Telegram).
 
@@ -15,12 +16,15 @@ Versions are in form "v$UPSTREAM$RELEASE" where:
 
 ### API, Protocol documentation
 
-Documentation for Telegram API is available here: http://core.telegram.org/api
+Telegram API manuals: http://core.telegram.org/api
 
-Documentation for MTproto protocol is available here: http://core.telegram.org/mtproto
+MTproto protocol manuals: http://core.telegram.org/mtproto
 
 ### Usage
 
+**Beware of using the dev branch and uploading it to any markets, in many cases it not will work as expected**.
+
+First of all, take a look at **src/main/java/org/telegram/messenger/BuildVars.java** and fill it with correct values.
 Import the root folder into your IDE (tested on Android Studio), then run project.
 
 ### Localization

@@ -176,7 +176,7 @@ public class FileLoader {
                                 }
                                 if (small) {
                                     currentUploadSmallOperationsCount--;
-                                    if (currentUploadSmallOperationsCount < 2) {
+                                    if (currentUploadSmallOperationsCount < 1) {
                                         FileUploadOperation operation = uploadSmallOperationQueue.poll();
                                         if (operation != null) {
                                             currentUploadSmallOperationsCount++;
@@ -185,7 +185,7 @@ public class FileLoader {
                                     }
                                 } else {
                                     currentUploadOperationsCount--;
-                                    if (currentUploadOperationsCount < 2) {
+                                    if (currentUploadOperationsCount < 1) {
                                         FileUploadOperation operation = uploadOperationQueue.poll();
                                         if (operation != null) {
                                             currentUploadOperationsCount++;
@@ -227,7 +227,7 @@ public class FileLoader {
                                 });
                                 if (small) {
                                     currentUploadSmallOperationsCount--;
-                                    if (currentUploadSmallOperationsCount < 2) {
+                                    if (currentUploadSmallOperationsCount < 1) {
                                         FileUploadOperation operation = uploadSmallOperationQueue.poll();
                                         if (operation != null) {
                                             currentUploadSmallOperationsCount++;
@@ -236,7 +236,7 @@ public class FileLoader {
                                     }
                                 } else {
                                     currentUploadOperationsCount--;
-                                    if (currentUploadOperationsCount < 2) {
+                                    if (currentUploadOperationsCount < 1) {
                                         FileUploadOperation operation = uploadOperationQueue.poll();
                                         if (operation != null) {
                                             currentUploadOperationsCount++;
@@ -259,14 +259,14 @@ public class FileLoader {
                     }
                 };
                 if (small) {
-                    if (currentUploadSmallOperationsCount < 2) {
+                    if (currentUploadSmallOperationsCount < 1) {
                         currentUploadSmallOperationsCount++;
                         operation.start();
                     } else {
                         uploadSmallOperationQueue.add(operation);
                     }
                 } else {
-                    if (currentUploadOperationsCount < 2) {
+                    if (currentUploadOperationsCount < 1) {
                         currentUploadOperationsCount++;
                         operation.start();
                     } else {
@@ -564,18 +564,30 @@ public class FileLoader {
         if (message == null) {
             return new File("");
         }
-        if (message.media instanceof TLRPC.TL_messageMediaVideo) {
-            return getPathToAttach(message.media.video);
-        } else if (message.media instanceof TLRPC.TL_messageMediaDocument) {
-            return getPathToAttach(message.media.document);
-        } else if (message.media instanceof TLRPC.TL_messageMediaAudio) {
-            return getPathToAttach(message.media.audio);
-        } else if (message.media instanceof TLRPC.TL_messageMediaPhoto) {
-            ArrayList<TLRPC.PhotoSize> sizes = message.media.photo.sizes;
-            if (sizes.size() > 0) {
-                TLRPC.PhotoSize sizeFull = getClosestPhotoSizeWithSize(sizes, AndroidUtilities.getPhotoSize());
-                if (sizeFull != null) {
-                    return getPathToAttach(sizeFull);
+        if (message instanceof TLRPC.TL_messageService) {
+            if (message.action.photo != null) {
+                ArrayList<TLRPC.PhotoSize> sizes = message.action.photo.sizes;
+                if (sizes.size() > 0) {
+                    TLRPC.PhotoSize sizeFull = getClosestPhotoSizeWithSize(sizes, AndroidUtilities.getPhotoSize());
+                    if (sizeFull != null) {
+                        return getPathToAttach(sizeFull);
+                    }
+                }
+            }
+        } else {
+            if (message.media instanceof TLRPC.TL_messageMediaVideo) {
+                return getPathToAttach(message.media.video);
+            } else if (message.media instanceof TLRPC.TL_messageMediaDocument) {
+                return getPathToAttach(message.media.document);
+            } else if (message.media instanceof TLRPC.TL_messageMediaAudio) {
+                return getPathToAttach(message.media.audio);
+            } else if (message.media instanceof TLRPC.TL_messageMediaPhoto) {
+                ArrayList<TLRPC.PhotoSize> sizes = message.media.photo.sizes;
+                if (sizes.size() > 0) {
+                    TLRPC.PhotoSize sizeFull = getClosestPhotoSizeWithSize(sizes, AndroidUtilities.getPhotoSize());
+                    if (sizeFull != null) {
+                        return getPathToAttach(sizeFull);
+                    }
                 }
             }
         }
@@ -593,38 +605,42 @@ public class FileLoader {
     }
 
     public static File getPathToAttach(TLObject attach) {
+        return getPathToAttach(attach, false);
+    }
+
+    public static File getPathToAttach(TLObject attach, boolean forceCache) {
         File dir = null;
         if (attach instanceof TLRPC.Video) {
             TLRPC.Video video = (TLRPC.Video)attach;
-            if (video.key != null) {
+            if (forceCache || video.key != null) {
                 dir = getInstance().getDirectory(MEDIA_DIR_CACHE);
             } else {
                 dir = getInstance().getDirectory(MEDIA_DIR_VIDEO);
             }
         } else if (attach instanceof TLRPC.Document) {
             TLRPC.Document document = (TLRPC.Document)attach;
-            if (document.key != null) {
+            if (forceCache || document.key != null) {
                 dir = getInstance().getDirectory(MEDIA_DIR_CACHE);
             } else {
                 dir = getInstance().getDirectory(MEDIA_DIR_DOCUMENT);
             }
         } else if (attach instanceof TLRPC.PhotoSize) {
             TLRPC.PhotoSize photoSize = (TLRPC.PhotoSize)attach;
-            if (photoSize.location == null || photoSize.location.key != null || photoSize.location.volume_id == Integer.MIN_VALUE && photoSize.location.local_id < 0) {
+            if (forceCache || photoSize.location == null || photoSize.location.key != null || photoSize.location.volume_id == Integer.MIN_VALUE && photoSize.location.local_id < 0) {
                 dir = getInstance().getDirectory(MEDIA_DIR_CACHE);
             } else {
                 dir = getInstance().getDirectory(MEDIA_DIR_IMAGE);
             }
         } else if (attach instanceof TLRPC.Audio) {
             TLRPC.Audio audio = (TLRPC.Audio)attach;
-            if (audio.key != null) {
+            if (forceCache || audio.key != null) {
                 dir = getInstance().getDirectory(MEDIA_DIR_CACHE);
             } else {
                 dir = getInstance().getDirectory(MEDIA_DIR_AUDIO);
             }
         } else if (attach instanceof TLRPC.FileLocation) {
             TLRPC.FileLocation fileLocation = (TLRPC.FileLocation)attach;
-            if (fileLocation.key != null || fileLocation.volume_id == Integer.MIN_VALUE && fileLocation.local_id < 0) {
+            if (forceCache || fileLocation.key != null || fileLocation.volume_id == Integer.MIN_VALUE && fileLocation.local_id < 0) {
                 dir = getInstance().getDirectory(MEDIA_DIR_CACHE);
             } else {
                 dir = getInstance().getDirectory(MEDIA_DIR_IMAGE);
@@ -687,5 +703,27 @@ public class FileLoader {
             return location.volume_id + "_" + location.local_id + ".jpg";
         }
         return "";
+    }
+
+    public void deleteFiles(final ArrayList<File> files) {
+        if (files == null || files.isEmpty()) {
+            return;
+        }
+        fileLoaderQueue.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                for (File file : files) {
+                    if (file.exists()) {
+                        try {
+                            if (!file.delete()) {
+                                file.deleteOnExit();
+                            }
+                        } catch (Exception e) {
+                            FileLog.e("tmessages", e);
+                        }
+                    }
+                }
+            }
+        });
     }
 }

@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
@@ -119,6 +120,12 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
             fragmentView = inflater.inflate(R.layout.photo_picker_layout, container, false);
 
             emptyView = (TextView)fragmentView.findViewById(R.id.searchEmptyView);
+            emptyView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return true;
+                }
+            });
             emptyView.setText(LocaleController.getString("NoPhotos", R.string.NoPhotos));
             listView = (GridView)fragmentView.findViewById(R.id.media_grid);
             progressView = fragmentView.findViewById(R.id.progressLayout);
@@ -272,6 +279,9 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         int count = listView.getChildCount();
         for (int a = 0; a < count; a++) {
             View view = listView.getChildAt(a);
+            if (view.getTag() == null) {
+                continue;
+            }
             int num = (Integer)view.getTag();
             if (num < 0 || num >= selectedAlbum.photos.size()) {
                 continue;
@@ -334,7 +344,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
     @Override
     public void sendButtonPressed(int index) {
         if (selectedPhotos.isEmpty()) {
-            if (index < 0 || index >= selectedAlbum.photos.size()) {
+            if (selectedAlbum == null || index < 0 || index >= selectedAlbum.photos.size()) {
                 return;
             }
             MediaController.PhotoEntry photoEntry = selectedAlbum.photos.get(index);

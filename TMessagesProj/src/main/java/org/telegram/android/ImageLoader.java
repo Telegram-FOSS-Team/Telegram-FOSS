@@ -28,7 +28,6 @@ import android.provider.MediaStore;
 import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.R;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
@@ -293,7 +292,7 @@ public class ImageLoader {
                             }
                         }
                         if (image != null && blur && bitmapH < 100 && bitmapW < 100) {
-                            Utilities.blurBitmap(image);
+                            Utilities.blurBitmap(image, 3);
                         }
                     }
                     if (runtimeHack != null) {
@@ -640,54 +639,77 @@ public class ImageLoader {
 
         try {
             if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-                telegramPath = new File(Environment.getExternalStorageDirectory(), LocaleController.getString("AppName", R.string.AppName));
+                telegramPath = new File(Environment.getExternalStorageDirectory(), "Telegram");
                 telegramPath.mkdirs();
-                if (telegramPath.isDirectory()) {
-                    try {
-                        File imagePath = new File(telegramPath, LocaleController.getString("AppName", R.string.AppName) + " Images");
-                        imagePath.mkdir();
-                        if (imagePath.isDirectory()) {
-                            mediaDirs.put(FileLoader.MEDIA_DIR_IMAGE, imagePath);
-                            FileLog.e("tmessages", "image path = " + imagePath);
-                        }
-                    } catch (Exception e) {
-                        FileLog.e("tmessages", e);
-                    }
 
-                    try {
-                        File videoPath = new File(telegramPath, LocaleController.getString("AppName", R.string.AppName) + " Video");
-                        videoPath.mkdir();
-                        if (videoPath.isDirectory()) {
-                            mediaDirs.put(FileLoader.MEDIA_DIR_VIDEO, videoPath);
-                            FileLog.e("tmessages", "video path = " + videoPath);
-                        }
-                    } catch (Exception e) {
-                        FileLog.e("tmessages", e);
-                    }
+                boolean canRename = false;
 
-                    try {
-                        File audioPath = new File(telegramPath, LocaleController.getString("AppName", R.string.AppName) + " Audio");
-                        audioPath.mkdir();
-                        if (audioPath.isDirectory()) {
-                            new File(audioPath, ".nomedia").createNewFile();
-                            mediaDirs.put(FileLoader.MEDIA_DIR_AUDIO, audioPath);
-                            FileLog.e("tmessages", "audio path = " + audioPath);
+                try {
+                    for (int a = 0; a < 5; a++) {
+                        File srcFile = new File(cachePath, "temp.file");
+                        srcFile.createNewFile();
+                        File dstFile = new File(telegramPath, "temp.file");
+                        canRename = srcFile.renameTo(dstFile);
+                        srcFile.delete();
+                        dstFile.delete();
+                        if (canRename) {
+                            break;
                         }
-                    } catch (Exception e) {
-                        FileLog.e("tmessages", e);
                     }
+                } catch (Exception e) {
+                    FileLog.e("tmessages", e);
+                }
 
-                    try {
-                        File documentPath = new File(telegramPath, LocaleController.getString("AppName", R.string.AppName) + " Documents");
-                        documentPath.mkdir();
-                        if (documentPath.isDirectory()) {
-                            new File(documentPath, ".nomedia").createNewFile();
-                            mediaDirs.put(FileLoader.MEDIA_DIR_DOCUMENT, documentPath);
-                            FileLog.e("tmessages", "documents path = " + documentPath);
+                if (canRename) {
+                    if (telegramPath.isDirectory()) {
+                        try {
+                            File imagePath = new File(telegramPath, "Telegram Images");
+                            imagePath.mkdir();
+                            if (imagePath.isDirectory()) {
+                                mediaDirs.put(FileLoader.MEDIA_DIR_IMAGE, imagePath);
+                                FileLog.e("tmessages", "image path = " + imagePath);
+                            }
+                        } catch (Exception e) {
+                            FileLog.e("tmessages", e);
                         }
-                    } catch (Exception e) {
-                        FileLog.e("tmessages", e);
+
+                        try {
+                            File videoPath = new File(telegramPath, "Telegram Video");
+                            videoPath.mkdir();
+                            if (videoPath.isDirectory()) {
+                                mediaDirs.put(FileLoader.MEDIA_DIR_VIDEO, videoPath);
+                                FileLog.e("tmessages", "video path = " + videoPath);
+                            }
+                        } catch (Exception e) {
+                            FileLog.e("tmessages", e);
+                        }
+
+                        try {
+                            File audioPath = new File(telegramPath, "Telegram Audio");
+                            audioPath.mkdir();
+                            if (audioPath.isDirectory()) {
+                                new File(audioPath, ".nomedia").createNewFile();
+                                mediaDirs.put(FileLoader.MEDIA_DIR_AUDIO, audioPath);
+                                FileLog.e("tmessages", "audio path = " + audioPath);
+                            }
+                        } catch (Exception e) {
+                            FileLog.e("tmessages", e);
+                        }
+
+                        try {
+                            File documentPath = new File(telegramPath, "Telegram Documents");
+                            documentPath.mkdir();
+                            if (documentPath.isDirectory()) {
+                                new File(documentPath, ".nomedia").createNewFile();
+                                mediaDirs.put(FileLoader.MEDIA_DIR_DOCUMENT, documentPath);
+                                FileLog.e("tmessages", "documents path = " + documentPath);
+                            }
+                        } catch (Exception e) {
+                            FileLog.e("tmessages", e);
+                        }
                     }
+                } else {
+                    FileLog.e("tmessages", "this Android can't rename files");
                 }
             }
             MediaController.getInstance().checkSaveToGalleryFiles();
@@ -809,7 +831,11 @@ public class ImageLoader {
         });
     }
 
-    public void loadImage(final TLRPC.FileLocation fileLocation, final String httpUrl, final ImageReceiver imageView, final int size) {
+    public void putImageToCache(BitmapDrawable bitmap, String key) {
+        memCache.put(key, bitmap);
+    }
+
+    public void loadImage(final TLRPC.FileLocation fileLocation, final String httpUrl, final ImageReceiver imageView, final int size, final boolean cacheOnly) {
         if ((fileLocation == null && httpUrl == null) || imageView == null || (fileLocation != null && !(fileLocation instanceof TLRPC.TL_fileLocation) && !(fileLocation instanceof TLRPC.TL_fileEncryptedLocation))) {
             return;
         }
@@ -861,7 +887,7 @@ public class ImageLoader {
         if (!added) {
             boolean onlyCache = false;
             File cacheFile = null;
-            if (size == 0 || httpUrl != null || fileLocation != null && (fileLocation.key != null || fileLocation.volume_id == Integer.MIN_VALUE && fileLocation.local_id < 0)) {
+            if (cacheOnly || size == 0 || httpUrl != null || fileLocation != null && (fileLocation.key != null || fileLocation.volume_id == Integer.MIN_VALUE && fileLocation.local_id < 0)) {
                 cacheFile = new File(FileLoader.getInstance().getDirectory(FileLoader.MEDIA_DIR_CACHE), url);
             } else {
                 cacheFile = new File(FileLoader.getInstance().getDirectory(FileLoader.MEDIA_DIR_IMAGE), url);
@@ -898,7 +924,7 @@ public class ImageLoader {
                 img.addImageView(imageView);
                 imageLoadingByUrl.put(url, img);
                 if (httpUrl == null) {
-                    FileLoader.getInstance().loadFile(fileLocation, size, size == 0 || fileLocation.key != null);
+                    FileLoader.getInstance().loadFile(fileLocation, size, size == 0 || fileLocation.key != null || cacheOnly);
                 } else {
                     String file = Utilities.MD5(httpUrl);
                     File cacheDir = FileLoader.getInstance().getDirectory(FileLoader.MEDIA_DIR_CACHE);
