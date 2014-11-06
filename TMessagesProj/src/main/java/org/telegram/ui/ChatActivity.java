@@ -3136,12 +3136,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                         alertUserOpenError(message);
                                     }
                                 } else if (message.type == 4) {
-                                    if (!isGoogleMapsInstalled()) {
-                                        return;
-                                    }
-                                    LocationActivity fragment = new LocationActivity();
-                                    fragment.setMessageObject(message);
-                                    presentFragment(fragment);
+                                    /* Telegram-FOSS doesn't support Google Location Services */
+                                    return;
                                 } else if (message.type == 9) {
                                     File f = null;
                                     String fileName = message.getFileName();
