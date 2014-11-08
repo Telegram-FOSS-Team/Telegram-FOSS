@@ -10,6 +10,6 @@ package org.telegram.messenger;
 
 public class BuildVars {
     public static boolean DEBUG_VERSION = false;
-    public static int APP_ID = 2458;
-    public static String APP_HASH = "5bce48dc7d331e62c955669eb7233217";
+    public static int APP_ID = 12834;
+    public static String APP_HASH = "c84d9229db1d6be95c067b02b126352c";
 }
