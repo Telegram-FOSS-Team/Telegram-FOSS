@@ -31,16 +31,9 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-<<<<<<< HEAD
-    compile 'com.android.support:support-v4:20.0.+'
-    compile 'com.googlecode.mp4parser:isoparser:1.0.2'
-    compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
-=======
     compile 'com.android.support:support-v4:21.0.+'
-    compile 'com.google.android.gms:play-services:3.2.+'
-    compile 'net.hockeyapp.android:HockeySDK:3.0.2'
     compile 'com.googlecode.mp4parser:isoparser:1.0.+'
->>>>>>> drklo/dev
+    compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
 android {
