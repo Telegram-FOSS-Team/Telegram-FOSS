@@ -25,7 +25,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.LaunchActivity;
 import org.telegram.ui.PhotoCropActivity;
-import org.telegram.ui.Views.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.BaseFragment;
 
 import java.io.File;
 
@@ -120,7 +120,7 @@ public class AvatarUpdater implements NotificationCenter.NotificationCenterDeleg
             return;
         }
         smallPhoto = ImageLoader.scaleAndSaveImage(bitmap, 100, 100, 80, false);
-        bigPhoto = ImageLoader.scaleAndSaveImage(bitmap, 800, 800, 80, false);
+        bigPhoto = ImageLoader.scaleAndSaveImage(bitmap, 800, 800, 80, false, 320, 320);
         if (bigPhoto != null && smallPhoto != null) {
             if (returnOnly) {
                 if (delegate != null) {
@@ -146,7 +146,7 @@ public class AvatarUpdater implements NotificationCenter.NotificationCenterDeleg
         if (id == NotificationCenter.FileDidUpload) {
             String location = (String)args[0];
             if (uploadingAvatar != null && location.equals(uploadingAvatar)) {
-                AndroidUtilities.RunOnUIThread(new Runnable() {
+                AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
                         NotificationCenter.getInstance().removeObserver(AvatarUpdater.this, NotificationCenter.FileDidUpload);
@@ -165,7 +165,7 @@ public class AvatarUpdater implements NotificationCenter.NotificationCenterDeleg
         } else if (id == NotificationCenter.FileDidFailUpload) {
             String location = (String)args[0];
             if (uploadingAvatar != null && location.equals(uploadingAvatar)) {
-                AndroidUtilities.RunOnUIThread(new Runnable() {
+                AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
                         NotificationCenter.getInstance().removeObserver(AvatarUpdater.this, NotificationCenter.FileDidUpload);

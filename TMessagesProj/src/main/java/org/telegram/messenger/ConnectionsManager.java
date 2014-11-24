@@ -14,7 +14,6 @@ import android.content.pm.PackageInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.os.PowerManager;
 import android.util.Base64;
 
 import org.telegram.android.AndroidUtilities;
@@ -83,9 +82,7 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
 
     private volatile long nextCallToken = 1;
 
-    private PowerManager.WakeLock wakeLock = null;
-
-    public static volatile ConnectionsManager Instance = null;
+    private static volatile ConnectionsManager Instance = null;
     public static ConnectionsManager getInstance() {
         ConnectionsManager localInstance = Instance;
         if (localInstance == null) {
@@ -217,10 +214,6 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
         }
 
         Utilities.stageQueue.postRunnable(stageRunnable, 1000);
-
-        PowerManager pm = (PowerManager)ApplicationLoader.applicationContext.getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "lock");
-        wakeLock.setReferenceCounted(false);
     }
 
     public int getConnectionState() {
@@ -646,7 +639,7 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
     }
 
     public void bindRequestToGuid(final Long request, final int guid) {
-        AndroidUtilities.RunOnUIThread(new Runnable() {
+        AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public void run() {
                 ArrayList<Long> requests = requestsByGuids.get(guid);
@@ -659,7 +652,7 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
     }
 
     public void removeRequestInClass(final Long request) {
-        AndroidUtilities.RunOnUIThread(new Runnable() {
+        AndroidUtilities.runOnUIThread(new Runnable() {
             @Override
             public void run() {
                 Integer guid = requestsByClass.get(request);
@@ -831,12 +824,11 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
                 if (invoke.system_version == null || invoke.system_version.length() == 0) {
                     invoke.system_version = "SDK Unknown";
                 }
-                object = invoke;
+                TLRPC.invokeWithLayer invoke2 = new TLRPC.invokeWithLayer();
+                invoke2.query = invoke;
+                FileLog.d("wrap in layer", "" + object);
+                object = invoke2;
             }
-            TLRPC.invokeWithLayer18 invoke = new TLRPC.invokeWithLayer18();
-            invoke.query = object;
-            FileLog.d("wrap in layer", "" + object);
-            return invoke;
         }
         return object;
     }
@@ -1614,12 +1606,12 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
             TLRPC.TL_protoMessage message = networkMessage.protoMessage;
 
             if (BuildVars.DEBUG_VERSION) {
-                if (message.body instanceof TLRPC.invokeWithLayer18) {
-                    FileLog.d("tmessages", connection.getSissionId() + ":DC" + datacenter.datacenterId + "> Send message (" + message.seqno + ", " + message.msg_id + "): " + ((TLRPC.invokeWithLayer18)message.body).query);
+                if (message.body instanceof TLRPC.invokeWithLayer) {
+                    FileLog.d("tmessages", connection.getSissionId() + ":DC" + datacenter.datacenterId + "> Send message (" + message.seqno + ", " + message.msg_id + "): " + ((TLRPC.invokeWithLayer)message.body).query);
                 } else if (message.body instanceof TLRPC.initConnection) {
                     TLRPC.initConnection r = (TLRPC.initConnection)message.body;
-                    if (r.query instanceof TLRPC.invokeWithLayer18) {
-                        FileLog.d("tmessages", connection.getSissionId() + ":DC" + datacenter.datacenterId + "> Send message (" + message.seqno + ", " + message.msg_id + "): " + ((TLRPC.invokeWithLayer18)r.query).query);
+                    if (r.query instanceof TLRPC.invokeWithLayer) {
+                        FileLog.d("tmessages", connection.getSissionId() + ":DC" + datacenter.datacenterId + "> Send message (" + message.seqno + ", " + message.msg_id + "): " + ((TLRPC.invokeWithLayer)r.query).query);
                     } else {
                         FileLog.d("tmessages", connection.getSissionId() + ":DC" + datacenter.datacenterId + "> Send message (" + message.seqno + ", " + message.msg_id + "): " + r.query);
                     }
@@ -1654,12 +1646,12 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
                 TLRPC.TL_protoMessage message = networkMessage.protoMessage;
                 containerMessages.add(message);
                 if (BuildVars.DEBUG_VERSION) {
-                    if (message.body instanceof TLRPC.invokeWithLayer18) {
-                        FileLog.d("tmessages", connection.getSissionId() + ":DC" + datacenter.datacenterId + "> Send message (" + message.seqno + ", " + message.msg_id + "): " + ((TLRPC.invokeWithLayer18)message.body).query);
+                    if (message.body instanceof TLRPC.invokeWithLayer) {
+                        FileLog.d("tmessages", connection.getSissionId() + ":DC" + datacenter.datacenterId + "> Send message (" + message.seqno + ", " + message.msg_id + "): " + ((TLRPC.invokeWithLayer)message.body).query);
                     } else if (message.body instanceof TLRPC.initConnection) {
                         TLRPC.initConnection r = (TLRPC.initConnection)message.body;
-                        if (r.query instanceof TLRPC.invokeWithLayer18) {
-                            FileLog.d("tmessages", connection.getSissionId() + ":DC" + datacenter.datacenterId + "> Send message (" + message.seqno + ", " + message.msg_id + "): " + ((TLRPC.invokeWithLayer18)r.query).query);
+                        if (r.query instanceof TLRPC.invokeWithLayer) {
+                            FileLog.d("tmessages", connection.getSissionId() + ":DC" + datacenter.datacenterId + "> Send message (" + message.seqno + ", " + message.msg_id + "): " + ((TLRPC.invokeWithLayer)r.query).query);
                         } else {
                             FileLog.d("tmessages", connection.getSissionId() + ":DC" + datacenter.datacenterId + "> Send message (" + message.seqno + ", " + message.msg_id + "): " + r.query);
                         }
@@ -2139,14 +2131,6 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
                                 } else {
                                     if (resultContainer.result instanceof TLRPC.updates_Difference) {
                                         pushMessagesReceived = true;
-                                        AndroidUtilities.RunOnUIThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (wakeLock.isHeld()) {
-                                                    wakeLock.release();
-                                                }
-                                            }
-                                        });
                                     }
                                     request.completionBlock.run(resultContainer.result, null);
                                 }
@@ -2158,7 +2142,7 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
                                     if ((request.flags & RPCRequest.RPCRequestClassGeneric) != 0) {
                                         if (UserConfig.isClientActivated()) {
                                             UserConfig.clearConfig();
-                                            AndroidUtilities.RunOnUIThread(new Runnable() {
+                                            AndroidUtilities.runOnUIThread(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     NotificationCenter.getInstance().postNotificationName(NotificationCenter.appDidLogout);
@@ -2252,6 +2236,17 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
 
                 lastOutgoingMessageId = Math.max(messageId, lastOutgoingMessageId);
             }
+            long resultMid = ((TLRPC.TL_bad_server_salt) message).bad_msg_id;
+            if (resultMid != 0) {
+                for (RPCRequest request : runningRequests) {
+                    if ((request.flags & RPCRequest.RPCRequestClassDownloadMedia) == 0) {
+                        continue;
+                    }
+                    if (request.respondsToMessageId(resultMid)) {
+                        request.retryCount = 0;
+                    }
+                }
+            }
 
             datacenter.clearServerSalts();
 
@@ -2317,23 +2312,9 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
                 if (paused) {
                     pushMessagesReceived = false;
                 }
-                AndroidUtilities.RunOnUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        wakeLock.acquire(20000);
-                    }
-                });
                 resumeNetworkInternal();
             } else {
                 pushMessagesReceived = true;
-                AndroidUtilities.RunOnUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (wakeLock.isHeld()) {
-                            wakeLock.release();
-                        }
-                    }
-                });
                 MessagesController.getInstance().processUpdates((TLRPC.Updates) message, false);
             }
         } else {
@@ -2431,7 +2412,7 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
                 }
             }
             final int stateCopy = connectionState;
-            AndroidUtilities.RunOnUIThread(new Runnable() {
+            AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     NotificationCenter.getInstance().postNotificationName(NotificationCenter.didUpdatedConnectionState, stateCopy);
@@ -2481,7 +2462,7 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
             if (ConnectionsManager.getInstance().connectionState == 3 && !MessagesController.getInstance().gettingDifference && !MessagesController.getInstance().gettingDifferenceAgain) {
                 ConnectionsManager.getInstance().connectionState = 0;
                 final int stateCopy = ConnectionsManager.getInstance().connectionState;
-                AndroidUtilities.RunOnUIThread(new Runnable() {
+                AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
                         NotificationCenter.getInstance().postNotificationName(NotificationCenter.didUpdatedConnectionState, stateCopy);
@@ -2497,7 +2478,7 @@ public class ConnectionsManager implements Action.ActionDelegate, TcpConnection.
             if (connectionState == 1 || connectionState == 2) {
                 connectionState = 3;
                 final int stateCopy = connectionState;
-                AndroidUtilities.RunOnUIThread(new Runnable() {
+                AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
                         NotificationCenter.getInstance().postNotificationName(NotificationCenter.didUpdatedConnectionState, stateCopy);

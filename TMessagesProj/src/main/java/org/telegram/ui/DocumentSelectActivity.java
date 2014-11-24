@@ -24,16 +24,17 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.telegram.android.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 import org.telegram.android.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.Adapters.BaseFragmentAdapter;
-import org.telegram.ui.Views.ActionBar.ActionBarLayer;
-import org.telegram.ui.Views.ActionBar.ActionBarMenu;
-import org.telegram.ui.Views.ActionBar.ActionBarMenuItem;
-import org.telegram.ui.Views.BackupImageView;
-import org.telegram.ui.Views.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.ActionBar;
+import org.telegram.ui.ActionBar.ActionBarMenu;
+import org.telegram.ui.ActionBar.ActionBarMenuItem;
+import org.telegram.ui.Cells.TextDetailDocumentsCell;
+import org.telegram.ui.ActionBar.BaseFragment;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -130,10 +131,10 @@ public class DocumentSelectActivity extends BaseFragment {
         }
 
         if (fragmentView == null) {
-            actionBarLayer.setDisplayHomeAsUpEnabled(true, R.drawable.ic_ab_back);
-            actionBarLayer.setBackOverlay(R.layout.updating_state_layout);
-            actionBarLayer.setTitle(LocaleController.getString("SelectFile", R.string.SelectFile));
-            actionBarLayer.setActionBarMenuOnItemClick(new ActionBarLayer.ActionBarMenuOnItemClick() {
+            actionBar.setBackButtonImage(R.drawable.ic_ab_back);
+            actionBar.setAllowOverlayTitle(true);
+            actionBar.setTitle(LocaleController.getString("SelectFile", R.string.SelectFile));
+            actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
                 @Override
                 public void onItemClick(int id) {
                     if (id == -1) {
@@ -146,7 +147,7 @@ public class DocumentSelectActivity extends BaseFragment {
                     }
                 }
             });
-            ActionBarMenu menu = actionBarLayer.createMenu();
+            ActionBarMenu menu = actionBar.createMenu();
             ActionBarMenuItem item = menu.addItem(1, R.drawable.ic_ab_other);
 
             fragmentView = inflater.inflate(R.layout.document_select_layout, container, false);
@@ -168,7 +169,7 @@ public class DocumentSelectActivity extends BaseFragment {
                     File file = item.file;
                     if (file == null) {
                         HistoryEntry he = history.remove(history.size() - 1);
-                        actionBarLayer.setTitle(he.title);
+                        actionBar.setTitle(he.title);
                         if (he.dir != null) {
                             listFiles(he.dir);
                         } else {
@@ -180,12 +181,12 @@ public class DocumentSelectActivity extends BaseFragment {
                         he.scrollItem = listView.getFirstVisiblePosition();
                         he.scrollOffset = listView.getChildAt(0).getTop();
                         he.dir = currentDir;
-                        he.title = actionBarLayer.getTitle().toString();
+                        he.title = actionBar.getTitle().toString();
                         if (!listFiles(file)) {
                             return;
                         }
                         history.add(he);
-                        actionBarLayer.setTitle(item.title);
+                        actionBar.setTitle(item.title);
                         listView.setSelection(0);
                     } else {
                         if (!file.canRead()) {
@@ -230,7 +231,7 @@ public class DocumentSelectActivity extends BaseFragment {
     public boolean onBackPressed() {
         if (history.size() > 0) {
             HistoryEntry he = history.remove(history.size() - 1);
-            actionBarLayer.setTitle(he.title);
+            actionBar.setTitle(he.title);
             if (he.dir != null) {
                 listFiles(he.dir);
             } else {
@@ -261,6 +262,7 @@ public class DocumentSelectActivity extends BaseFragment {
                     } else {
                         emptyView.setText(LocaleController.getString("NotMounted", R.string.NotMounted));
                     }
+                    AndroidUtilities.clearDrawableAnimation(listView);
                     listAdapter.notifyDataSetChanged();
                     return true;
                 }
@@ -309,6 +311,7 @@ public class DocumentSelectActivity extends BaseFragment {
             item.file = file;
             if (file.isDirectory()) {
                 item.icon = R.drawable.ic_directory;
+                item.subtitle = LocaleController.getString("Folder", R.string.Folder);
             } else {
                 String fname = file.getName();
                 String[] sp = fname.split("\\.");
@@ -323,10 +326,11 @@ public class DocumentSelectActivity extends BaseFragment {
         }
         ListItem item = new ListItem();
         item.title = "..";
-        item.subtitle = "";
+        item.subtitle = LocaleController.getString("Folder", R.string.Folder);
         item.icon = R.drawable.ic_directory;
         item.file = null;
         items.add(0, item);
+        AndroidUtilities.clearDrawableAnimation(listView);
         listAdapter.notifyDataSetChanged();
         return true;
     }
@@ -335,11 +339,7 @@ public class DocumentSelectActivity extends BaseFragment {
         if (getParentActivity() == null) {
             return;
         }
-        new AlertDialog.Builder(getParentActivity())
-                .setTitle(LocaleController.getString("AppName", R.string.AppName))
-                .setMessage(error)
-                .setPositiveButton(R.string.OK, null)
-                .show();
+        new AlertDialog.Builder(getParentActivity()).setTitle(LocaleController.getString("AppName", R.string.AppName)).setMessage(error).setPositiveButton(R.string.OK, null).show();
     }
 
     private void listRoots() {
@@ -420,6 +420,7 @@ public class DocumentSelectActivity extends BaseFragment {
             FileLog.e("tmessages", e);
         }
 
+        AndroidUtilities.clearDrawableAnimation(listView);
         listAdapter.notifyDataSetChanged();
     }
 
@@ -465,35 +466,18 @@ public class DocumentSelectActivity extends BaseFragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            View v = convertView;
+            if (convertView == null) {
+                convertView = new TextDetailDocumentsCell(mContext);
+            }
+            TextDetailDocumentsCell textDetailCell = (TextDetailDocumentsCell) convertView;
             ListItem item = items.get(position);
-            if (v == null) {
-                v = View.inflate(mContext, R.layout.document_item, null);
-                if (item.subtitle.length() == 0) {
-                    v.findViewById(R.id.docs_item_info).setVisibility(View.GONE);
-                }
-            }
-            TextView typeTextView = (TextView)v.findViewById(R.id.docs_item_type);
-            ((TextView)v.findViewById(R.id.docs_item_title)).setText(item.title);
-
-            ((TextView)v.findViewById(R.id.docs_item_info)).setText(item.subtitle);
-            BackupImageView imageView = (BackupImageView)v.findViewById(R.id.docs_item_thumb);
-            if (item.thumb != null) {
-                imageView.setImageBitmap(null);
-                typeTextView.setText(item.ext.toUpperCase().substring(0, Math.min(item.ext.length(), 4)));
-                imageView.setImage(item.thumb, "55_42", 0);
-                imageView.setVisibility(View.VISIBLE);
-                typeTextView.setVisibility(View.VISIBLE);
-            } else if (item.icon != 0) {
-                imageView.setImageResource(item.icon);
-                imageView.setVisibility(View.VISIBLE);
-                typeTextView.setVisibility(View.GONE);
+            if (item.icon != 0) {
+                ((TextDetailDocumentsCell) convertView).setTextAndValueAndTypeAndThumb(item.title, item.subtitle, null, null, item.icon);
             } else {
-                typeTextView.setText(item.ext.toUpperCase().substring(0, Math.min(item.ext.length(), 4)));
-                imageView.setVisibility(View.GONE);
-                typeTextView.setVisibility(View.VISIBLE);
+                String type = item.ext.toUpperCase().substring(0, Math.min(item.ext.length(), 4));
+                ((TextDetailDocumentsCell) convertView).setTextAndValueAndTypeAndThumb(item.title, item.subtitle, type, item.thumb, 0);
             }
-            return v;
+            return convertView;
         }
     }
 }

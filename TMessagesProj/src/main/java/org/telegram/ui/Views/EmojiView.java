@@ -10,7 +10,6 @@ package org.telegram.ui.Views;
 
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
@@ -114,18 +113,19 @@ public class EmojiView extends LinearLayout {
 
             EmojiGridAdapter localEmojiGridAdapter = new EmojiGridAdapter(Emoji.data[i]);
             gridView.setAdapter(localEmojiGridAdapter);
+            AndroidUtilities.setListViewEdgeEffectColor(gridView, 0xff999999);
             adapters.add(localEmojiGridAdapter);
         }
 
-        setBackgroundDrawable(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[] { -14145496, -16777216 }));
+        setBackgroundColor(0xff222222);
         pager = new ViewPager(getContext());
         pager.setAdapter(new EmojiPagesAdapter());
         PagerSlidingTabStrip tabs = new PagerSlidingTabStrip(getContext());
         tabs.setViewPager(pager);
         tabs.setShouldExpand(true);
         tabs.setIndicatorColor(0xff33b5e5);
-        tabs.setIndicatorHeight(AndroidUtilities.dpf(2.0f));
-        tabs.setUnderlineHeight(AndroidUtilities.dpf(2.0f));
+        tabs.setIndicatorHeight(AndroidUtilities.dp(2.0f));
+        tabs.setUnderlineHeight(AndroidUtilities.dp(2.0f));
         tabs.setUnderlineColor(0x66000000);
         tabs.setTabBackground(0);
         LinearLayout localLinearLayout = new LinearLayout(getContext());
@@ -152,7 +152,7 @@ public class EmojiView extends LinearLayout {
         localTextView.setGravity(17);
         recentsWrap.addView(localTextView);
         views.get(0).setEmptyView(localTextView);
-        addView(localLinearLayout, new LinearLayout.LayoutParams(-1, AndroidUtilities.dpf(48.0f)));
+        addView(localLinearLayout, new LinearLayout.LayoutParams(-1, AndroidUtilities.dp(48.0f)));
         addView(pager);
         loadRecents();
         if (Emoji.data[0] == null || Emoji.data[0].length == 0) {
@@ -258,33 +258,30 @@ public class EmojiView extends LinearLayout {
 
     private class EmojiPagesAdapter extends PagerAdapter implements PagerSlidingTabStrip.IconTabProvider {
 
-        private EmojiPagesAdapter() {
-        }
-
         public void destroyItem(ViewGroup paramViewGroup, int paramInt, Object paramObject) {
             View localObject;
             if (paramInt == 0) {
-                localObject = EmojiView.this.recentsWrap;
+                localObject = recentsWrap;
             } else {
-                localObject = EmojiView.this.views.get(paramInt);
+                localObject = views.get(paramInt);
             }
             paramViewGroup.removeView(localObject);
         }
 
         public int getCount() {
-            return EmojiView.this.views.size();
+            return views.size();
         }
 
         public int getPageIconResId(int paramInt) {
-            return EmojiView.this.icons[paramInt];
+            return icons[paramInt];
         }
 
         public Object instantiateItem(ViewGroup paramViewGroup, int paramInt) {
             View localObject;
             if (paramInt == 0) {
-                localObject = EmojiView.this.recentsWrap;
+                localObject = recentsWrap;
             } else {
-                localObject = EmojiView.this.views.get(paramInt);
+                localObject = views.get(paramInt);
             }
             paramViewGroup.addView(localObject);
             return localObject;

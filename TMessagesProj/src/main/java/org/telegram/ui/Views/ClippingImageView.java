@@ -10,12 +10,17 @@ package org.telegram.ui.Views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Shader;
 import android.view.View;
 
 import org.telegram.messenger.FileLog;
+import org.telegram.ui.AnimationCompat.ViewProxy;
 
 public class ClippingImageView extends View {
     private int clipBottom;
@@ -26,6 +31,14 @@ public class ClippingImageView extends View {
     private Paint paint;
     private Bitmap bmp;
     private onDrawListener drawListener;
+
+    private boolean needRadius;
+    private int radius;
+    private BitmapShader bitmapShader;
+    private Paint roundPaint;
+    private RectF roundRect;
+    private RectF bitmapRect;
+    private Matrix shaderMatrix;
 
     public static interface onDrawListener {
         public abstract void onDraw();
@@ -58,18 +71,34 @@ public class ClippingImageView extends View {
         return clipTop;
     }
 
+    public int getRadius() {
+        return radius;
+    }
+
     public void onDraw(Canvas canvas) {
+        if (getVisibility() == GONE || getVisibility() == INVISIBLE) {
+            return;
+        }
         if (bmp != null) {
-            if (drawListener != null && getScaleY() != 1) {
+            float scaleY = ViewProxy.getScaleY(this);
+            if (drawListener != null && scaleY != 1) {
                 drawListener.onDraw();
             }
             canvas.save();
-            canvas.clipRect(clipLeft / getScaleY(), clipTop / getScaleY(), getWidth() - clipRight / getScaleY(), getHeight() - clipBottom / getScaleY());
-            drawRect.set(0, 0, getWidth(), getHeight());
-            try {
-                canvas.drawBitmap(this.bmp, null, drawRect, this.paint);
-            } catch (Exception e) {
-                FileLog.e("tmessages", e);
+            if (needRadius) {
+                roundRect.set(0, 0, getWidth(), getHeight());
+                shaderMatrix.reset();
+                shaderMatrix.setRectToRect(bitmapRect, roundRect, Matrix.ScaleToFit.FILL);
+                bitmapShader.setLocalMatrix(shaderMatrix);
+                canvas.drawRoundRect(roundRect, radius, radius, roundPaint);
+            } else {
+                canvas.clipRect(clipLeft / scaleY, clipTop / scaleY, getWidth() - clipRight / scaleY, getHeight() - clipBottom / scaleY);
+                drawRect.set(0, 0, getWidth(), getHeight());
+                try {
+                    canvas.drawBitmap(bmp, null, drawRect, paint);
+                } catch (Exception e) {
+                    FileLog.e("tmessages", e);
+                }
             }
             canvas.restore();
         }
@@ -109,10 +138,27 @@ public class ClippingImageView extends View {
 
     public void setImageBitmap(Bitmap bitmap) {
         bmp = bitmap;
+        if (bitmap != null && needRadius) {
+            roundRect = new RectF();
+            shaderMatrix = new Matrix();
+            bitmapRect = new RectF();
+            bitmapRect.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+            roundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            roundPaint.setShader(bitmapShader);
+        }
         invalidate();
     }
 
     public void setOnDrawListener(onDrawListener listener) {
         drawListener = listener;
+    }
+
+    public void setNeedRadius(boolean value) {
+        needRadius = value;
+    }
+
+    public void setRadius(int value) {
+        radius = value;
     }
 }
