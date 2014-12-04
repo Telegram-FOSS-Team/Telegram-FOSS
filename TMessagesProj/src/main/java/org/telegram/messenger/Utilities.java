@@ -24,8 +24,6 @@ import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.util.Base64;
 
-import org.telegram.ui.ApplicationLoader;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
