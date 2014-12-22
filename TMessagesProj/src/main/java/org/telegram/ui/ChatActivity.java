@@ -2330,7 +2330,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         dayArr.remove(obj);
                         if (dayArr.isEmpty()) {
                             messagesByDays.remove(obj.dateKey);
-                            messages.remove(index);
+                            if (index >= 0 && index < messages.size()) { //TODO fix it
+                                messages.remove(index);
+                            }
                         }
                         updated = true;
                     }
@@ -2666,6 +2668,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     @Override
     public void onPause() {
         super.onPause();
+        if (menuItem != null) {
+            menuItem.closeSubMenu();
+        }
         chatActivityEnterView.hideEmojiPopup();
         paused = true;
         NotificationsController.getInstance().setOpennedDialogId(0);
