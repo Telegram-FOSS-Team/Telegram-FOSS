@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Base64;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.telegram.android.AndroidUtilities;
+import org.telegram.android.ImageLoader;
 import org.telegram.android.LocaleController;
 import org.telegram.android.MediaController;
 import org.telegram.android.MessagesStorage;
@@ -45,6 +47,7 @@ import org.telegram.android.volley.toolbox.JsonObjectRequest;
 import org.telegram.android.volley.toolbox.Volley;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
+import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.R;
 import org.telegram.messenger.TLRPC;
@@ -65,7 +68,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class PhotoPickerActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, PhotoViewer.PhotoViewerProvider {
+public class PhotoPickerActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, PhotoViewer.PhotoViewerProvider, PhotoCropActivity.PhotoEditActivityDelegate {
 
     public static interface PhotoPickerActivityDelegate {
         public abstract void selectedPhotosChanged();
@@ -85,7 +88,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
 
     private boolean searching;
     private String nextSearchBingString;
-    private boolean giffySearchEndReached = true;
+    private boolean giphySearchEndReached = true;
     private String lastSearchString;
     private boolean loadingRecent;
 
@@ -184,7 +187,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                             searchResultKeys.clear();
                             lastSearchString = null;
                             nextSearchBingString = null;
-                            giffySearchEndReached = true;
+                            giphySearchEndReached = true;
                             searching = false;
                             requestQueue.cancelAll("search");
                             if (type == 0) {
@@ -587,6 +590,20 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         }
     }
 
+    @Override
+    public void didFinishEdit(Bitmap bitmap, Bundle args) {
+        TLRPC.PhotoSize size = ImageLoader.scaleAndSaveImage(bitmap, AndroidUtilities.getPhotoSize(), AndroidUtilities.getPhotoSize(), 80, false, 101, 101);
+        if (size != null) {
+            int id = args.getInt("id");
+            MediaController.PhotoEntry entry = selectedAlbum.photosByIds.get(id);
+            entry.imagePath = FileLoader.getPathToAttach(size, true).toString();
+            selectedPhotos.put(entry.imageId, entry);
+            listAdapter.notifyDataSetChanged();
+            photoPickerBottomLayout.updateSelectedCount(selectedPhotos.size() + selectedWebPhotos.size(), true);
+            delegate.selectedPhotosChanged();
+        }
+    }
+
     private void updateSearchInterface() {
         if (listAdapter != null) {
             listAdapter.notifyDataSetChanged();
@@ -697,7 +714,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                 } else if (type == 0) {
                     return searchResult.size() + (nextSearchBingString == null ? 0 : 1);
                 } else if (type == 1) {
-                    return searchResult.size() + (giffySearchEndReached ? 0 : 1);
+                    return searchResult.size() + (giphySearchEndReached ? 0 : 1);
                 }
             }
             return selectedAlbum.photos.size();
@@ -733,9 +750,11 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                                 MediaController.PhotoEntry photoEntry = selectedAlbum.photos.get((Integer) ((View) v.getParent()).getTag());
                                 if (selectedPhotos.containsKey(photoEntry.imageId)) {
                                     selectedPhotos.remove(photoEntry.imageId);
+                                    photoEntry.imagePath = null;
                                 } else {
                                     selectedPhotos.put(photoEntry.imageId, photoEntry);
                                 }
+                                ((PhotoPickerPhotoCell) v.getParent()).editedImage.setVisibility(photoEntry.imagePath != null ? View.VISIBLE : View.GONE);
                                 ((PhotoPickerPhotoCell) v.getParent()).checkBox.setChecked(selectedPhotos.containsKey(photoEntry.imageId), true);
                             } else {
                                 AndroidUtilities.hideKeyboard(getParentActivity().getCurrentFocus());
@@ -750,6 +769,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                                 } else {
                                     selectedWebPhotos.put(photoEntry.id, photoEntry);
                                 }
+                                ((PhotoPickerPhotoCell) v.getParent()).editedImage.setVisibility(View.GONE);
                                 ((PhotoPickerPhotoCell) v.getParent()).checkBox.setChecked(selectedWebPhotos.containsKey(photoEntry.id), true);
                             }
                             photoPickerBottomLayout.updateSelectedCount(selectedPhotos.size() + selectedWebPhotos.size(), true);
@@ -771,6 +791,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                         imageView.setImageResource(R.drawable.nophotos);
                     }
                     cell.checkBox.setChecked(selectedPhotos.containsKey(photoEntry.imageId), false);
+                    cell.editedImage.setVisibility(photoEntry.imagePath != null ? View.VISIBLE : View.GONE);
                     showing = PhotoViewer.getInstance().isShowingImage(photoEntry.path);
                 } else {
                     MediaController.SearchImage photoEntry = null;
@@ -785,6 +806,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                         imageView.setImageResource(R.drawable.nophotos);
                     }
                     cell.checkBox.setChecked(selectedWebPhotos.containsKey(photoEntry.id), false);
+                    cell.editedImage.setVisibility(View.GONE);
                     showing = PhotoViewer.getInstance().isShowingImage(photoEntry.thumbUrl);
                 }
                 imageView.imageReceiver.setVisible(!showing, false);
