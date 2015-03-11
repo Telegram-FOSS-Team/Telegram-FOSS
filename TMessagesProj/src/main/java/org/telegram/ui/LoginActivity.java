@@ -58,6 +58,7 @@ import org.telegram.messenger.RPCRequest;
 import org.telegram.messenger.TLObject;
 import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.Utilities;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -103,7 +104,7 @@ public class LoginActivity extends BaseFragment {
     }
 
     @Override
-    public View createView(LayoutInflater inflater, ViewGroup container) {
+    public View createView(LayoutInflater inflater) {
         if (fragmentView == null) {
             actionBar.setTitle(LocaleController.getString("AppName", R.string.AppName));
 
@@ -685,6 +686,7 @@ public class LoginActivity extends BaseFragment {
                     codesMap.put(args[0], args[2]);
                     languageMap.put(args[1], args[2]);
                 }
+                reader.close();
             } catch (Exception e) {
                 FileLog.e("tmessages", e);
             }
@@ -829,9 +831,6 @@ public class LoginActivity extends BaseFragment {
                                 final TLRPC.TL_auth_sentCode res = (TLRPC.TL_auth_sentCode)response;
                                 params.putString("phoneHash", res.phone_code_hash);
                                 params.putInt("calltime", res.send_call_timeout * 1000);
-                                if (res.phone_registered) {
-                                    params.putString("registered", "true");
-                                }
                                 setPage(1, true, params, false);
                             } else {
                                 if (error.text != null) {
@@ -898,7 +897,6 @@ public class LoginActivity extends BaseFragment {
 
         private String phoneHash;
         private String requestPhone;
-        private String registered;
         private EditText codeField;
         private TextView confirmTextView;
         private TextView timeText;
@@ -1067,7 +1065,6 @@ public class LoginActivity extends BaseFragment {
             String phone = params.getString("phone");
             requestPhone = params.getString("phoneFormated");
             phoneHash = params.getString("phoneHash");
-            registered = params.getString("registered");
             time = params.getInt("calltime");
 
             if (phone == null) {
@@ -1238,10 +1235,16 @@ public class LoginActivity extends BaseFragment {
                                 MessagesController.getInstance().getBlockedUsers(true);
                                 needFinishActivity();
                                 ConnectionsManager.getInstance().initPushConnection();
+                                Utilities.stageQueue.postRunnable(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ConnectionsManager.getInstance().updateDcSettings(0);
+                                    }
+                                });
                             } else {
                                 lastError = error.text;
 
-                                if (error.text.contains("PHONE_NUMBER_UNOCCUPIED") && registered == null) {
+                                if (error.text.contains("PHONE_NUMBER_UNOCCUPIED")) {
                                     Bundle params = new Bundle();
                                     params.putString("phoneFormated", requestPhone);
                                     params.putString("phoneHash", phoneHash);
@@ -1541,6 +1544,12 @@ public class LoginActivity extends BaseFragment {
                                 MessagesController.getInstance().getBlockedUsers(true);
                                 needFinishActivity();
                                 ConnectionsManager.getInstance().initPushConnection();
+                                Utilities.stageQueue.postRunnable(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ConnectionsManager.getInstance().updateDcSettings(0);
+                                    }
+                                });
                             } else {
                                 if (error.text.contains("PHONE_NUMBER_INVALID")) {
                                     needShowAlert(LocaleController.getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
