@@ -20,6 +20,7 @@ import org.telegram.android.ContactsController;
 import org.telegram.messenger.TLRPC;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackupImageView;
+import org.telegram.ui.Components.LayoutHelper;
 
 public class MentionCell extends LinearLayout {
 
@@ -37,7 +38,7 @@ public class MentionCell extends LinearLayout {
         avatarDrawable.setSmallStyle(true);
 
         imageView = new BackupImageView(context);
-        imageView.imageReceiver.setRoundRadius(AndroidUtilities.dp(14));
+        imageView.setRoundRadius(AndroidUtilities.dp(14));
         addView(imageView);
         LayoutParams layoutParams = (LayoutParams) imageView.getLayoutParams();
         layoutParams.leftMargin = AndroidUtilities.dp(12);
@@ -55,8 +56,8 @@ public class MentionCell extends LinearLayout {
         addView(nameTextView);
         layoutParams = (LayoutParams) nameTextView.getLayoutParams();
         layoutParams.leftMargin = AndroidUtilities.dp(12);
-        layoutParams.width = LayoutParams.WRAP_CONTENT;
-        layoutParams.height = LayoutParams.WRAP_CONTENT;
+        layoutParams.width = LayoutHelper.WRAP_CONTENT;
+        layoutParams.height = LayoutHelper.WRAP_CONTENT;
         layoutParams.gravity = Gravity.CENTER_VERTICAL;
         nameTextView.setLayoutParams(layoutParams);
 
@@ -69,8 +70,8 @@ public class MentionCell extends LinearLayout {
         addView(usernameTextView);
         layoutParams = (LayoutParams) usernameTextView.getLayoutParams();
         layoutParams.leftMargin = AndroidUtilities.dp(12);
-        layoutParams.width = LayoutParams.WRAP_CONTENT;
-        layoutParams.height = LayoutParams.WRAP_CONTENT;
+        layoutParams.width = LayoutHelper.WRAP_CONTENT;
+        layoutParams.height = LayoutHelper.WRAP_CONTENT;
         layoutParams.gravity = Gravity.CENTER_VERTICAL;
         usernameTextView.setLayoutParams(layoutParams);
     }
@@ -95,5 +96,23 @@ public class MentionCell extends LinearLayout {
         }
         nameTextView.setText(ContactsController.formatName(user.first_name, user.last_name));
         usernameTextView.setText("@" + user.username);
+        imageView.setVisibility(VISIBLE);
+        usernameTextView.setVisibility(VISIBLE);
+    }
+
+    public void setText(String text) {
+        imageView.setVisibility(INVISIBLE);
+        usernameTextView.setVisibility(INVISIBLE);
+        nameTextView.setText(text);
+    }
+
+    public void setIsDarkTheme(boolean isDarkTheme) {
+        if (isDarkTheme) {
+            nameTextView.setTextColor(0xffffffff);
+            usernameTextView.setTextColor(0xff999999);
+        } else {
+            nameTextView.setTextColor(0xff000000);
+            usernameTextView.setTextColor(0xff999999);
+        }
     }
 }

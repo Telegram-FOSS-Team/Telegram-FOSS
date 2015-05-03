@@ -20,10 +20,11 @@ import org.telegram.android.ImageReceiver;
 import org.telegram.messenger.TLObject;
 import org.telegram.messenger.TLRPC;
 
-
 public class BackupImageView extends View {
-    public ImageReceiver imageReceiver;
-    public boolean processDetach = true;
+
+    private ImageReceiver imageReceiver;
+    private int width = -1;
+    private int height = -1;
 
     public BackupImageView(Context context) {
         super(context);
@@ -91,17 +92,42 @@ public class BackupImageView extends View {
         imageReceiver.setImageBitmap(drawable);
     }
 
+    public void setRoundRadius(int value) {
+        imageReceiver.setRoundRadius(value);
+    }
+
+    public void setAspectFit(boolean value) {
+        imageReceiver.setAspectFit(value);
+    }
+
+    public ImageReceiver getImageReceiver() {
+        return imageReceiver;
+    }
+
+    public void setSize(int w, int h) {
+        width = w;
+        height = h;
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (processDetach) {
-            imageReceiver.clearImage();
-        }
+        imageReceiver.onDetachedFromWindow();
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        imageReceiver.onAttachedToWindow();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        imageReceiver.setImageCoords(0, 0, getWidth(), getHeight());
+        if (width != -1 && height != -1) {
+            imageReceiver.setImageCoords((getWidth() - width) / 2, (getHeight() - height) / 2, width, height);
+        } else {
+            imageReceiver.setImageCoords(0, 0, getWidth(), getHeight());
+        }
         imageReceiver.draw(canvas);
     }
 }

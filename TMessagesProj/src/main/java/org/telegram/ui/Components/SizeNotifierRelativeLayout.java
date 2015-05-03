@@ -28,19 +28,22 @@ public class SizeNotifierRelativeLayout extends RelativeLayout {
     private SizeNotifierRelativeLayoutDelegate delegate;
 
     public interface SizeNotifierRelativeLayoutDelegate {
-        void onSizeChanged(int keyboardHeight);
+        void onSizeChanged(int keyboardHeight, boolean isWidthGreater);
     }
 
     public SizeNotifierRelativeLayout(Context context) {
         super(context);
+        setWillNotDraw(false);
     }
 
     public SizeNotifierRelativeLayout(android.content.Context context, android.util.AttributeSet attrs) {
         super(context, attrs);
+        setWillNotDraw(false);
     }
 
     public SizeNotifierRelativeLayout(android.content.Context context, android.util.AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        setWillNotDraw(false);
     }
 
     public void setBackgroundImage(int resourceId) {
@@ -66,21 +69,23 @@ public class SizeNotifierRelativeLayout extends RelativeLayout {
     @SuppressLint("DrawAllocation")
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if (changed && delegate != null) {
+        super.onLayout(changed, l, t, r, b);
+
+        if (delegate != null) {
             View rootView = this.getRootView();
             int usableViewHeight = rootView.getHeight() - AndroidUtilities.statusBarHeight - AndroidUtilities.getViewInset(rootView);
             this.getWindowVisibleDisplayFrame(rect);
             keyboardHeight = usableViewHeight - (rect.bottom - rect.top);
+            final boolean isWidthGreater = AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y;
             post(new Runnable() {
                 @Override
                 public void run() {
                     if (delegate != null) {
-                        delegate.onSizeChanged(keyboardHeight);
+                        delegate.onSizeChanged(keyboardHeight, isWidthGreater);
                     }
                 }
             });
         }
-        super.onLayout(changed, l, t, r, b);
     }
 
     @Override

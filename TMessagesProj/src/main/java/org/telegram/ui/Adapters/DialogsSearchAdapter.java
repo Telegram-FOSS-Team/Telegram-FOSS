@@ -9,7 +9,6 @@
 package org.telegram.ui.Adapters;
 
 import android.content.Context;
-import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,13 +25,12 @@ import org.telegram.messenger.ConnectionsManager;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.R;
 import org.telegram.messenger.RPCRequest;
-import org.telegram.messenger.TLClassStore;
 import org.telegram.messenger.TLObject;
 import org.telegram.messenger.TLRPC;
-import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.Cells.DialogCell;
 import org.telegram.ui.Cells.GreySectionCell;
+import org.telegram.ui.Cells.HashtagSearchCell;
 import org.telegram.ui.Cells.LoadingCell;
 import org.telegram.ui.Cells.ProfileSearchCell;
 
@@ -44,13 +42,14 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
+public class DialogsSearchAdapter extends BaseSearchAdapter {
 
     private Context mContext;
     private Timer searchTimer;
     private ArrayList<TLObject> searchResult = new ArrayList<>();
     private ArrayList<CharSequence> searchResultNames = new ArrayList<>();
     private ArrayList<MessageObject> searchResultMessages = new ArrayList<>();
+    private ArrayList<String> searchResultHashtags = new ArrayList<>();
     private String lastSearchText;
     private long reqId = 0;
     private int lastReqId;
@@ -85,6 +84,10 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
 
     public void loadMoreSearchMessages() {
         searchMessagesInternal(lastMessagesSearchString);
+    }
+
+    public String getLastSearchString() {
+        return lastMessagesSearchString;
     }
 
     private void searchMessagesInternal(final String query) {
@@ -188,8 +191,8 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
                         dialogSearchResult.date = cursor.intValue(1);
                         dialogsResult.put(id, dialogSearchResult);
 
-                        int lower_id = (int)id;
-                        int high_id = (int)(id >> 32);
+                        int lower_id = (int) id;
+                        int high_id = (int) (id >> 32);
                         if (lower_id != 0) {
                             if (high_id == 1) {
                                 if (!serverOnly && !chatsToLoad.contains(lower_id)) {
@@ -237,20 +240,18 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
                                 if (found != 0) {
                                     ByteBufferDesc data = MessagesStorage.getInstance().getBuffersStorage().getFreeBuffer(cursor.byteArrayLength(0));
                                     if (data != null && cursor.byteBufferValue(0, data.buffer) != 0) {
-                                        TLRPC.User user = (TLRPC.User) TLClassStore.Instance().TLdeserialize(data, data.readInt32());
-                                        if (user.id != UserConfig.getClientUserId()) {
-                                            DialogSearchResult dialogSearchResult = dialogsResult.get((long) user.id);
-                                            if (user.status != null) {
-                                                user.status.expires = cursor.intValue(1);
-                                            }
-                                            if (found == 1) {
-                                                dialogSearchResult.name = Utilities.generateSearchName(user.first_name, user.last_name, q);
-                                            } else {
-                                                dialogSearchResult.name = Utilities.generateSearchName("@" + user.username, null, "@" + q);
-                                            }
-                                            dialogSearchResult.object = user;
-                                            resultCount++;
+                                        TLRPC.User user = TLRPC.User.TLdeserialize(data, data.readInt32(false), false);
+                                        DialogSearchResult dialogSearchResult = dialogsResult.get((long) user.id);
+                                        if (user.status != null) {
+                                            user.status.expires = cursor.intValue(1);
                                         }
+                                        if (found == 1) {
+                                            dialogSearchResult.name = Utilities.generateSearchName(user.first_name, user.last_name, q);
+                                        } else {
+                                            dialogSearchResult.name = Utilities.generateSearchName("@" + user.username, null, "@" + q);
+                                        }
+                                        dialogSearchResult.object = user;
+                                        resultCount++;
                                     }
                                     MessagesStorage.getInstance().getBuffersStorage().reuseFreeBuffer(data);
                                     break;
@@ -272,7 +273,7 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
                                 if (name.startsWith(q) || name.contains(" " + q) || tName != null && (tName.startsWith(q) || tName.contains(" " + q))) {
                                     ByteBufferDesc data = MessagesStorage.getInstance().getBuffersStorage().getFreeBuffer(cursor.byteArrayLength(0));
                                     if (data != null && cursor.byteBufferValue(0, data.buffer) != 0) {
-                                        TLRPC.Chat chat = (TLRPC.Chat) TLClassStore.Instance().TLdeserialize(data, data.readInt32());
+                                        TLRPC.Chat chat = TLRPC.Chat.TLdeserialize(data, data.readInt32(false), false);
                                         long dialog_id;
                                         if (chat.id > 0) {
                                             dialog_id = -chat.id;
@@ -318,7 +319,7 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
                                     ByteBufferDesc data = MessagesStorage.getInstance().getBuffersStorage().getFreeBuffer(cursor.byteArrayLength(0));
                                     ByteBufferDesc data2 = MessagesStorage.getInstance().getBuffersStorage().getFreeBuffer(cursor.byteArrayLength(6));
                                     if (data != null && cursor.byteBufferValue(0, data.buffer) != 0 && cursor.byteBufferValue(6, data2.buffer) != 0) {
-                                        TLRPC.EncryptedChat chat = (TLRPC.EncryptedChat) TLClassStore.Instance().TLdeserialize(data, data.readInt32());
+                                        TLRPC.EncryptedChat chat = TLRPC.EncryptedChat.TLdeserialize(data, data.readInt32(false), false);
                                         DialogSearchResult dialogSearchResult = dialogsResult.get((long) chat.id << 32);
 
                                         chat.user_id = cursor.intValue(2);
@@ -337,12 +338,12 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
                                         chat.future_auth_key = cursor.byteArrayValue(15);
                                         chat.key_hash = cursor.byteArrayValue(16);
 
-                                        TLRPC.User user = (TLRPC.User) TLClassStore.Instance().TLdeserialize(data2, data2.readInt32());
+                                        TLRPC.User user = TLRPC.User.TLdeserialize(data2, data2.readInt32(false), false);
                                         if (user.status != null) {
                                             user.status.expires = cursor.intValue(7);
                                         }
                                         if (found == 1) {
-                                            dialogSearchResult.name = Html.fromHtml("<font color=\"#00a60e\">" + ContactsController.formatName(user.first_name, user.last_name) + "</font>");
+                                            dialogSearchResult.name = AndroidUtilities.replaceTags("<c#ff00a60e>" + ContactsController.formatName(user.first_name, user.last_name) + "</c>");
                                         } else {
                                             dialogSearchResult.name = Utilities.generateSearchName("@" + user.username, null, "@" + q);
                                         }
@@ -389,7 +390,7 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
                     cursor = MessagesStorage.getInstance().getDatabase().queryFinalized("SELECT u.data, u.status, u.name, u.uid FROM users as u INNER JOIN contacts as c ON u.uid = c.uid");
                     while (cursor.next()) {
                         int uid = cursor.intValue(3);
-                        if (dialogsResult.containsKey((long)uid)) {
+                        if (dialogsResult.containsKey((long) uid)) {
                             continue;
                         }
                         String name = cursor.stringValue(2);
@@ -412,18 +413,16 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
                             if (found != 0) {
                                 ByteBufferDesc data = MessagesStorage.getInstance().getBuffersStorage().getFreeBuffer(cursor.byteArrayLength(0));
                                 if (data != null && cursor.byteBufferValue(0, data.buffer) != 0) {
-                                    TLRPC.User user = (TLRPC.User) TLClassStore.Instance().TLdeserialize(data, data.readInt32());
-                                    if (user.id != UserConfig.getClientUserId()) {
-                                        if (user.status != null) {
-                                            user.status.expires = cursor.intValue(1);
-                                        }
-                                        if (found == 1) {
-                                            resultArrayNames.add(Utilities.generateSearchName(user.first_name, user.last_name, q));
-                                        } else {
-                                            resultArrayNames.add(Utilities.generateSearchName("@" + user.username, null, "@" + q));
-                                        }
-                                        resultArray.add(user);
+                                    TLRPC.User user = TLRPC.User.TLdeserialize(data, data.readInt32(false), false);
+                                    if (user.status != null) {
+                                        user.status.expires = cursor.intValue(1);
                                     }
+                                    if (found == 1) {
+                                        resultArrayNames.add(Utilities.generateSearchName(user.first_name, user.last_name, q));
+                                    } else {
+                                        resultArrayNames.add(Utilities.generateSearchName("@" + user.username, null, "@" + q));
+                                    }
+                                    resultArray.add(user);
                                 }
                                 MessagesStorage.getInstance().getBuffersStorage().reuseFreeBuffer(data);
                                 break;
@@ -477,6 +476,25 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
         return i > searchResult.size() && i <= globalSearch.size() + searchResult.size();
     }
 
+    @Override
+    public void clearRecentHashtags() {
+        super.clearRecentHashtags();
+        searchResultHashtags.clear();
+        notifyDataSetChanged();
+    }
+
+    @Override
+    protected void setHashtags(ArrayList<HashtagObject> arrayList, HashMap<String, HashtagObject> hashMap) {
+        super.setHashtags(arrayList, hashMap);
+        for (HashtagObject hashtagObject : arrayList) {
+            searchResultHashtags.add(hashtagObject.hashtag);
+        }
+        if (delegate != null) {
+            delegate.searchStateChanged(false);
+        }
+        notifyDataSetChanged();
+    }
+
     public void searchDialogs(final String query, final boolean serverOnly) {
         if (query != null && lastSearchText != null && query.equals(lastSearchText)) {
             return;
@@ -489,14 +507,39 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
             FileLog.e("tmessages", e);
         }
         if (query == null || query.length() == 0) {
+            hashtagsLoadedFromDb = false;
             searchResult.clear();
             searchResultNames.clear();
+            searchResultHashtags.clear();
             if (needMessagesSearch != 2) {
                 queryServerSearch(null);
             }
             searchMessagesInternal(null);
             notifyDataSetChanged();
         } else {
+            if (query.startsWith("#") && query.length() == 1) {
+                messagesSearchEndReached = true;
+                if (!hashtagsLoadedFromDb) {
+                    loadRecentHashtags();
+                    if (delegate != null) {
+                        delegate.searchStateChanged(true);
+                    }
+                    notifyDataSetChanged();
+                    return;
+                }
+                searchResultMessages.clear();
+                searchResultHashtags.clear();
+                for (HashtagObject hashtagObject : hashtags) {
+                    searchResultHashtags.add(hashtagObject.hashtag);
+                }
+                if (delegate != null) {
+                    delegate.searchStateChanged(false);
+                }
+                notifyDataSetChanged();
+                return;
+            } else {
+                searchResultHashtags.clear();
+            }
             final int searchId = ++lastSearchId;
             searchTimer = new Timer();
             searchTimer.schedule(new TimerTask() {
@@ -530,11 +573,27 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
 
     @Override
     public boolean isEnabled(int i) {
-        return i != searchResult.size() && i != searchResult.size() + (globalSearch.isEmpty() ? 0 : globalSearch.size() + 1);
+        if (!searchResultHashtags.isEmpty()) {
+            return i != 0;
+        }
+        int localCount = searchResult.size();
+        int globalCount = globalSearch.isEmpty() ? 0 : globalSearch.size() + 1;
+        int messagesCount = searchResultMessages.isEmpty() ? 0 : searchResultMessages.size() + 1;
+        if (i >= 0 && i < localCount || i > localCount && i < globalCount + localCount) {
+            return true;
+        } else if (i > globalCount + localCount && i < globalCount + localCount + messagesCount) {
+            return true;
+        } else if (messagesCount != 0 && i == globalCount + localCount + messagesCount) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public int getCount() {
+        if (!searchResultHashtags.isEmpty()) {
+            return searchResultHashtags.size() + 1;
+        }
         int count = searchResult.size();
         int globalCount = globalSearch.size();
         int messagesCount = searchResultMessages.size();
@@ -549,6 +608,9 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
 
     @Override
     public Object getItem(int i) {
+        if (!searchResultHashtags.isEmpty()) {
+            return searchResultHashtags.get(i - 1);
+        }
         int localCount = searchResult.size();
         int globalCount = globalSearch.isEmpty() ? 0 : globalSearch.size() + 1;
         int messagesCount = searchResultMessages.isEmpty() ? 0 : searchResultMessages.size() + 1;
@@ -580,7 +642,9 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
             if (view == null) {
                 view = new GreySectionCell(mContext);
             }
-            if (!globalSearch.isEmpty() && i == searchResult.size()) {
+            if (!searchResultHashtags.isEmpty()) {
+                ((GreySectionCell) view).setText(LocaleController.getString("Hashtags", R.string.Hashtags).toUpperCase());
+            }  else if (!globalSearch.isEmpty() && i == searchResult.size()) {
                 ((GreySectionCell) view).setText(LocaleController.getString("GlobalSearch", R.string.GlobalSearch));
             } else {
                 ((GreySectionCell) view).setText(LocaleController.getString("SearchMessages", R.string.SearchMessages));
@@ -600,10 +664,11 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
             ((ProfileSearchCell) view).useSeparator = (i != getCount() - 1 && i != localCount - 1 && i != localCount + globalCount - 1);
             Object obj = getItem(i);
             if (obj instanceof TLRPC.User) {
-                user = MessagesController.getInstance().getUser(((TLRPC.User) obj).id);
+                /*user = MessagesController.getInstance().getUser(((TLRPC.User) obj).id);
                 if (user == null) {
                     user = (TLRPC.User) obj;
-                }
+                }*/
+                user = (TLRPC.User) obj;
             } else if (obj instanceof TLRPC.Chat) {
                 chat = MessagesController.getInstance().getChat(((TLRPC.Chat) obj).id);
             } else if (obj instanceof TLRPC.EncryptedChat) {
@@ -627,7 +692,7 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
                     foundUserName = foundUserName.substring(1);
                 }
                 try {
-                    username = Html.fromHtml(String.format("<font color=\"#4d83b3\">@%s</font>%s", user.username.substring(0, foundUserName.length()), user.username.substring(foundUserName.length())));
+                    username = AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>@%s</c>%s", user.username.substring(0, foundUserName.length()), user.username.substring(foundUserName.length())));
                 } catch (Exception e) {
                     username = user.username;
                     FileLog.e("tmessages", e);
@@ -646,6 +711,12 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
             if (view == null) {
                 view = new LoadingCell(mContext);
             }
+        } else if (type == 4) {
+            if (view == null) {
+                view = new HashtagSearchCell(mContext);
+            }
+            ((HashtagSearchCell) view).setText(searchResultHashtags.get(i - 1));
+            ((HashtagSearchCell) view).setNeedDivider(i != searchResultHashtags.size());
         }
 
         return view;
@@ -653,6 +724,9 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
 
     @Override
     public int getItemViewType(int i) {
+        if (!searchResultHashtags.isEmpty()) {
+            return i == 0 ? 1 : 4;
+        }
         int localCount = searchResult.size();
         int globalCount = globalSearch.isEmpty() ? 0 : globalSearch.size() + 1;
         int messagesCount = searchResultMessages.isEmpty() ? 0 : searchResultMessages.size() + 1;
@@ -668,11 +742,11 @@ public class DialogsSearchAdapter extends BaseContactsSearchAdapter {
 
     @Override
     public int getViewTypeCount() {
-        return 4;
+        return 5;
     }
 
     @Override
     public boolean isEmpty() {
-        return searchResult.isEmpty() && globalSearch.isEmpty() && searchResultMessages.isEmpty();
+        return searchResult.isEmpty() && globalSearch.isEmpty() && searchResultMessages.isEmpty() && searchResultHashtags.isEmpty();
     }
 }

@@ -31,12 +31,13 @@ import org.telegram.messenger.TLRPC;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.CheckBox;
+import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.LineProgressView;
 
 import java.io.File;
 import java.util.Date;
 
-public class SharedDocumentCell extends FrameLayout  implements MediaController.FileDownloadProgressListener {
+public class SharedDocumentCell extends FrameLayout implements MediaController.FileDownloadProgressListener {
 
     private ImageView placeholderImabeView;
     private BackupImageView thumbImageView;
@@ -98,7 +99,7 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
         addView(extTextView);
         layoutParams = (LayoutParams) extTextView.getLayoutParams();
         layoutParams.width = AndroidUtilities.dp(32);
-        layoutParams.height = LayoutParams.WRAP_CONTENT;
+        layoutParams.height = LayoutHelper.WRAP_CONTENT;
         layoutParams.topMargin = AndroidUtilities.dp(22);
         layoutParams.leftMargin = LocaleController.isRTL ? 0 : AndroidUtilities.dp(16);
         layoutParams.rightMargin = LocaleController.isRTL ? AndroidUtilities.dp(16) : 0;
@@ -106,11 +107,11 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
         extTextView.setLayoutParams(layoutParams);
 
         thumbImageView = new BackupImageView(context);
-        thumbImageView.imageReceiver.setDelegate(new ImageReceiver.ImageReceiverDelegate() {
+        thumbImageView.getImageReceiver().setDelegate(new ImageReceiver.ImageReceiverDelegate() {
             @Override
             public void didSetImage(ImageReceiver imageReceiver, boolean set, boolean thumb) {
-                extTextView.setVisibility(set ? GONE : VISIBLE);
-                placeholderImabeView.setVisibility(set ? GONE : VISIBLE);
+                extTextView.setVisibility(set ? INVISIBLE : VISIBLE);
+                placeholderImabeView.setVisibility(set ? INVISIBLE : VISIBLE);
             }
         });
         addView(thumbImageView);
@@ -134,8 +135,8 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
         nameTextView.setGravity((LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) | Gravity.CENTER_VERTICAL);
         addView(nameTextView);
         layoutParams = (LayoutParams) nameTextView.getLayoutParams();
-        layoutParams.width = LayoutParams.MATCH_PARENT;
-        layoutParams.height = LayoutParams.WRAP_CONTENT;
+        layoutParams.width = LayoutHelper.MATCH_PARENT;
+        layoutParams.height = LayoutHelper.WRAP_CONTENT;
         layoutParams.topMargin = AndroidUtilities.dp(5);
         layoutParams.leftMargin = LocaleController.isRTL ? AndroidUtilities.dp(8) : AndroidUtilities.dp(72);
         layoutParams.rightMargin = LocaleController.isRTL ? AndroidUtilities.dp(72) : AndroidUtilities.dp(8);
@@ -143,11 +144,11 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
         nameTextView.setLayoutParams(layoutParams);
 
         statusImageView = new ImageView(context);
-        statusImageView.setVisibility(GONE);
+        statusImageView.setVisibility(INVISIBLE);
         addView(statusImageView);
         layoutParams = (LayoutParams) statusImageView.getLayoutParams();
-        layoutParams.width = LayoutParams.WRAP_CONTENT;
-        layoutParams.height = LayoutParams.WRAP_CONTENT;
+        layoutParams.width = LayoutHelper.WRAP_CONTENT;
+        layoutParams.height = LayoutHelper.WRAP_CONTENT;
         layoutParams.topMargin = AndroidUtilities.dp(35);
         layoutParams.leftMargin = LocaleController.isRTL ? AndroidUtilities.dp(8) : AndroidUtilities.dp(72);
         layoutParams.rightMargin = LocaleController.isRTL ? AndroidUtilities.dp(72) : AndroidUtilities.dp(8);
@@ -164,8 +165,8 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
         dateTextView.setGravity((LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) | Gravity.CENTER_VERTICAL);
         addView(dateTextView);
         layoutParams = (LayoutParams) dateTextView.getLayoutParams();
-        layoutParams.width = LayoutParams.MATCH_PARENT;
-        layoutParams.height = LayoutParams.WRAP_CONTENT;
+        layoutParams.width = LayoutHelper.MATCH_PARENT;
+        layoutParams.height = LayoutHelper.WRAP_CONTENT;
         layoutParams.topMargin = AndroidUtilities.dp(30);
         layoutParams.leftMargin = LocaleController.isRTL ? AndroidUtilities.dp(8) : AndroidUtilities.dp(72);
         layoutParams.rightMargin = LocaleController.isRTL ? AndroidUtilities.dp(72) : AndroidUtilities.dp(8);
@@ -175,7 +176,7 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
         progressView = new LineProgressView(context);
         addView(progressView);
         layoutParams = (LayoutParams) progressView.getLayoutParams();
-        layoutParams.width = LayoutParams.MATCH_PARENT;
+        layoutParams.width = LayoutHelper.MATCH_PARENT;
         layoutParams.height = AndroidUtilities.dp(2);
         layoutParams.topMargin = AndroidUtilities.dp(54);
         layoutParams.leftMargin = LocaleController.isRTL ? 0 : AndroidUtilities.dp(72);
@@ -184,7 +185,7 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
         progressView.setLayoutParams(layoutParams);
 
         checkBox = new CheckBox(context, R.drawable.round_check2);
-        checkBox.setVisibility(GONE);
+        checkBox.setVisibility(INVISIBLE);
         addView(checkBox);
         layoutParams = (LayoutParams) checkBox.getLayoutParams();
         layoutParams.width = AndroidUtilities.dp(22);
@@ -229,13 +230,13 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
             extTextView.setVisibility(VISIBLE);
             extTextView.setText(type);
         } else {
-            extTextView.setVisibility(GONE);
+            extTextView.setVisibility(INVISIBLE);
         }
         if (resId == 0) {
             placeholderImabeView.setImageResource(getThumbForNameOrMime(text, type));
             placeholderImabeView.setVisibility(VISIBLE);
         } else {
-            placeholderImabeView.setVisibility(GONE);
+            placeholderImabeView.setVisibility(INVISIBLE);
         }
         if (thumb != null || resId != 0) {
             if (thumb != null) {
@@ -245,7 +246,7 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
             }
             thumbImageView.setVisibility(VISIBLE);
         } else {
-            thumbImageView.setVisibility(GONE);
+            thumbImageView.setVisibility(INVISIBLE);
         }
     }
 
@@ -277,7 +278,7 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
             nameTextView.setText(name);
             extTextView.setText((idx = name.lastIndexOf(".")) == -1 ? "" : name.substring(idx + 1).toLowerCase());
             if (document.messageOwner.media.document.thumb instanceof TLRPC.TL_photoSizeEmpty) {
-                thumbImageView.setVisibility(GONE);
+                thumbImageView.setVisibility(INVISIBLE);
                 thumbImageView.setImageBitmap(null);
             } else {
                 thumbImageView.setVisibility(VISIBLE);
@@ -291,7 +292,7 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
             dateTextView.setText("");
             placeholderImabeView.setVisibility(VISIBLE);
             extTextView.setVisibility(VISIBLE);
-            thumbImageView.setVisibility(GONE);
+            thumbImageView.setVisibility(INVISIBLE);
             thumbImageView.setImageBitmap(null);
         }
 
@@ -312,7 +313,7 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
             }
             loaded = false;
             if (fileName == null) {
-                statusImageView.setVisibility(GONE);
+                statusImageView.setVisibility(INVISIBLE);
                 dateTextView.setPadding(0, 0, 0, 0);
                 loading = false;
                 loaded = true;
@@ -331,15 +332,15 @@ public class SharedDocumentCell extends FrameLayout  implements MediaController.
                     }
                     progressView.setProgress(progress, false);
                 } else {
-                    progressView.setVisibility(GONE);
+                    progressView.setVisibility(INVISIBLE);
                 }
             }
         } else {
             loading = false;
             loaded = true;
-            progressView.setVisibility(GONE);
+            progressView.setVisibility(INVISIBLE);
             progressView.setProgress(0, false);
-            statusImageView.setVisibility(GONE);
+            statusImageView.setVisibility(INVISIBLE);
             dateTextView.setPadding(0, 0, 0, 0);
             MediaController.getInstance().removeLoadingFileObserver(this);
         }

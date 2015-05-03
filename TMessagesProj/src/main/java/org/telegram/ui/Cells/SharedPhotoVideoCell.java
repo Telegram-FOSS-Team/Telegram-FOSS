@@ -27,6 +27,7 @@ import org.telegram.messenger.TLRPC;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.CheckBox;
 import org.telegram.ui.Components.FrameLayoutFixed;
+import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.PhotoViewer;
 
 public class SharedPhotoVideoCell extends FrameLayoutFixed {
@@ -55,65 +56,38 @@ public class SharedPhotoVideoCell extends FrameLayoutFixed {
             super(context);
 
             imageView = new BackupImageView(context);
-            imageView.imageReceiver.setNeedsQualityThumb(true);
-            imageView.imageReceiver.setShouldGenerateQualityThumb(true);
-            addView(imageView);
-            LayoutParams layoutParams = (LayoutParams) imageView.getLayoutParams();
-            layoutParams.width = LayoutParams.MATCH_PARENT;
-            layoutParams.height = LayoutParams.MATCH_PARENT;
-            imageView.setLayoutParams(layoutParams);
+            imageView.getImageReceiver().setNeedsQualityThumb(true);
+            imageView.getImageReceiver().setShouldGenerateQualityThumb(true);
+            addView(imageView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
             videoInfoContainer = new LinearLayout(context);
             videoInfoContainer.setOrientation(LinearLayout.HORIZONTAL);
             videoInfoContainer.setBackgroundResource(R.drawable.phototime);
             videoInfoContainer.setPadding(AndroidUtilities.dp(3), 0, AndroidUtilities.dp(3), 0);
             videoInfoContainer.setGravity(Gravity.CENTER_VERTICAL);
-            addView(videoInfoContainer);
-            layoutParams = (LayoutParams) videoInfoContainer.getLayoutParams();
-            layoutParams.width = LayoutParams.MATCH_PARENT;
-            layoutParams.height = AndroidUtilities.dp(16);
-            layoutParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
-            videoInfoContainer.setLayoutParams(layoutParams);
+            addView(videoInfoContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 16, Gravity.BOTTOM | Gravity.LEFT));
 
             ImageView imageView1 = new ImageView(context);
             imageView1.setImageResource(R.drawable.ic_video);
             videoInfoContainer.addView(imageView1);
             LinearLayout.LayoutParams layoutParams1 = (LinearLayout.LayoutParams) imageView1.getLayoutParams();
-            layoutParams1.width = LinearLayout.LayoutParams.WRAP_CONTENT;
-            layoutParams1.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            layoutParams1.width = LayoutHelper.WRAP_CONTENT;
+            layoutParams1.height = LayoutHelper.WRAP_CONTENT;
             imageView1.setLayoutParams(layoutParams1);
 
             videoTextView = new TextView(context);
             videoTextView.setTextColor(0xffffffff);
             videoTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
             videoTextView.setGravity(Gravity.CENTER_VERTICAL);
-            videoInfoContainer.addView(videoTextView);
-            layoutParams1 = (LinearLayout.LayoutParams) videoTextView.getLayoutParams();
-            layoutParams1.width = LinearLayout.LayoutParams.WRAP_CONTENT;
-            layoutParams1.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-            layoutParams1.leftMargin = AndroidUtilities.dp(4);
-            layoutParams1.gravity = Gravity.CENTER_VERTICAL;
-            layoutParams1.bottomMargin = AndroidUtilities.dp(1);
-            videoTextView.setLayoutParams(layoutParams1);
+            videoInfoContainer.addView(videoTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 4, 0, 0, 1));
 
             selector = new View(context);
             selector.setBackgroundResource(R.drawable.list_selector);
-            addView(selector);
-            layoutParams = (LayoutParams) selector.getLayoutParams();
-            layoutParams.width = LayoutParams.MATCH_PARENT;
-            layoutParams.height = LayoutParams.MATCH_PARENT;
-            selector.setLayoutParams(layoutParams);
+            addView(selector, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
             checkBox = new CheckBox(context, R.drawable.round_check2);
-            checkBox.setVisibility(GONE);
-            addView(checkBox);
-            layoutParams = (LayoutParams) checkBox.getLayoutParams();
-            layoutParams.width = AndroidUtilities.dp(22);
-            layoutParams.height = AndroidUtilities.dp(22);
-            layoutParams.gravity = Gravity.RIGHT | Gravity.TOP;
-            layoutParams.topMargin = AndroidUtilities.dp(6);
-            layoutParams.rightMargin = AndroidUtilities.dp(6);
-            checkBox.setLayoutParams(layoutParams);
+            checkBox.setVisibility(INVISIBLE);
+            addView(checkBox, LayoutHelper.createFrame(22, 22, Gravity.RIGHT | Gravity.TOP, 6, 0, 6, 0));
         }
 
         @Override
@@ -134,7 +108,7 @@ public class SharedPhotoVideoCell extends FrameLayoutFixed {
         for (int a = 0; a < 6; a++) {
             photoVideoViews[a] = new PhotoVideoView(context);
             addView(photoVideoViews[a]);
-            photoVideoViews[a].setVisibility(GONE);
+            photoVideoViews[a].setVisibility(INVISIBLE);
             photoVideoViews[a].setTag(a);
             photoVideoViews[a].setOnClickListener(new OnClickListener() {
                 @Override
@@ -164,7 +138,7 @@ public class SharedPhotoVideoCell extends FrameLayoutFixed {
 
     public void setItemsCount(int count) {
         for (int a = 0; a < photoVideoViews.length; a++) {
-            photoVideoViews[a].setVisibility(a < count ? VISIBLE : GONE);
+            photoVideoViews[a].setVisibility(a < count ? VISIBLE : INVISIBLE);
         }
         itemsCount = count;
     }
@@ -202,8 +176,8 @@ public class SharedPhotoVideoCell extends FrameLayoutFixed {
             photoVideoViews[a].setVisibility(VISIBLE);
 
             PhotoVideoView photoVideoView = photoVideoViews[a];
-            photoVideoView.imageView.imageReceiver.setParentMessageObject(messageObject);
-            photoVideoView.imageView.imageReceiver.setVisible(!PhotoViewer.getInstance().isShowingImage(messageObject), false);
+            photoVideoView.imageView.getImageReceiver().setParentMessageObject(messageObject);
+            photoVideoView.imageView.getImageReceiver().setVisible(!PhotoViewer.getInstance().isShowingImage(messageObject), false);
             if (messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaVideo && messageObject.messageOwner.media.video != null) {
                 photoVideoView.videoInfoContainer.setVisibility(VISIBLE);
                 int duration = messageObject.messageOwner.media.video.duration;
@@ -217,15 +191,15 @@ public class SharedPhotoVideoCell extends FrameLayoutFixed {
                     photoVideoView.imageView.setImageResource(R.drawable.photo_placeholder_in);
                 }
             } else if (messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaPhoto && messageObject.messageOwner.media.photo != null && !messageObject.photoThumbs.isEmpty()) {
-                photoVideoView.videoInfoContainer.setVisibility(GONE);
+                photoVideoView.videoInfoContainer.setVisibility(INVISIBLE);
                 TLRPC.PhotoSize photoSize = FileLoader.getClosestPhotoSizeWithSize(messageObject.photoThumbs, 80);
                 photoVideoView.imageView.setImage(null, null, null, ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.photo_placeholder_in), null, photoSize.location, "b", 0);
             } else {
-                photoVideoView.videoInfoContainer.setVisibility(GONE);
+                photoVideoView.videoInfoContainer.setVisibility(INVISIBLE);
                 photoVideoView.imageView.setImageResource(R.drawable.photo_placeholder_in);
             }
         } else {
-            photoVideoViews[a].setVisibility(GONE);
+            photoVideoViews[a].setVisibility(INVISIBLE);
             messageObjects[a] = null;
         }
     }

@@ -31,9 +31,8 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:22.0.+'
+    compile 'com.android.support:support-v4:22.1.+'
     compile 'com.googlecode.mp4parser:isoparser:1.0.+'
-    compile 'com.android.support:recyclerview-v7:+'
     compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
@@ -82,7 +81,7 @@ android {
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 22
-        versionCode 469
-        versionName "2.6.0"
+        versionCode 521
+        versionName "2.8.1"
     }
 }
