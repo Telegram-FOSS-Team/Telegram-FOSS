@@ -307,13 +307,8 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
 
                 @Override
                 public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                    if (visibleItemCount != 0 && firstVisibleItem + visibleItemCount > totalItemCount - 2 && !searching) {
-                        if (type == 0 && nextSearchBingString != null) {
-                            searchBingImages(lastSearchString, searchResult.size(), 54);
-                        } else if (type == 1 && !giphySearchEndReached) {
-                            searchGiphyImages(searchItem.getSearchField().getText().toString(), searchResult.size(), 54);
-                        }
-                    }
+                    // Telegram-FOSS doesn't support searching with external engines (privacy issues)
+                    return;
                 }
             });
 
