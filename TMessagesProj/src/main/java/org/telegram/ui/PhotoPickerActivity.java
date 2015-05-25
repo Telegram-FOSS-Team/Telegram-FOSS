@@ -240,7 +240,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                         finishFragment();
                     }
                 } else {
-                    ArrayList<Object> arrayList = null;
+                    ArrayList<Object> arrayList;
                     if (selectedAlbum != null) {
                         arrayList = (ArrayList) selectedAlbum.photos;
                     } else {
@@ -408,7 +408,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                         continue;
                     }
                 } else {
-                    ArrayList<MediaController.SearchImage> array = null;
+                    ArrayList<MediaController.SearchImage> array;
                     if (searchResult.isEmpty() && lastSearchString == null) {
                         array = recentImages;
                     } else {
@@ -464,7 +464,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                     cell.photoImage.setImageResource(R.drawable.nophotos);
                 }
             } else {
-                ArrayList<MediaController.SearchImage> array = null;
+                ArrayList<MediaController.SearchImage> array;
                 if (searchResult.isEmpty() && lastSearchString == null) {
                     array = recentImages;
                 } else {
@@ -506,7 +506,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                     continue;
                 }
             } else {
-                ArrayList<MediaController.SearchImage> array = null;
+                ArrayList<MediaController.SearchImage> array;
                 if (searchResult.isEmpty() && lastSearchString == null) {
                     array = recentImages;
                 } else {
@@ -535,7 +535,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         if (selectedAlbum != null) {
             return !(index < 0 || index >= selectedAlbum.photos.size()) && selectedPhotos.containsKey(selectedAlbum.photos.get(index).imageId);
         } else {
-            ArrayList<MediaController.SearchImage> array = null;
+            ArrayList<MediaController.SearchImage> array;
             if (searchResult.isEmpty() && lastSearchString == null) {
                 array = recentImages;
             } else {
@@ -560,8 +560,8 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                 selectedPhotos.put(photoEntry.imageId, photoEntry);
             }
         } else {
-            MediaController.SearchImage photoEntry = null;
-            ArrayList<MediaController.SearchImage> array = null;
+            MediaController.SearchImage photoEntry;
+            ArrayList<MediaController.SearchImage> array;
             if (searchResult.isEmpty() && lastSearchString == null) {
                 array = recentImages;
             } else {
@@ -608,7 +608,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                 selectedPhotos.put(photoEntry.imageId, photoEntry);
             }
         } else if (selectedPhotos.isEmpty()) {
-            ArrayList<MediaController.SearchImage> array = null;
+            ArrayList<MediaController.SearchImage> array;
             if (searchResult.isEmpty() && lastSearchString == null) {
                 array = recentImages;
             } else {
@@ -688,7 +688,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         WindowManager manager = (WindowManager) ApplicationLoader.applicationContext.getSystemService(Activity.WINDOW_SERVICE);
         int rotation = manager.getDefaultDisplay().getRotation();
 
-        int columnsCount = 2;
+        int columnsCount;
         if (AndroidUtilities.isTablet()) {
             columnsCount = 3;
         } else {
@@ -792,7 +792,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                                 ((PhotoPickerPhotoCell) v.getParent()).checkBox.setChecked(selectedPhotos.containsKey(photoEntry.imageId), true);
                             } else {
                                 AndroidUtilities.hideKeyboard(getParentActivity().getCurrentFocus());
-                                MediaController.SearchImage photoEntry = null;
+                                MediaController.SearchImage photoEntry;
                                 if (searchResult.isEmpty() && lastSearchString == null) {
                                     photoEntry = recentImages.get((Integer)((View)v.getParent()).getTag());
                                 } else {
@@ -818,7 +818,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                 BackupImageView imageView = ((PhotoPickerPhotoCell) view).photoImage;
                 imageView.setTag(i);
                 view.setTag(i);
-                boolean showing = false;
+                boolean showing;
                 imageView.setOrientation(0, true);
 
                 if (selectedAlbum != null) {
@@ -838,7 +838,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                     cell.checkBox.setChecked(selectedPhotos.containsKey(photoEntry.imageId), false);
                     showing = PhotoViewer.getInstance().isShowingImage(photoEntry.path);
                 } else {
-                    MediaController.SearchImage photoEntry = null;
+                    MediaController.SearchImage photoEntry;
                     if (searchResult.isEmpty() && lastSearchString == null) {
                         photoEntry = recentImages.get(i);
                     } else {
