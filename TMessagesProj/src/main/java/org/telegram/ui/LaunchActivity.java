@@ -1286,7 +1286,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         }
         ApplicationLoader.mainInterfacePaused = true;
         ConnectionsManager.getInstance().setAppPaused(true, false);
-        AndroidUtilities.unregisterUpdates();
     }
 
     @Override
@@ -1318,8 +1317,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         } else {
             passcodeView.onResume();
         }
-        AndroidUtilities.checkForCrashes(this);
-        AndroidUtilities.checkForUpdates(this);
         ApplicationLoader.mainInterfacePaused = false;
         ConnectionsManager.getInstance().setAppPaused(false, false);
         updateCurrentConnectionState();

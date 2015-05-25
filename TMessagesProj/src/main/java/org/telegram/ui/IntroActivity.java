@@ -235,14 +235,11 @@ public class IntroActivity extends Activity {
             }
             justCreated = false;
         }
-        AndroidUtilities.checkForCrashes(this);
-        AndroidUtilities.checkForUpdates(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        AndroidUtilities.unregisterUpdates();
     }
 
     private class IntroAdapter extends PagerAdapter {
