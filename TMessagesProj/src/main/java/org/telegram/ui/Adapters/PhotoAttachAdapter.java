@@ -13,13 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.telegram.android.MediaController;
-import org.telegram.android.NotificationCenter;
 import org.telegram.android.support.widget.RecyclerView;
 import org.telegram.ui.Cells.PhotoAttachPhotoCell;
 
 import java.util.HashMap;
 
-public class PhotoAttachAdapter extends RecyclerView.Adapter implements NotificationCenter.NotificationCenterDelegate {
+public class PhotoAttachAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
     private PhotoAttachAdapterDelegate delegate;
@@ -38,14 +37,6 @@ public class PhotoAttachAdapter extends RecyclerView.Adapter implements Notifica
 
     public PhotoAttachAdapter(Context context) {
         mContext = context;
-        NotificationCenter.getInstance().addObserver(this, NotificationCenter.albumsDidLoaded);
-        if (MediaController.allPhotosAlbumEntry == null) {
-            MediaController.loadGalleryPhotosAlbums(0);
-        }
-    }
-
-    public void onDestroy() {
-        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.albumsDidLoaded);
     }
 
     public void clearSelectedPhotos() {
@@ -65,13 +56,6 @@ public class PhotoAttachAdapter extends RecyclerView.Adapter implements Notifica
     }
 
     @Override
-    public void didReceivedNotification(int id, Object... args) {
-        if (id == NotificationCenter.albumsDidLoaded) {
-            notifyDataSetChanged();
-        }
-    }
-
-    @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         //if (position != 0) {
             PhotoAttachPhotoCell cell = (PhotoAttachPhotoCell) holder.itemView;
@@ -88,24 +72,27 @@ public class PhotoAttachAdapter extends RecyclerView.Adapter implements Notifica
             view = new PhotoAttachCameraCell(mContext);
         } else {*/
             PhotoAttachPhotoCell cell = new PhotoAttachPhotoCell(mContext);
-            cell.setOnCheckClickLisnener(new View.OnClickListener() {
+            /*cell.setOnCheckClickLisnener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PhotoAttachPhotoCell cell = (PhotoAttachPhotoCell) v.getParent();
-                    MediaController.PhotoEntry photoEntry = cell.getPhotoEntry();
-                    if (selectedPhotos.containsKey(photoEntry.imageId)) {
-                        selectedPhotos.remove(photoEntry.imageId);
-                        cell.setChecked(false, true);
-                    } else {
-                        selectedPhotos.put(photoEntry.imageId, photoEntry);
-                        cell.setChecked(true, true);
-                    }
-                    delegate.selectedPhotosChanged();
+                    onItemClick((PhotoAttachPhotoCell) v.getParent());
                 }
             });
-            view = cell;
+            view = cell;*/
         //}
-        return new Holder(view);
+        return new Holder(cell);
+    }
+
+    public void onItemClick(PhotoAttachPhotoCell cell) {
+        MediaController.PhotoEntry photoEntry = cell.getPhotoEntry();
+        if (selectedPhotos.containsKey(photoEntry.imageId)) {
+            selectedPhotos.remove(photoEntry.imageId);
+            cell.setChecked(false, true);
+        } else {
+            selectedPhotos.put(photoEntry.imageId, photoEntry);
+            cell.setChecked(true, true);
+        }
+        delegate.selectedPhotosChanged();
     }
 
     @Override

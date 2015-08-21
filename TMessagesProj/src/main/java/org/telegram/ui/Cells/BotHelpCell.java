@@ -102,7 +102,7 @@ public class BotHelpCell extends View {
         height = textLayout.getHeight() + AndroidUtilities.dp(4 + 18);
         int count = textLayout.getLineCount();
         for (int a = 0; a < count; a++) {
-            width = (int) Math.ceil(Math.max(width, textLayout.getLineWidth(a) - textLayout.getLineLeft(a)));
+            width = (int) Math.ceil(Math.max(width, textLayout.getLineWidth(a) + textLayout.getLineLeft(a)));
         }
         width += AndroidUtilities.dp(4 + 18);
     }
@@ -113,7 +113,6 @@ public class BotHelpCell extends View {
         float y = event.getY();
 
         boolean result = false;
-        int side = AndroidUtilities.dp(48);
         if (textLayout != null) {
             if (event.getAction() == MotionEvent.ACTION_DOWN || pressedLink != null && event.getAction() == MotionEvent.ACTION_UP) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {

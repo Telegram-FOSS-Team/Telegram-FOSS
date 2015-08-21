@@ -131,6 +131,8 @@ public class MessagesStorage {
 
                 database.executeFast("CREATE TABLE sent_files_v2(uid TEXT, type INTEGER, data BLOB, PRIMARY KEY (uid, type))").stepThis().dispose();
 
+                database.executeFast("CREATE TABLE search_recent(did INTEGER PRIMARY KEY, date INTEGER);").stepThis().dispose();
+
                 //database.executeFast("CREATE TABLE messages_holes(uid INTEGER, start INTEGER, end INTEGER, PRIMARY KEY(uid, start));").stepThis().dispose();
                 //database.executeFast("CREATE INDEX IF NOT EXISTS type_uid_end_messages_holes ON messages_holes(uid, end);").stepThis().dispose();
                 //database.executeFast("CREATE TABLE secret_holes(uid INTEGER, seq_in INTEGER, seq_out INTEGER, data BLOB, PRIMARY KEY (uid, seq_in, seq_out));").stepThis().dispose();
@@ -170,7 +172,7 @@ public class MessagesStorage {
                 database.executeFast("CREATE INDEX IF NOT EXISTS bot_keyboard_idx_mid ON bot_keyboard(mid);").stepThis().dispose();
 
                 //version
-                database.executeFast("PRAGMA user_version = 20").stepThis().dispose();
+                database.executeFast("PRAGMA user_version = 21").stepThis().dispose();
             } else {
                 try {
                     SQLiteCursor cursor = database.queryFinalized("SELECT seq, pts, date, qts, lsv, sg, pbytes FROM params WHERE id = 1");
@@ -201,7 +203,7 @@ public class MessagesStorage {
                     }
                 }
                 int version = database.executeInt("PRAGMA user_version");
-                if (version < 20) {
+                if (version < 21) {
                     updateDbToLastVersion(version);
                 }
             }
@@ -410,7 +412,12 @@ public class MessagesStorage {
                         database.executeFast("CREATE TABLE IF NOT EXISTS bot_keyboard(uid INTEGER PRIMARY KEY, mid INTEGER, info BLOB)").stepThis().dispose();
                         database.executeFast("CREATE INDEX IF NOT EXISTS bot_keyboard_idx_mid ON bot_keyboard(mid);").stepThis().dispose();
                         database.executeFast("PRAGMA user_version = 20").stepThis().dispose();
-                        //version = 20;
+                        version = 20;
+                    }
+                    if (version == 20) {
+                        database.executeFast("CREATE TABLE search_recent(did INTEGER PRIMARY KEY, date INTEGER);").stepThis().dispose();
+                        database.executeFast("PRAGMA user_version = 21").stepThis().dispose();
+                        //version = 21;
                     }
                 } catch (Exception e) {
                     FileLog.e("tmessages", e);
@@ -887,6 +894,7 @@ public class MessagesStorage {
                     if (!messagesOnly) {
                         database.executeFast("DELETE FROM dialogs WHERE did = " + did).stepThis().dispose();
                         database.executeFast("DELETE FROM chat_settings WHERE uid = " + did).stepThis().dispose();
+                        database.executeFast("DELETE FROM search_recent WHERE did = " + did).stepThis().dispose();
                         int lower_id = (int)did;
                         int high_id = (int)(did >> 32);
                         if (lower_id != 0) {
@@ -1149,7 +1157,7 @@ public class MessagesStorage {
         });
     }
 
-    private void updateDialogsWithReadedMessagesInternal(final ArrayList<Integer> messages, final HashMap<Integer, Integer> inbox) {
+    private void updateDialogsWithReadMessagesInternal(final ArrayList<Integer> messages, final HashMap<Integer, Integer> inbox) {
         try {
             HashMap<Long, Integer> dialogsToUpdate = new HashMap<>();
             StringBuilder dialogsToReload = new StringBuilder();
@@ -1184,14 +1192,13 @@ public class MessagesStorage {
                     SQLiteCursor cursor = database.queryFinalized(String.format(Locale.US, "SELECT COUNT(mid) FROM messages WHERE uid = %d AND mid <= %d AND read_state IN(0,2) AND out = 0", entry.getKey(), entry.getValue()));
                     if (cursor.next()) {
                         int count = cursor.intValue(0);
-                        if (count == 0) {
-                            continue;
+                        if (count != 0) {
+                            dialogsToUpdate.put((long) entry.getKey(), count);
+                            if (dialogsToReload.length() != 0) {
+                                dialogsToReload.append(",");
+                            }
+                            dialogsToReload.append(entry.getKey());
                         }
-                        dialogsToUpdate.put((long) entry.getKey(), count);
-                        if (dialogsToReload.length() != 0) {
-                            dialogsToReload.append(",");
-                        }
-                        dialogsToReload.append(entry.getKey());
                     }
                     cursor.dispose();
                 }
@@ -1231,7 +1238,7 @@ public class MessagesStorage {
         }
     }
 
-    public void updateDialogsWithReadedMessages(final HashMap<Integer, Integer> inbox, boolean useQueue) {
+    public void updateDialogsWithReadMessages(final HashMap<Integer, Integer> inbox, boolean useQueue) {
         if (inbox.isEmpty()) {
             return;
         }
@@ -1239,11 +1246,11 @@ public class MessagesStorage {
             storageQueue.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    updateDialogsWithReadedMessagesInternal(null, inbox);
+                    updateDialogsWithReadMessagesInternal(null, inbox);
                 }
             });
         } else {
-            updateDialogsWithReadedMessagesInternal(null, inbox);
+            updateDialogsWithReadMessagesInternal(null, inbox);
         }
     }
 
@@ -2101,11 +2108,19 @@ public class MessagesStorage {
             storageQueue.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    database.commitTransaction();
+                    try {
+                        database.commitTransaction();
+                    } catch (Exception e) {
+                        FileLog.e("tmessages", e);
+                    }
                 }
             });
         } else {
-            database.commitTransaction();
+            try {
+                database.commitTransaction();
+            } catch (Exception e) {
+                FileLog.e("tmessages", e);
+            }
         }
     }
 
@@ -2746,6 +2761,7 @@ public class MessagesStorage {
                     database.beginTransaction();
 
                     SQLitePreparedStatement state = database.executeFast("UPDATE messages SET data = ? WHERE mid = ?");
+                    SQLitePreparedStatement state2 = database.executeFast("UPDATE media_v2 SET data = ? WHERE mid = ?");
                     for (TLRPC.Message message : messages) {
                         ByteBufferDesc data = buffersStorage.getFreeBuffer(message.getObjectSize());
                         message.serializeToStream(data);
@@ -2755,9 +2771,15 @@ public class MessagesStorage {
                         state.bindInteger(2, message.id);
                         state.step();
 
+                        state2.requery();
+                        state2.bindByteBuffer(1, data.buffer);
+                        state2.bindInteger(2, message.id);
+                        state2.step();
+
                         buffersStorage.reuseFreeBuffer(data);
                     }
                     state.dispose();
+                    state2.dispose();
 
                     database.commitTransaction();
 
@@ -3473,7 +3495,7 @@ public class MessagesStorage {
                                 NotificationCenter.getInstance().postNotificationName(NotificationCenter.messagesDeleted, mids);
                             }
                         });
-                        MessagesStorage.getInstance().updateDialogsWithReadedMessagesInternal(mids, null);
+                        MessagesStorage.getInstance().updateDialogsWithReadMessagesInternal(mids, null);
                         MessagesStorage.getInstance().markMessagesAsDeletedInternal(mids);
                         MessagesStorage.getInstance().updateDialogsWithDeletedMessagesInternal(mids);
                     }

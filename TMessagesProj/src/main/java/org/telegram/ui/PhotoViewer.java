@@ -26,6 +26,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Browser;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -78,7 +79,7 @@ import org.telegram.ui.Components.GifDrawable;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.PhotoCropView;
 import org.telegram.ui.Components.PhotoFilterView;
-import org.telegram.ui.Components.PhotoPickerBottomLayout;
+import org.telegram.ui.Components.PickerBottomLayout;
 import org.telegram.ui.Components.PhotoViewerCaptionEnterView;
 import org.telegram.ui.Components.SizeNotifierFrameLayoutPhoto;
 
@@ -114,8 +115,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private ImageView shareButton;
     private BackgroundDrawable backgroundDrawable = new BackgroundDrawable(0xff000000);
     private CheckBox checkImageView;
-    private PhotoPickerBottomLayout pickerView;
-    private PhotoPickerBottomLayout editorDoneLayout;
+    private PickerBottomLayout pickerView;
+    private PickerBottomLayout editorDoneLayout;
     private RadialProgressView radialProgressViews[] = new RadialProgressView[3];
     private GifDrawable gifDrawable;
     private ActionBarMenuItem cropItem;
@@ -522,8 +523,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-            int heightMode = MeasureSpec.getMode(heightMeasureSpec);
             int widthSize = MeasureSpec.getSize(widthMeasureSpec);
             int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
@@ -1161,6 +1160,13 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     File f = null;
 
                     if (currentMessageObject != null) {
+                        if (currentMessageObject.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage) {
+                            Uri uri = Uri.parse(currentMessageObject.messageOwner.media.webpage.url);
+                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                            intent.putExtra(Browser.EXTRA_APPLICATION_ID, parentActivity.getPackageName());
+                            parentActivity.startActivity(intent);
+                            return;
+                        }
                         f = FileLoader.getPathToMessage(currentMessageObject.messageOwner);
                     } else if (currentFileLocation != null) {
                         f = FileLoader.getPathToAttach(currentFileLocation, avatarsUserId != 0);
@@ -1209,7 +1215,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         dateTextView.setGravity(Gravity.LEFT);
         bottomLayout.addView(dateTextView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | Gravity.LEFT, 16, 25, 50, 0));
 
-        pickerView = new PhotoPickerBottomLayout(parentActivity);
+        pickerView = new PickerBottomLayout(parentActivity);
         pickerView.setBackgroundColor(0x7f000000);
         containerView.addView(pickerView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, Gravity.BOTTOM | Gravity.LEFT));
         pickerView.cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -1231,7 +1237,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
         });
 
-        editorDoneLayout = new PhotoPickerBottomLayout(parentActivity);
+        editorDoneLayout = new PickerBottomLayout(parentActivity);
         editorDoneLayout.setBackgroundColor(0x7f000000);
         editorDoneLayout.updateSelectedCount(0, false);
         editorDoneLayout.setVisibility(View.GONE);
@@ -1310,7 +1316,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             @Override
             public void onWindowSizeChanged(int size) {
                 int height = AndroidUtilities.dp(36 * Math.min(3, mentionsAdapter.getCount()) + (mentionsAdapter.getCount() > 3 ? 18 : 0));
-                if (size - AndroidUtilities.getCurrentActionBarHeight() * 2 < height) {
+                if (size - ActionBar.getCurrentActionBarHeight() * 2 < height) {
                     allowMentions = false;
                     if (mentionListView != null && mentionListView.getVisibility() == View.VISIBLE) {
                         mentionListView.clearAnimation();
@@ -1613,8 +1619,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 float newScaleY = (float) getContainerViewHeight(0) / (float) bitmapHeight;
                 float scale = scaleX > scaleY ? scaleY : scaleX;
                 float newScale = newScaleX > newScaleY ? newScaleY : newScaleX;
-                int width = (int) (bitmapWidth * scale);
-                int height = (int) (bitmapHeight * scale);
 
                 animateToScale = newScale / scale;
                 animateToX = 0;
@@ -1767,8 +1771,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         float newScaleY = (float) getContainerViewHeight(1) / (float) bitmapHeight;
                         float scale = scaleX > scaleY ? scaleY : scaleX;
                         float newScale = newScaleX > newScaleY ? newScaleY : newScaleX;
-                        int width = (int) (bitmapWidth * scale);
-                        int height = (int) (bitmapHeight * scale);
 
                         animateToScale = newScale / scale;
                         animateToX = 0;
@@ -1887,8 +1889,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         float newScaleY = (float) getContainerViewHeight(2) / (float) bitmapHeight;
                         float scale = scaleX > scaleY ? scaleY : scaleX;
                         float newScale = newScaleX > newScaleY ? newScaleY : newScaleX;
-                        int width = (int) (bitmapWidth * scale);
-                        int height = (int) (bitmapHeight * scale);
 
                         animateToScale = newScale / scale;
                         animateToX = 0;
@@ -2028,7 +2028,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 } else if (message.messageOwner.media != null) {
                     if (message.messageOwner.media instanceof TLRPC.TL_messageMediaVideo) {
                         return file.volume_id + "_" + file.id + ".mp4";
-                    } else if (message.messageOwner.media instanceof TLRPC.TL_messageMediaPhoto) {
+                    } else if (message.messageOwner.media instanceof TLRPC.TL_messageMediaPhoto || message.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage) {
                         return file.volume_id + "_" + file.local_id + ".jpg";
                     }
                 }
@@ -2084,7 +2084,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         size[0] = -1;
                     }
                 }
-            } else if (message.messageOwner.media instanceof TLRPC.TL_messageMediaPhoto && message.messageOwner.media.photo != null) {
+            } else if (message.messageOwner.media instanceof TLRPC.TL_messageMediaPhoto && message.messageOwner.media.photo != null || message.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage && message.messageOwner.media.webpage != null) {
                 TLRPC.PhotoSize sizeFull = FileLoader.getClosestPhotoSizeWithSize(message.photoThumbs, AndroidUtilities.getPhotoSize());
                 if (sizeFull != null) {
                     size[0] = sizeFull.size;
@@ -2146,7 +2146,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         return location;
                     }
                 }
-            } else if (message.messageOwner.media instanceof TLRPC.TL_messageMediaPhoto) {
+            } else if (message.messageOwner.media instanceof TLRPC.TL_messageMediaPhoto || message.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage) {
                 TLRPC.PhotoSize sizeFull = FileLoader.getClosestPhotoSizeWithSize(message.photoThumbs, AndroidUtilities.getPhotoSize());
                 if (sizeFull != null) {
                     TLRPC.TL_inputFileLocation location = new TLRPC.TL_inputFileLocation();
@@ -2245,7 +2245,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
         if (messageObject != null && messages == null) {
             imagesArr.add(messageObject);
-            if (messageObject.messageOwner.action == null || messageObject.messageOwner.action instanceof TLRPC.TL_messageActionEmpty) {
+            if (!(messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage) && (messageObject.messageOwner.action == null || messageObject.messageOwner.action instanceof TLRPC.TL_messageActionEmpty)) {
                 needSearchImageInArr = true;
                 imagesByIds.put(messageObject.getId(), messageObject);
                 if (messageObject.messageOwner.dialog_id != 0) {
@@ -2405,6 +2405,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     }
                     actionBar.setTitle(LocaleController.formatString("Of", R.string.Of, (totalImagesCount - imagesArr.size()) + currentIndex + 1, totalImagesCount));
                 }
+            } else if (currentMessageObject.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage) {
+                actionBar.setTitle(LocaleController.getString("AttachPhoto", R.string.AttachPhoto));
             }
             if (currentMessageObject.messageOwner.ttl != 0) {
                 menuItem.hideSubItem(gallery_menu_save);
@@ -2557,7 +2559,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             captionTextViewNew = captionTextView;
 
             captionItem.setIcon(R.drawable.photo_text2);
-            CharSequence oldText = captionTextView.getText();
             captionTextView.setTag(caption);
             captionTextView.setText(caption);
             ViewProxy.setAlpha(captionTextView, bottomLayout.getVisibility() == View.VISIBLE || pickerView.getVisibility() == View.VISIBLE ? 1.0f : 0.0f);
@@ -3055,7 +3056,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
         if (animated) {
             animationInProgress = 1;
-            int visibility = animatingImageView.getVisibility();
             animatingImageView.setVisibility(View.VISIBLE);
             containerView.invalidate();
 
@@ -3739,7 +3739,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         }
 
         ImageReceiver sideImage = null;
-        Bitmap bitmap;
         if (currentEditMode == 0) {
             if (scale >= 1.0f && !zoomAnimation && !zooming) {
                 if (currentTranslationX > maxX + AndroidUtilities.dp(5)) {
