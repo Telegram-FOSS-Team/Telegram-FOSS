@@ -26,8 +26,8 @@ LOCAL_MODULE := breakpad
 LOCAL_CPPFLAGS := -Wall -std=c++11 -DANDROID -finline-functions -ffast-math -Os -fno-strict-aliasing
 
 LOCAL_C_INCLUDES := \
-./breakpad/common/android/include \
-./breakpad
+$(LOCAL_PATH)/breakpad/common/android/include \
+$(LOCAL_PATH)/breakpad
 
 LOCAL_SRC_FILES := \
 ./breakpad/client/linux/crash_generation/crash_generation_client.cc \
@@ -57,7 +57,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CPPFLAGS := -Wall -std=c++11 -DANDROID -frtti -DHAVE_PTHREAD -finline-functions -ffast-math -Os
-LOCAL_C_INCLUDES += ./boringssl/include/
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/boringssl/include/
 LOCAL_ARM_MODE := arm
 LOCAL_MODULE := tgnet
 LOCAL_STATIC_LIBRARIES := crypto
@@ -85,7 +85,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS := -Wall -DANDROID -DHAVE_MALLOC_H -DHAVE_PTHREAD -DWEBP_USE_THREAD -finline-functions -ffast-math -ffunction-sections -fdata-sections -Os
-LOCAL_C_INCLUDES += ./libwebp/src
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/libwebp/src
 LOCAL_ARM_MODE := arm
 LOCAL_STATIC_LIBRARIES := cpufeatures
 LOCAL_MODULE := webp
