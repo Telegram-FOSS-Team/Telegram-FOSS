@@ -12,8 +12,6 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 
-import net.hockeyapp.android.Constants;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -85,7 +83,7 @@ public class NativeLoader {
 
             try {
                 System.load(destLocalFile.getAbsolutePath());
-                init(Constants.FILES_PATH, BuildVars.DEBUG_VERSION);
+                init(context.getCacheDir().getAbsolutePath(), BuildVars.DEBUG_VERSION);
                 nativeLoaded = true;
             } catch (Error e) {
                 FileLog.e("tmessages", e);
@@ -117,7 +115,7 @@ public class NativeLoader {
             return;
         }
 
-        Constants.loadFromContext(context);
+        String crashDir = context.getCacheDir().getAbsolutePath();
 
         try {
             String folder;
@@ -150,7 +148,7 @@ public class NativeLoader {
                     FileLog.d("tmessages", "Load normal lib");
                     try {
                         System.loadLibrary(LIB_NAME);
-                        init(Constants.FILES_PATH, BuildVars.DEBUG_VERSION);
+                        init(crashDir, BuildVars.DEBUG_VERSION);
                         nativeLoaded = true;
                         return;
                     } catch (Error e) {
@@ -159,7 +157,7 @@ public class NativeLoader {
                 } else {
                     try {
                         System.loadLibrary(LIB_NAME);
-                        init(Constants.FILES_PATH, BuildVars.DEBUG_VERSION);
+                        init(crashDir, BuildVars.DEBUG_VERSION);
                         nativeLoaded = true;
                         return;
                     } catch (Error e) {
@@ -174,7 +172,7 @@ public class NativeLoader {
                         FileLog.d("tmessages", "load normal lib");
                         try {
                             System.loadLibrary(LIB_NAME);
-                            init(Constants.FILES_PATH, BuildVars.DEBUG_VERSION);
+                            init(crashDir, BuildVars.DEBUG_VERSION);
                             nativeLoaded = true;
                             return;
                         } catch (Error e) {
@@ -192,7 +190,7 @@ public class NativeLoader {
                 try {
                     FileLog.d("tmessages", "Load local lib");
                     System.load(destLocalFile.getAbsolutePath());
-                    init(Constants.FILES_PATH, BuildVars.DEBUG_VERSION);
+                    init(crashDir, BuildVars.DEBUG_VERSION);
                     nativeLoaded = true;
                     return;
                 } catch (Error e) {
@@ -212,7 +210,7 @@ public class NativeLoader {
 
         try {
             System.loadLibrary(LIB_NAME);
-            init(Constants.FILES_PATH, BuildVars.DEBUG_VERSION);
+            init(crashDir, BuildVars.DEBUG_VERSION);
             nativeLoaded = true;
         } catch (Error e) {
             FileLog.e("tmessages", e);
