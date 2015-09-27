@@ -2,6 +2,9 @@ apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
+    maven {
+        url 'http://dl.bintray.com/amulyakhare/maven'
+    }
 }
 
 task nativeLibsToJar(
@@ -26,6 +29,7 @@ dependencies {
     compile 'com.android.support:support-v4:23.0.+'
     compile 'com.googlecode.mp4parser:isoparser:1.0.+'
     compile 'org.apache.httpcomponents:httpmime:4.2.1'
+    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
@@ -77,7 +81,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 8
+        minSdkVersion 10
         targetSdkVersion 22
         versionCode 627
         versionName "3.2.2"

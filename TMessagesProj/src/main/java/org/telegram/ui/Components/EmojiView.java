@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -32,7 +33,7 @@ import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationCompat.ViewProxy;
-import org.telegram.messenger.Emoji;
+import org.telegram.messenger.EmojiData;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.query.StickersQuery;
@@ -42,6 +43,8 @@ import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Cells.EmptyCell;
 import org.telegram.ui.Cells.StickerEmojiCell;
 import org.telegram.ui.StickerPreviewViewer;
+
+import com.amulyakhare.textdrawable.TextDrawable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,7 +105,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
 
         showStickers = needStickers;
 
-        for (int i = 0; i < Emoji.data.length + 1; i++) {
+        for (int i = 0; i < EmojiData.data.length + 1; i++) {
             GridView gridView = new GridView(context);
             if (AndroidUtilities.isTablet()) {
                 gridView.setColumnWidth(AndroidUtilities.dp(60));
@@ -510,7 +513,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
 
         loadRecents();
 
-        if (Emoji.data[0] == null || Emoji.data[0].length == 0) {
+        if (EmojiData.data[0] == null || EmojiData.data[0].length == 0) {
             pager.setCurrentItem(1);
         }
     }
@@ -1080,7 +1083,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             if (emojiPage == -1) {
                 return recentEmoji.size();
             }
-            return Emoji.data[emojiPage].length;
+            return EmojiData.data[emojiPage].length;
         }
 
         public Object getItem(int i) {
@@ -1135,10 +1138,22 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             if (emojiPage == -1) {
                 code = recentEmoji.get(i);
             } else {
-                code = Emoji.data[emojiPage][i];
+                code = EmojiData.data[emojiPage][i];
             }
-            imageView.setImageDrawable(Emoji.getEmojiBigDrawable(code));
+            /*
+             * Telegram-FOSS - Draw native Emojis using TextDrawable. See:
+             *  - https://github.com/Jamesits/Moegram/commit/8e52c6222cf00bc9a86d52fed4c06558f48c345c
+             *  - https://github.com/amulyakhare/TextDrawable
+             */
+            //imageView.setImageDrawable(Emoji.getEmojiBigDrawable(code));
             imageView.setTag(code);
+            int bigImgSize;
+            if (AndroidUtilities.isTablet()) {
+                bigImgSize = AndroidUtilities.dp(40);
+            } else {
+                bigImgSize = AndroidUtilities.dp(32);
+            }
+            imageView.setImageDrawable(TextDrawable.builder().beginConfig().textColor(Color.BLACK).fontSize(bigImgSize).endConfig().buildRect(convert((long) imageView.getTag()), Color.TRANSPARENT));
             return imageView;
         }
 
