@@ -5,6 +5,10 @@ This repo contains the official source code for [Telegram App for Android](https
 
 This is an unofficial, FOSS friendly fork of the original [Telegram App for Android](https://github.com/DrKLO/Telegram).
 
+### Donations
+
+If you like the work I'm doing maintaining this FOSS friendly version of Telegram, please consider [buying me a beer](https://sinrega.org/?page_id=241).
+
 ### Versioning
 
 This repository contains tags to make tracking versions easier.
