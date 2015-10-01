@@ -2,9 +2,7 @@ apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
-    maven {
-        url 'http://dl.bintray.com/amulyakhare/maven'
-    }
+    jcenter()
 }
 
 task nativeLibsToJar(
