@@ -2340,6 +2340,27 @@ public class SendMessagesHelper implements NotificationCenter.NotificationCenter
         });
     }
 
+    public static void prepareSendingLocation(final TLRPC.MessageMedia location, final long dialog_id, final boolean asAdmin) {
+        MessagesStorage.getInstance().getStorageQueue().postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                Utilities.stageQueue.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        AndroidUtilities.runOnUIThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (location != null) {
+                                    SendMessagesHelper.getInstance().sendMessage(location, dialog_id, null, asAdmin);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     public static void prepareSendingPhotos(ArrayList<String> paths, ArrayList<Uri> uris, final long dialog_id, final MessageObject reply_to_msg, final ArrayList<String> captions, final boolean asAdmin) {
         if (paths == null && uris == null || paths != null && paths.isEmpty() || uris != null && uris.isEmpty()) {
             return;
