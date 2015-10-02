@@ -81,6 +81,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
     private boolean finished;
     private String videoPath;
     private String sendingText;
+    private TLRPC.TL_messageMediaGeo sendingLocation;
     private ArrayList<Uri> photoPathsArray;
     private ArrayList<String> documentsPathsArray;
     private ArrayList<Uri> documentsUrisArray;
@@ -614,12 +615,22 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                     text = intent.getCharSequenceExtra(Intent.EXTRA_TEXT).toString();
                                 }
                                 String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-
-                                if (text != null && text.length() != 0) {
+                                if (text.startsWith("Location: geo:")){
+                                    //Build Location Object
+                                    String[] parts = text.split(",");
+                                    String lat = parts[0].split(":")[2];
+                                    String lon = parts[1].split("\\?")[0];
+                                    sendingLocation = new TLRPC.TL_messageMediaGeo();
+                                    sendingLocation.geo = new TLRPC.TL_geoPoint();
+                                    sendingLocation.geo.lat = Double.parseDouble(lat);
+                                    sendingLocation.geo._long = Double.parseDouble(lon);
+                                }
+                                else if (text != null && text.length() != 0) {
                                     if ((text.startsWith("http://") || text.startsWith("https://")) && subject != null && subject.length() != 0) {
                                         text = subject + "\n" + text;
                                     }
                                     sendingText = text;
+
                                 } else {
                                     error = true;
                                 }
@@ -665,7 +676,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                         sendingText = null;
                                     }
                                 }
-                            } else if (sendingText == null) {
+                            } else if (sendingText == null && sendingLocation == null) {
                                 error = true;
                             }
                         }
@@ -897,7 +908,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                 }
                 actionBarLayout.presentFragment(new AudioPlayerActivity(), false, true, true);
                 pushOpened = true;
-            } else if (videoPath != null || photoPathsArray != null || sendingText != null || documentsPathsArray != null || contactsToSend != null || documentsUrisArray != null) {
+            } else if (videoPath != null || photoPathsArray != null || sendingText != null || sendingLocation != null || documentsPathsArray != null || contactsToSend != null || documentsUrisArray != null) {
                 if (!AndroidUtilities.isTablet()) {
                     NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
                 }
@@ -1320,7 +1331,9 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                 if (sendingText != null) {
                     SendMessagesHelper.prepareSendingText(sendingText, dialog_id, true);
                 }
-
+                if (sendingLocation != null) {
+                    SendMessagesHelper.prepareSendingLocation(sendingLocation, dialog_id, true);
+                }
                 if (photoPathsArray != null) {
                     SendMessagesHelper.prepareSendingPhotos(null, photoPathsArray, dialog_id, null, null, true);
                 }
@@ -1337,6 +1350,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             photoPathsArray = null;
             videoPath = null;
             sendingText = null;
+            sendingLocation = null;
             documentsPathsArray = null;
             documentsOriginalPathsArray = null;
             contactsToSend = null;
