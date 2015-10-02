@@ -2229,8 +2229,19 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 FileLog.e("tmessages", e);
             }
         } else if (which == attach_location) {
-            /* Telegram-FOSS doesn't support Google's Location Services */
-            return;
+            /* Telegram-FOSS just try to launch a map application here */
+            //TODO: Maybe launch with current position. Or better yet ask the user.
+            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                    Uri.parse("geo:" + 51.4765 + "," + 0 + "?z=8"));
+            if(intent.resolveActivity(getParentActivity().getPackageManager()) != null) {
+                try{
+                    getParentActivity().startActivity(intent);
+                }
+                catch (Exception e){
+                    Toast.makeText(getParentActivity(), "Error handling geo: intent", Toast.LENGTH_SHORT).show();
+                    FileLog.e("tmessages", e);
+                }
+            }
         } else if (which == attach_document) {
             DocumentSelectActivity fragment = new DocumentSelectActivity();
             fragment.setDelegate(new DocumentSelectActivity.DocumentSelectActivityDelegate() {
@@ -5990,8 +6001,21 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 alertUserOpenError(message);
                             }
                         } else if (message.type == 4) {
-                            /* Telegram-FOSS doesn't support Location services */
-                            return;
+                            /* Telegram-FOSS: Try to fire off a geo: intent */
+                            double lat = message.messageOwner.media.geo.lat;
+                            double lon = message.messageOwner.media.geo._long;
+                            //TODO: get actual message Sender, localization
+                            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                                    Uri.parse("geo:" + lat + "," + lon + "?z=15&q=" + Uri.encode("(Shared by " + nameTextView.getText() + ")")));
+                            if(intent.resolveActivity(getParentActivity().getPackageManager()) != null) {
+                                try{
+                                    getParentActivity().startActivity(intent);
+                                }
+                                catch (Exception e){
+                                    Toast.makeText(getParentActivity(), "Error handling geo: intent", Toast.LENGTH_SHORT).show();
+                                    FileLog.e("tmessages", e);
+                                }
+                            }
                         } else if (message.type == 9) {
                             File f = null;
                             String fileName = message.getFileName();
