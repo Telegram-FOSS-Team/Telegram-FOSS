@@ -19,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.query.StickersQuery;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Components.BackupImageView;
@@ -64,8 +65,8 @@ public class StickerEmojiCell extends FrameLayout {
                     if (attribute instanceof TLRPC.TL_documentAttributeSticker) {
                         if (attribute.alt != null && attribute.alt.length() > 0) {
                             /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                            //emojiTextView.setText(Emoji.replaceEmoji(attribute.alt, emojiTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(16), false));
-                            emojiTextView.setText(attribute.alt);
+                            //emojiTextView.setText(attribute.alt);
+                            emojiTextView.setText(Emoji.replaceEmoji(attribute.alt, emojiTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(16), false));
                             set = true;
                         }
                         break;
@@ -73,8 +74,8 @@ public class StickerEmojiCell extends FrameLayout {
                 }
                 if (!set) {
                     /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                    //emojiTextView.setText(Emoji.replaceEmoji(StickersQuery.getEmojiForSticker(sticker.id), emojiTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(16), false));
-                    emojiTextView.setText(StickersQuery.getEmojiForSticker(sticker.id));
+                    //emojiTextView.setText(StickersQuery.getEmojiForSticker(sticker.id));
+                    emojiTextView.setText(Emoji.replaceEmoji(StickersQuery.getEmojiForSticker(sticker.id), emojiTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(16), false));
                 }
                 emojiTextView.setVisibility(VISIBLE);
             } else {

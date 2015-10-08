@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.UserObject;
@@ -542,9 +543,9 @@ public class ChatBaseCell extends BaseCell implements MediaController.FileDownlo
                     }
                     mess = mess.replace("\n", " ");
                     /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                    //stringFinalText = Emoji.replaceEmoji(mess, replyTextPaint.getFontMetricsInt(), AndroidUtilities.dp(14), false);
-                    //stringFinalText = TextUtils.ellipsize(stringFinalText, replyTextPaint, maxWidth - AndroidUtilities.dp(8), TextUtils.TruncateAt.END);
-                    stringFinalText = TextUtils.ellipsize(mess, replyTextPaint, maxWidth - AndroidUtilities.dp(8), TextUtils.TruncateAt.END);
+                    //stringFinalText = TextUtils.ellipsize(mess, replyTextPaint, maxWidth - AndroidUtilities.dp(8), TextUtils.TruncateAt.END);
+                    stringFinalText = Emoji.replaceEmoji(mess, replyTextPaint.getFontMetricsInt(), AndroidUtilities.dp(14), false);
+                    stringFinalText = TextUtils.ellipsize(stringFinalText, replyTextPaint, maxWidth - AndroidUtilities.dp(8), TextUtils.TruncateAt.END);
                 }
             }
             if (stringFinalName == null) {

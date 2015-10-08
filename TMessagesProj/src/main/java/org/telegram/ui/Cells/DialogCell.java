@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.PhoneFormat.PhoneFormat;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.UserObject;
@@ -375,14 +376,14 @@ public class DialogCell extends BaseCell {
                             }
                             mess = mess.replace("\n", " ");
                             /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                            //messageString = Emoji.replaceEmoji(AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff808080>%s</c>", name, mess), AndroidUtilities.FLAG_TAG_COLOR), messagePaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
-                            messageString = AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff808080>%s</c>", name, mess), AndroidUtilities.FLAG_TAG_COLOR);
+                            messageString = Emoji.replaceEmoji(AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff808080>%s</c>", name, mess), AndroidUtilities.FLAG_TAG_COLOR), messagePaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
+                            //messageString = AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff808080>%s</c>", name, mess), AndroidUtilities.FLAG_TAG_COLOR);
                         } else {
                             if (message.messageOwner.media != null && !message.isMediaEmpty()) {
                                 currentMessagePaint = messagePrintingPaint;
                                 /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                                //messageString = Emoji.replaceEmoji(AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff4d83b3>%s</c>", name, message.messageText), AndroidUtilities.FLAG_TAG_COLOR), messagePaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
-                                messageString = AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff4d83b3>%s</c>", name, message.messageText), AndroidUtilities.FLAG_TAG_COLOR);
+                                messageString = Emoji.replaceEmoji(AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff4d83b3>%s</c>", name, message.messageText), AndroidUtilities.FLAG_TAG_COLOR), messagePaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
+                                //messageString = AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff4d83b3>%s</c>", name, message.messageText), AndroidUtilities.FLAG_TAG_COLOR);
                             } else {
                                 if (message.messageOwner.message != null) {
                                     String mess = message.messageOwner.message;
@@ -391,8 +392,8 @@ public class DialogCell extends BaseCell {
                                     }
                                     mess = mess.replace("\n", " ");
                                     /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                                    //messageString = Emoji.replaceEmoji(AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff808080>%s</c>", name, mess), AndroidUtilities.FLAG_TAG_COLOR), messagePaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
-                                    messageString = AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff808080>%s</c>", name, mess), AndroidUtilities.FLAG_TAG_COLOR);
+                                    messageString = Emoji.replaceEmoji(AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff808080>%s</c>", name, mess), AndroidUtilities.FLAG_TAG_COLOR), messagePaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
+                                    //messageString = AndroidUtilities.replaceTags(String.format("<c#ff4d83b3>%s:</c> <c#ff808080>%s</c>", name, mess), AndroidUtilities.FLAG_TAG_COLOR);
                                 }
                             }
                         }
@@ -588,8 +589,8 @@ public class DialogCell extends BaseCell {
             }
             mess = mess.replace("\n", " ");
             /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-            //messageString = Emoji.replaceEmoji(mess, messagePaint.getFontMetricsInt(), AndroidUtilities.dp(17), false);
-            messageString = mess;
+            messageString = Emoji.replaceEmoji(mess, messagePaint.getFontMetricsInt(), AndroidUtilities.dp(17), false);
+            //messageString = mess;
         }
         messageWidth = Math.max(AndroidUtilities.dp(12), messageWidth);
         CharSequence messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - AndroidUtilities.dp(12), TextUtils.TruncateAt.END);

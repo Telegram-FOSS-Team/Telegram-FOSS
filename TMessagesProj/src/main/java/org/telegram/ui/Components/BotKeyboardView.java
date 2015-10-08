@@ -17,6 +17,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 
@@ -106,8 +107,8 @@ public class BotKeyboardView extends LinearLayout {
                     textView.setBackgroundResource(R.drawable.bot_keyboard_states);
                     textView.setPadding(AndroidUtilities.dp(4), 0, AndroidUtilities.dp(4), 0);
                     /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                    //textView.setText(Emoji.replaceEmoji(button.text, textView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(16), false));
-                    textView.setText(button.text);
+                    //textView.setText(button.text);
+                    textView.setText(Emoji.replaceEmoji(button.text, textView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(16), false));
                     layout.addView(textView, LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, weight, 0, 0, b != row.buttons.size() - 1 ? 10 : 0, 0));
                     textView.setOnClickListener(new OnClickListener() {
                         @Override

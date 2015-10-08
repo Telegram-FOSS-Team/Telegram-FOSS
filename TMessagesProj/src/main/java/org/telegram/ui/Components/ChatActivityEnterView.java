@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ChatObject;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessageObject;
@@ -316,7 +317,7 @@ public class ChatActivityEnterView extends FrameLayoutFixed implements Notificat
                         editable.removeSpan(spans[i]);
                     }
                     /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                    //Emoji.replaceEmoji(editable, messageEditText.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20), false);
+                    Emoji.replaceEmoji(editable, messageEditText.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20), false);
                     processChange = false;
                 }
             }
@@ -1308,8 +1309,8 @@ public class ChatActivityEnterView extends FrameLayoutFixed implements Notificat
                         try {
                             innerTextChange = 2;
                             /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                            //CharSequence localCharSequence = Emoji.replaceEmoji(symbol/* + "\uFE0F"*/, messageEditText.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20), false);
-                            CharSequence localCharSequence = symbol;
+                            CharSequence localCharSequence = Emoji.replaceEmoji(symbol/* + "\uFE0F"*/, messageEditText.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20), false);
+                            //CharSequence localCharSequence = symbol;
                             messageEditText.setText(messageEditText.getText().insert(i, localCharSequence));
                             int j = i + localCharSequence.length();
                             messageEditText.setSelection(j, j);
