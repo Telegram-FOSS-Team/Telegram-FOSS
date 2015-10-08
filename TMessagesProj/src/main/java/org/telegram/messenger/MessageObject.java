@@ -354,7 +354,7 @@ public class MessageObject {
         }
         if (generateLayout) {
             /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-            //messageText = Emoji.replaceEmoji(messageText, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
+            messageText = Emoji.replaceEmoji(messageText, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
         }
 
         if (message instanceof TLRPC.TL_message || message instanceof TLRPC.TL_messageForwarded_old2) {
@@ -635,8 +635,8 @@ public class MessageObject {
         }
         if (messageOwner.media != null && messageOwner.media.caption != null && messageOwner.media.caption.length() > 0) {
             /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-            //caption = Emoji.replaceEmoji(messageOwner.media.caption, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
-            caption = messageOwner.media.caption;
+            caption = Emoji.replaceEmoji(messageOwner.media.caption, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
+            //caption = Spannable.Factory.getInstance().newSpannable(messageOwner.media.caption.toString());
             if (containsUrls(caption)) {
                 try {
                     Linkify.addLinks((Spannable) caption, Linkify.WEB_URLS);

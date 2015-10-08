@@ -34,6 +34,7 @@ import android.widget.TextView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationCompat.ViewProxy;
 import org.telegram.messenger.EmojiData;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.query.StickersQuery;
@@ -1145,15 +1146,15 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
              *  - https://github.com/Jamesits/Moegram/commit/8e52c6222cf00bc9a86d52fed4c06558f48c345c
              *  - https://github.com/amulyakhare/TextDrawable
              */
-            //imageView.setImageDrawable(Emoji.getEmojiBigDrawable(code));
+            imageView.setImageDrawable(Emoji.getEmojiBigDrawable(code));
             imageView.setTag(code);
-            int bigImgSize;
-            if (AndroidUtilities.isTablet()) {
-                bigImgSize = AndroidUtilities.dp(40);
-            } else {
-                bigImgSize = AndroidUtilities.dp(32);
-            }
-            imageView.setImageDrawable(TextDrawable.builder().beginConfig().textColor(Color.BLACK).fontSize(bigImgSize).endConfig().buildRect(convert((long) imageView.getTag()), Color.TRANSPARENT));
+            //int bigImgSize;
+            //if (AndroidUtilities.isTablet()) {
+            //    bigImgSize = AndroidUtilities.dp(40);
+            //} else {
+            //    bigImgSize = AndroidUtilities.dp(32);
+            //}
+            //imageView.setImageDrawable(TextDrawable.builder().beginConfig().textColor(Color.BLACK).fontSize(bigImgSize).endConfig().buildRect(convert((long) imageView.getTag()), Color.TRANSPARENT));
             return imageView;
         }
 
