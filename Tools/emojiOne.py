@@ -22,12 +22,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+# USAGE: emojiOne.py /path/to/emojiOne/assets/
+# The script needs tinycss and beautifulsoup 4 to work.
+# You can install these with pip for python 3, i.e.:
+# pip3 install beautifulsoup
+# pip3 install tinycss
 
 import sys, os
-from bs4 import BeautifulSoup
-import tinycss
 import urllib.request
 from datetime import date
+import tinycss
+from bs4 import BeautifulSoup
 
 class CodeFinder():
     def __init__(self, path):
