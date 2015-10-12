@@ -6,7 +6,8 @@ This is an unofficial, FOSS friendly fork of the original [Telegram App for Andr
 
 Several proprietary parts were removed from the original Telegram client, including Google Play Services for the location services and HockeySDK for self-updates. Push notifications through Google Cloud Messaging and the automatic SMS receiving features were also removed.
 
-### Get it
+This version of Telegram is available on FDroid: 
+
 [![Fdroid](https://f-droid.org/wiki/images/0/06/F-Droid-button_get-it-on.png)](https://f-droid.org/repository/browse/?fdid=org.telegram.messenger)
 
 ### Donations
