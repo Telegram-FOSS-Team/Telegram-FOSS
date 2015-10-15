@@ -42,6 +42,7 @@ import android.view.ViewOutlineProvider;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.view.textservice.TextInfo;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -1185,7 +1186,9 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                     view = new TextInfoCell(mContext);
                     try {
                         PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-                        ((TextInfoCell) view).setText(String.format(Locale.US, "Telegram for Android v%s (%d)", pInfo.versionName, pInfo.versionCode));
+                        ((TextInfoCell) view).setText(Html.fromHtml(String.format(Locale.US,
+                                "Telegram for Android v%s (%d)<br>Emoji provided free by", pInfo.versionName, pInfo.versionCode) + " <a href=\"http://emojione.com/\">Emoji One</a>"));
+                        ((TextInfoCell) view).makeClickable();
                     } catch (Exception e) {
                         FileLog.e("tmessages", e);
                     }

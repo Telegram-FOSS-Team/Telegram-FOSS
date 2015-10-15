@@ -9,6 +9,7 @@
 package org.telegram.ui.Cells;
 
 import android.content.Context;
+import android.text.method.LinkMovementMethod;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.FrameLayout;
@@ -37,7 +38,12 @@ public class TextInfoCell extends FrameLayout {
         super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
     }
 
-    public void setText(String text) {
+    public void setText(CharSequence text) {
         textView.setText(text);
+    }
+
+    public void makeClickable(){
+        textView.setLinksClickable(true);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
     }
 }
