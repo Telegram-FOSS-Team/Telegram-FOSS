@@ -84,7 +84,7 @@ public class PhotoAttachAdapter extends RecyclerView.Adapter {
                     cell.setChecked(false, true);
                     photoEntry.imagePath = null;
                     photoEntry.thumbPath = null;
-                    cell.setPhotoEntry(photoEntry, cell.getTag() == MediaController.allPhotosAlbumEntry.photos.size() - 1);
+                    cell.setPhotoEntry(photoEntry, ((Integer) cell.getTag()) == MediaController.allPhotosAlbumEntry.photos.size() - 1);
                 } else {
                     selectedPhotos.put(photoEntry.imageId, photoEntry);
                     cell.setChecked(true, true);
