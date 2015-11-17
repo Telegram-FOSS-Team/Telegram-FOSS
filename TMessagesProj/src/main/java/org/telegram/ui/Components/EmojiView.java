@@ -105,7 +105,6 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             setOnLongClickListener(new OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    String code = (String) view.getTag();
                     return false;
                 }
             });
