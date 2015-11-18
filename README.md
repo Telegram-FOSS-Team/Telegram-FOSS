@@ -29,9 +29,9 @@ Telegram API manuals: http://core.telegram.org/api
 
 MTproto protocol manuals: http://core.telegram.org/mtproto
 
-### Usage
+### Building
 
-**Beware of using the dev branch and uploading it to any markets, in many cases it not will work as expected**.
+The project can be build with Android Studio or from the command line with gradle.
 
-First of all, take a look at **src/main/java/org/telegram/messenger/BuildVars.java** and fill it with correct values.
-Import the root folder into your IDE (tested on Android Studio), then run project.
+If you want to publish a modified version of Telegram you should get **your own API key** form here: https://core.telegram.org/api/obtaining_api_id.
+Then update the file **src/main/java/org/telegram/messenger/BuildVars.java** accordingly.
