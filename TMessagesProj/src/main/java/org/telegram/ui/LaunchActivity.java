@@ -616,14 +616,35 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                 }
                                 String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
                                 if (text.startsWith("Location: geo:")){
-                                    //Build Location Object
-                                    String[] parts = text.split(",");
-                                    String lat = parts[0].split(":")[2];
-                                    String lon = parts[1].split("\\?")[0];
-                                    sendingLocation = new TLRPC.TL_messageMediaGeo();
-                                    sendingLocation.geo = new TLRPC.TL_geoPoint();
-                                    sendingLocation.geo.lat = Double.parseDouble(lat);
-                                    sendingLocation.geo._long = Double.parseDouble(lon);
+                                    //OSMAnd Syntax: Location: geo: <lat>,<long>?z=<zoom> http://osmand.net/go?lat=<lat>&long=<long>&z=<zoom>
+                                    try {
+                                        String[] parts = text.split(",");
+                                        String lat = parts[0].split(":")[2];
+                                        String lon = parts[1].split("\\?")[0];
+                                        sendingLocation = new TLRPC.TL_messageMediaGeo();
+                                        sendingLocation.geo = new TLRPC.TL_geoPoint();
+                                        sendingLocation.geo.lat = Double.parseDouble(lat);
+                                        sendingLocation.geo._long = Double.parseDouble(lon);
+                                    }
+                                    catch (IndexOutOfBoundsException e){
+                                        Toast.makeText(this, "Unsupported location content", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                else if (text.startsWith("geo:")){
+                                    //Orux Maps Syntax: geo:Lat,Long,zoom\nhttp://maps.google.com/maps?q=Lat,Long
+                                    try {
+                                        String[] parts = text.split("\n");
+                                        parts = parts[0].split(",");
+                                        String lat = parts[0].split(":")[1];
+                                        String lon = parts[1];
+                                        sendingLocation = new TLRPC.TL_messageMediaGeo();
+                                        sendingLocation.geo = new TLRPC.TL_geoPoint();
+                                        sendingLocation.geo.lat = Double.parseDouble(lat);
+                                        sendingLocation.geo._long = Double.parseDouble(lon);
+                                    }
+                                    catch (IndexOutOfBoundsException e){
+                                        Toast.makeText(this, "Unsupported location content", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                                 else if (text != null && text.length() != 0) {
                                     if ((text.startsWith("http://") || text.startsWith("https://")) && subject != null && subject.length() != 0) {
