@@ -33,6 +33,8 @@ JavaVM *javaVm = nullptr;
 JNIEnv *jniEnv = nullptr;
 jclass jclass_ByteBuffer = nullptr;
 jmethodID jclass_ByteBuffer_allocateDirect = 0;
+jclass jclass_ApplicationLoader = nullptr;
+jmethodID jclass_ApplicationLoader_setAlarm = 0;
 #endif
 
 static bool done = false;
@@ -136,6 +138,13 @@ int ConnectionsManager::callEvents(int64_t now) {
         return 1000;
     }
     DEBUG_D("schedule next epoll wakeup in %d ms", timeToPushPing);
+
+    JNIEnv *env = 0;
+    if (javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
+        DEBUG_E("can't get jnienv");
+    }
+    env->CallStaticVoidMethod(jclass_ApplicationLoader, jclass_ApplicationLoader_setAlarm, (jint) timeToPushPing);
+
     return timeToPushPing;
 }
 
@@ -2471,12 +2480,26 @@ void ConnectionsManager::setUseIpv6(bool value) {
 #ifdef ANDROID
 void ConnectionsManager::useJavaVM(JavaVM *vm, bool useJavaByteBuffers) {
     javaVm = vm;
+
+    JNIEnv *env = 0;
+    if (javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
+        DEBUG_E("can't get jnienv");
+        exit(1);
+    }
+
+    jclass_ApplicationLoader = (jclass) env->NewGlobalRef(env->FindClass("org/telegram/messenger/ApplicationLoader"));
+    if (jclass_ApplicationLoader == 0) {
+        DEBUG_E("can't find ApplicationLoader class");
+        exit(1);
+    }
+
+    jclass_ApplicationLoader_setAlarm = env->GetStaticMethodID(jclass_ApplicationLoader, "setAlarm", "(I)V");
+    if (jclass_ApplicationLoader_setAlarm == 0) {
+        DEBUG_E("can't find ApplicationLoader setAlarm method");
+        exit(1);
+    }
+
     if (useJavaByteBuffers) {
-        JNIEnv *env = 0;
-        if (javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
-            DEBUG_E("can't get jnienv");
-            exit(1);
-        }
         jclass_ByteBuffer = (jclass) env->NewGlobalRef(env->FindClass("java/nio/ByteBuffer"));
         if (jclass_ByteBuffer == 0) {
             DEBUG_E("can't find java ByteBuffer class");
