@@ -26,21 +26,15 @@ tasks.withType(JavaCompile) {
 dependencies {
     compile 'com.android.support:support-v4:23.1.+'
     compile 'com.googlecode.mp4parser:isoparser:1.0.+'
-    compile 'org.apache.httpcomponents:httpmime:4.2.1'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.1'
+    buildToolsVersion '23.0.2'
 
     useLibrary 'org.apache.http.legacy'
-
-    packagingOptions {
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/LICENSE.txt'
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -65,6 +59,7 @@ android {
             debuggable true
             jniDebuggable true
             signingConfig signingConfigs.debug
+            applicationIdSuffix ".beta"
         }
 
         release {
@@ -80,10 +75,22 @@ android {
         }
     }
 
+    sourceSets.debug {
+        manifest.srcFile 'config/debug/AndroidManifest.xml'
+    }
+
+    sourceSets.release {
+        manifest.srcFile 'config/release/AndroidManifest.xml'
+    }
+
+    sourceSets.foss {
+        manifest.srcFile 'config/foss/AndroidManifest.xml'
+    }
+
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 654
-        versionName "3.2.6"
+        versionCode 685
+        versionName "3.3.1"
     }
 }

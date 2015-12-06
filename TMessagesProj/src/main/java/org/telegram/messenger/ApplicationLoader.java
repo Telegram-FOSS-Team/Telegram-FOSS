@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ApplicationLoader extends Application {
     private AtomicInteger msgId = new AtomicInteger();
     private String regid;
+    private static NetworkAlarm networkAlarm = null;
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
@@ -276,36 +277,30 @@ public class ApplicationLoader extends Application {
 
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
-        startPushService();
-    }
-
-    public static void startPushService() {
         SharedPreferences preferences = applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
-
         if (preferences.getBoolean("pushService", true)) {
-            applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
-
-            if (android.os.Build.VERSION.SDK_INT >= 19) {
-//                Calendar cal = Calendar.getInstance();
-//                PendingIntent pintent = PendingIntent.getService(applicationContext, 0, new Intent(applicationContext, NotificationsService.class), 0);
-//                AlarmManager alarm = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
-//                alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 30000, pintent);
-
-                PendingIntent pintent = PendingIntent.getService(applicationContext, 0, new Intent(applicationContext, NotificationsService.class), 0);
-                AlarmManager alarm = (AlarmManager)applicationContext.getSystemService(Context.ALARM_SERVICE);
-                alarm.cancel(pintent);
-            }
+            networkAlarm = new NetworkAlarm();
+            startPushService();
         } else {
+            networkAlarm = null;
             stopPushService();
         }
     }
 
+    public static void startPushService() {
+        applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
+    }
+
     public static void stopPushService() {
         applicationContext.stopService(new Intent(applicationContext, NotificationsService.class));
+    }
 
-        PendingIntent pintent = PendingIntent.getService(applicationContext, 0, new Intent(applicationContext, NotificationsService.class), 0);
-        AlarmManager alarm = (AlarmManager)applicationContext.getSystemService(Context.ALARM_SERVICE);
-        alarm.cancel(pintent);
+    public static void setAlarm(int timeout) {
+        FileLog.d("tmessages", "setting alarm to wake us in " + String.valueOf(timeout) + "ms");
+
+        if (networkAlarm != null) {
+            networkAlarm.setAlarm(applicationContext, timeout);
+        }
     }
 
     @Override
