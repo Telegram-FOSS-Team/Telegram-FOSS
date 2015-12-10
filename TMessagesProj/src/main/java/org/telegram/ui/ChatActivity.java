@@ -2562,30 +2562,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         } else if (which == attach_location) {
             /* Telegram-FOSS  Disabled for now.*/
-            AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+            Toast.makeText(getParentActivity(), "Telegram-FOSS: Disabled for now.\nYou can share locations from OSMAnd.", Toast.LENGTH_LONG).show();
+            /*AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
             builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    Toast.makeText(getParentActivity(), "Not yet implemented in FOSS version.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getParentActivity(), "Telegram-FOSS: Disabled for now.\nYou can share locations from OSMAnd.", Toast.LENGTH_LONG).show();
                     }
             });
             builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
             builder.setMessage("Send current Location?");
-            showDialog(builder.create());
-            /* just try to launch a map application here
-            //TODO: Maybe launch with current position. Or better yet ask the user.
-            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                    Uri.parse("geo:" + 51.4765 + "," + 0 + "?z=8"));
-            if(intent.resolveActivity(getParentActivity().getPackageManager()) != null) {
-                try{
-                    getParentActivity().startActivity(intent);
-                }
-                catch (Exception e){
-                    Toast.makeText(getParentActivity(), "Error handling geo: intent", Toast.LENGTH_SHORT).show();
-                    FileLog.e("tmessages", e);
-                }
-            }*/
+            showDialog(builder.create());*/
         } else if (which == attach_document) {
             if (Build.VERSION.SDK_INT >= 23 && getParentActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 getParentActivity().requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 4);
