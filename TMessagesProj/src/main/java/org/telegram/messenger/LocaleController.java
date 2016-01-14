@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2015.
+ * Copyright Nikolai Kudashov, 2013-2016.
  */
 
 package org.telegram.messenger;
@@ -495,7 +495,7 @@ public class LocaleController {
                 FileLog.e("tmessages", e);
             }
         }
-        return null;
+        return new HashMap<>();
     }
 
     public void applyLanguage(LocaleInfo localeInfo, boolean override) {
@@ -800,6 +800,7 @@ public class LocaleController {
     public static String formatShortNumber(int number, int[] rounded) {
         String K = "";
         int lastDec = 0;
+        int KCount = 0;
         while (number / 1000 > 0) {
             K += "K";
             lastDec = (number % 1000) / 100;
@@ -813,9 +814,17 @@ public class LocaleController {
             rounded[0] = (int) value;
         }
         if (lastDec != 0 && K.length() > 0) {
-            return String.format(Locale.US, "%d.%d%s", number, lastDec, K);
+            if (K.length() == 2) {
+                return String.format(Locale.US, "%d.%dM", number, lastDec);
+            } else {
+                return String.format(Locale.US, "%d.%d%s", number, lastDec, K);
+            }
         }
-        return String.format(Locale.US, "%d%s", number, K);
+        if (K.length() == 2) {
+            return String.format(Locale.US, "%dM", number);
+        } else {
+            return String.format(Locale.US, "%d%s", number, K);
+        }
     }
 
     public static String formatUserStatus(TLRPC.User user) {

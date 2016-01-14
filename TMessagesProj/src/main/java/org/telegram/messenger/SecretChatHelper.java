@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2015.
+ * Copyright Nikolai Kudashov, 2013-2016.
  */
 
 package org.telegram.messenger;
@@ -538,7 +538,7 @@ public class SecretChatHelper {
                 File cacheFile = new File(FileLoader.getInstance().getDirectory(FileLoader.MEDIA_DIR_CACHE), fileName + ".jpg");
                 File cacheFile2 = FileLoader.getPathToAttach(size);
                 cacheFile.renameTo(cacheFile2);
-                ImageLoader.getInstance().replaceImageInCache(fileName, fileName2, size.location);
+                ImageLoader.getInstance().replaceImageInCache(fileName, fileName2, size.location, true);
                 ArrayList<TLRPC.Message> arr = new ArrayList<>();
                 arr.add(newMsg);
                 MessagesStorage.getInstance().putMessages(arr, false, true, false, 0);
@@ -1078,7 +1078,7 @@ public class SecretChatHelper {
                                     });
                                 }
                             });
-                            MessagesStorage.getInstance().deleteDialog(did, true);
+                            MessagesStorage.getInstance().deleteDialog(did, 1);
                             NotificationCenter.getInstance().postNotificationName(NotificationCenter.dialogsNeedReload);
                             NotificationCenter.getInstance().postNotificationName(NotificationCenter.removeAllMessagesFromDialog, did, false);
                         }

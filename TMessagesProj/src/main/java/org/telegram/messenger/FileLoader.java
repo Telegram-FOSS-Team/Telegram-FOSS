@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2015.
+ * Copyright Nikolai Kudashov, 2013-2016.
  */
 
 package org.telegram.messenger;
@@ -78,6 +78,10 @@ public class FileLoader {
 
     public void setMediaDirs(HashMap<Integer, File> dirs) {
         mediaDirs = dirs;
+    }
+
+    public File checkDirectory(int type) {
+        return mediaDirs.get(type);
     }
 
     public File getDirectory(int type) {
@@ -588,16 +592,6 @@ public class FileLoader {
         return new File("");
     }
 
-    public static File getExistPathToAttach(TLObject attach) {
-        File path = getInstance().getDirectory(MEDIA_DIR_CACHE);
-        String fileName = getAttachFileName(attach);
-        File attachPath = new File(path, fileName);
-        if (attachPath.exists()) {
-            return attachPath;
-        }
-        return getPathToAttach(attach);
-    }
-
     public static File getPathToAttach(TLObject attach) {
         return getPathToAttach(attach, null, false);
     }
@@ -699,7 +693,8 @@ public class FileLoader {
             if (document.file_name != null) {
                 return document.file_name;
             }
-            for (TLRPC.DocumentAttribute documentAttribute : document.attributes) {
+            for (int a = 0; a < document.attributes.size(); a++) {
+                TLRPC.DocumentAttribute documentAttribute = document.attributes.get(a);
                 if (documentAttribute instanceof TLRPC.TL_documentAttributeFilename) {
                     return documentAttribute.file_name;
                 }
@@ -718,12 +713,15 @@ public class FileLoader {
             return video.dc_id + "_" + video.id + "." + (ext != null ? ext : "mp4");
         } else if (attach instanceof TLRPC.Document) {
             TLRPC.Document document = (TLRPC.Document) attach;
-            String docExt = getDocumentFileName(document);
-            int idx;
-            if (docExt == null || (idx = docExt.lastIndexOf(".")) == -1) {
-                docExt = "";
-            } else {
-                docExt = docExt.substring(idx);
+            String docExt = null;
+            if (docExt == null) {
+                docExt = getDocumentFileName(document);
+                int idx;
+                if (docExt == null || (idx = docExt.lastIndexOf(".")) == -1) {
+                    docExt = "";
+                } else {
+                    docExt = docExt.substring(idx);
+                }
             }
             if (docExt.length() > 1) {
                 return document.dc_id + "_" + document.id + docExt;
@@ -732,7 +730,7 @@ public class FileLoader {
             }
         } else if (attach instanceof TLRPC.PhotoSize) {
             TLRPC.PhotoSize photo = (TLRPC.PhotoSize) attach;
-            if (photo.location == null) {
+            if (photo.location == null || photo.location instanceof TLRPC.TL_fileLocationUnavailable) {
                 return "";
             }
             return photo.location.volume_id + "_" + photo.location.local_id + "." + (ext != null ? ext : "jpg");
@@ -740,13 +738,16 @@ public class FileLoader {
             TLRPC.Audio audio = (TLRPC.Audio) attach;
             return audio.dc_id + "_" + audio.id + "." + (ext != null ? ext : "ogg");
         } else if (attach instanceof TLRPC.FileLocation) {
+            if (attach instanceof TLRPC.TL_fileLocationUnavailable) {
+                return "";
+            }
             TLRPC.FileLocation location = (TLRPC.FileLocation) attach;
             return location.volume_id + "_" + location.local_id + "." + (ext != null ? ext : "jpg");
         }
         return "";
     }
 
-    public void deleteFiles(final ArrayList<File> files) {
+    public void deleteFiles(final ArrayList<File> files, final int type) {
         if (files == null || files.isEmpty()) {
             return;
         }
@@ -765,15 +766,18 @@ public class FileLoader {
                         }
                     }
                     try {
-                        File qFile = new File(file.getPath(), "q_" + file.getName());
+                        File qFile = new File(file.getParentFile(), "q_" + file.getName());
                         if (qFile.exists()) {
-                            if (!file.delete()) {
-                                file.deleteOnExit();
+                            if (!qFile.delete()) {
+                                qFile.deleteOnExit();
                             }
                         }
                     } catch (Exception e) {
                         FileLog.e("tmessages", e);
                     }
+                }
+                if (type == 2) {
+                    ImageLoader.getInstance().clearMemory();
                 }
             }
         });

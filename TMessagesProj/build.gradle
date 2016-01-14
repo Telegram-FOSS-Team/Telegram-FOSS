@@ -35,6 +35,7 @@ android {
     buildToolsVersion '23.0.2'
 
     useLibrary 'org.apache.http.legacy'
+    defaultConfig.applicationId = "org.telegram.messenger"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -66,6 +67,8 @@ android {
             debuggable false
             jniDebuggable false
             signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         foss {
@@ -90,7 +93,7 @@ android {
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 685
-        versionName "3.3.1"
+        versionCode 719
+        versionName "3.4.2"
     }
 }

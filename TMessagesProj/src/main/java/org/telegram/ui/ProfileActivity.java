@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2015.
+ * Copyright Nikolai Kudashov, 2013-2016.
  */
 
 package org.telegram.ui;
@@ -354,7 +354,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             MessagesController.getInstance().blockUser(user_id);
                         } else {
                             MessagesController.getInstance().unblockUser(user_id);
-                            SendMessagesHelper.getInstance().sendMessage("/start", user_id, null, null, false, false);
+                            SendMessagesHelper.getInstance().sendMessage("/start", user_id, null, null, false, false, null, null);
                             finishFragment();
                         }
                     }
@@ -2168,7 +2168,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     if (chat.creator && chat_id > 0) {
                         item.addSubItem(set_admins, LocaleController.getString("SetAdmins", R.string.SetAdmins), 0);
                     }
-                    if (chat.creator || chat.admin) {
+                    if (!chat.admins_enabled || chat.creator || chat.admin) {
                         item.addSubItem(edit_name, LocaleController.getString("EditName", R.string.EditName), 0);
                     }
                     item.addSubItem(leave_group, LocaleController.getString("DeleteAndExit", R.string.DeleteAndExit), 0);

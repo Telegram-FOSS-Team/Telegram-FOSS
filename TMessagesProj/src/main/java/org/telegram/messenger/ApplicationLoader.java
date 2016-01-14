@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2015.
+ * Copyright Nikolai Kudashov, 2013-2016.
  */
 
 package org.telegram.messenger;
@@ -22,7 +22,6 @@ import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -35,16 +34,10 @@ import org.telegram.ui.Components.ForegroundDetector;
 
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ApplicationLoader extends Application {
-    private AtomicInteger msgId = new AtomicInteger();
-    private String regid;
     private static NetworkAlarm networkAlarm = null;
-    public static final String EXTRA_MESSAGE = "message";
-    public static final String PROPERTY_REG_ID = "registration_id";
-    private static final String PROPERTY_APP_VERSION = "appVersion";
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+
     private static Drawable cachedWallpaper;
     private static int selectedColor;
     private static boolean isCustomTheme;
@@ -229,16 +222,16 @@ public class ApplicationLoader extends Application {
             appVersion = "App version unknown";
             systemVersion = "SDK " + Build.VERSION.SDK_INT;
         }
-        if (langCode.length() == 0) {
+        if (langCode.trim().length() == 0) {
             langCode = "en";
         }
-        if (deviceModel.length() == 0) {
+        if (deviceModel.trim().length() == 0) {
             deviceModel = "Android unknown";
         }
-        if (appVersion.length() == 0) {
+        if (appVersion.trim().length() == 0) {
             appVersion = "App version unknown";
         }
-        if (systemVersion.length() == 0) {
+        if (systemVersion.trim().length() == 0) {
             systemVersion = "SDK Unknown";
         }
 
