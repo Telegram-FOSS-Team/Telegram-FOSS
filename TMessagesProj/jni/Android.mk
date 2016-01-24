@@ -28,8 +28,8 @@ local_src_files := \
 	$(FFMPEG_PATH)/libavformat/utils.c
 
 local_c_includes := \
-        $(FFMPEG_PATH) \
-	$(FFMPEG_PATH)/config/armeabi
+        $(LOCAL_PATH)/$(FFMPEG_PATH) \
+	$(LOCAL_PATH)/$(FFMPEG_PATH)/config/$(TARGET_ARCH_ABI)
 
 #include $(LOCAL_PATH)/openssl/android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
@@ -124,10 +124,17 @@ local_arm_files := \
 	$(FFMPEG_PATH)/libavutil/arm/cpu.c \
 	$(FFMPEG_PATH)/libavutil/arm/float_dsp_init_arm.c
 
+local_armv7_files := \
+	$(FFMPEG_PATH)/libavutil/arm/cpu.c \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_init_arm.c \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_init_neon.c \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_init_vfp.c \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_neon.S \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_vfp.S
 
 local_c_includes := \
-        $(FFMPEG_PATH) \
-	$(FFMPEG_PATH)/config/armeabi
+        $(LOCAL_PATH)/$(FFMPEG_PATH) \
+	$(LOCAL_PATH)/$(FFMPEG_PATH)/config/$(TARGET_ARCH_ABI)
 
 #include $(LOCAL_PATH)/openssl/android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
@@ -233,9 +240,41 @@ local_arm_files := \
 	$(FFMPEG_PATH)/libavcodec/arm/videodsp_init_armv5te.c \
 	$(FFMPEG_PATH)/libavcodec/arm/videodsp_init_arm.c
 
+local_armv7_files := \
+	$(FFMPEG_PATH)/libavcodec/arm/h264cmc_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264chroma_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/h264dsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/h264dsp_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264idct_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264qpel_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264pred_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/hpeldsp_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_arm.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_armv6.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264pred_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/h264qpel_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_init_armv5te.c \
+	$(FFMPEG_PATH)/libavcodec/arm/jrevdct_arm.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_init_armv6.c \
+	$(FFMPEG_PATH)/libavcodec/arm/me_cmp_armv6.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_init_neon.c \
+	$(FFMPEG_PATH)/libavcodec/arm/pixblockdsp_armv6.S \
+	$(FFMPEG_PATH)/libavcodec/arm/simple_idct_arm.S \
+	$(FFMPEG_PATH)/libavcodec/arm/simple_idct_armv5te.S \
+	$(FFMPEG_PATH)/libavcodec/arm/simple_idct_armv6.S \
+	$(FFMPEG_PATH)/libavcodec/arm/simple_idct_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/startcode_armv6.S \
+	$(FFMPEG_PATH)/libavcodec/arm/pixblockdsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/me_cmp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/videodsp_armv5te.S \
+	$(FFMPEG_PATH)/libavcodec/arm/videodsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/videodsp_init_armv5te.c
+
 local_c_includes := \
-        $(FFMPEG_PATH) \
-	$(FFMPEG_PATH)/config/armeabi
+        $(LOCAL_PATH)/$(FFMPEG_PATH) \
+	$(LOCAL_PATH)/$(FFMPEG_PATH)/config/$(TARGET_ARCH_ABI)
 
 #include $(LOCAL_PATH)/openssl/android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
@@ -1126,7 +1165,7 @@ $(LOCAL_PATH)/libyuv/include \
 $(LOCAL_PATH)/openssl/include \
 $(LOCAL_PATH)/breakpad/common/android/include \
 $(LOCAL_PATH)/breakpad \
-$(LOCAL_PATH)/ffmpeg/include
+$(LOCAL_PATH)/ffmpeg
 
 LOCAL_SRC_FILES     += \
 ./libjpeg/jcapimin.c \
