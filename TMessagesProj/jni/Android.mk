@@ -132,6 +132,12 @@ local_armv7_files := \
 	$(FFMPEG_PATH)/libavutil/arm/float_dsp_neon.S \
 	$(FFMPEG_PATH)/libavutil/arm/float_dsp_vfp.S
 
+local_x86_files := \
+	$(FFMPEG_PATH)/libavutil/x86/cpu.c \
+	$(FFMPEG_PATH)/libavutil/x86/fixed_dsp_init.c \
+	$(FFMPEG_PATH)/libavutil/x86/float_dsp_init.c \
+	$(FFMPEG_PATH)/libavutil/x86/lls_init.c
+
 local_c_includes := \
         $(LOCAL_PATH)/$(FFMPEG_PATH) \
 	$(LOCAL_PATH)/$(FFMPEG_PATH)/config/$(TARGET_ARCH_ABI)
@@ -271,6 +277,18 @@ local_armv7_files := \
 	$(FFMPEG_PATH)/libavcodec/arm/videodsp_armv5te.S \
 	$(FFMPEG_PATH)/libavcodec/arm/videodsp_init_arm.c \
 	$(FFMPEG_PATH)/libavcodec/arm/videodsp_init_armv5te.c
+
+local_x86_files := \
+	$(FFMPEG_PATH)/libavcodec/x86/constants.c \
+	$(FFMPEG_PATH)/libavcodec/x86/fdctdsp_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/h264_intrapred_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/h264chroma_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/h264_qpel.c \
+	$(FFMPEG_PATH)/libavcodec/x86/h264dsp_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/idctdsp_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/me_cmp_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/pixblockdsp_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/videodsp_init.c
 
 local_c_includes := \
         $(LOCAL_PATH)/$(FFMPEG_PATH) \
