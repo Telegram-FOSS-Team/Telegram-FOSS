@@ -1337,14 +1337,13 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
     }
 
     public void loadRecents() {
+        String str;
         SharedPreferences preferences = getContext().getSharedPreferences("emoji", Activity.MODE_PRIVATE);
         lastGifLoadTime = preferences.getLong("lastGifLoadTime", 0);
 
-        String str;
-        try {
-            emojiUseHistory.clear();
-            if (preferences.contains("emojis")) {
-                str = preferences.getString("emojis", "");
+        if (preferences.contains("emojis")) {
+            try {
+                str = preferences.getString("recents", "");
                 if (str != null && str.length() > 0) {
                     String[] args = str.split(",");
                     for (int i = 0; i < args.length; i++) {
