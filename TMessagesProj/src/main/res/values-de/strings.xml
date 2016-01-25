@@ -455,7 +455,7 @@
     <string name="Enabled">Aktiviert</string>
     <string name="Disabled">Deaktiviert</string>
     <string name="NotificationsService">Mitteilungsdienst</string>
-    <string name="NotificationsServiceDisableInfo">Sofern Google Play Dienste ausreichend für deine Mitteilungen sind, kannst du unseren Mitteilungsdienst abschalten. Wir empfehlen allerdings, unseren Dienst dauerhaft aktiviert zu lassen, um über neue Nachrichten in Echtzeit informiert zu werden.</string>
+    <string name="NotificationsServiceDisableInfo">Ohne den Mitteilungsdienst wirst du keine Benachrichtigungen mehr erhalten, wenn Telegram im Hintergund ist. Bist du sicher, dass du fortfahren willst</string>
     <string name="SortBy">sortiert nach</string>
     <string name="ImportContacts">Kontakte importieren</string>
     <string name="SortFirstName">Vorname</string>

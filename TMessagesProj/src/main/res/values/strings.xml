@@ -455,7 +455,7 @@
     <string name="Enabled">Enabled</string>
     <string name="Disabled">Disabled</string>
     <string name="NotificationsService">Notifications Service</string>
-    <string name="NotificationsServiceDisableInfo">If Google Play Services are enough for you to receive notifications, you can disable Notifications Service. However we recommend you to leave it enabled to keep app running in background and receive instant notifications.</string>
+    <string name="NotificationsServiceDisableInfo">Google Play Services were removed from this build. So turning off the notifications service will disable all background notifications. Are you sure?</string>
     <string name="SortBy">Sort By</string>
     <string name="ImportContacts">Import Contacts</string>
     <string name="SortFirstName">First name</string>
