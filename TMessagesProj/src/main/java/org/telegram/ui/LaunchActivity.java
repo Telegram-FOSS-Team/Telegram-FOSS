@@ -615,10 +615,11 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                     text = intent.getCharSequenceExtra(Intent.EXTRA_TEXT).toString();
                                 }
                                 String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-                                if (text.startsWith("Location: geo:")){
-                                    //OSMAnd Syntax: Location: geo: <lat>,<long>?z=<zoom> http://osmand.net/go?lat=<lat>&long=<long>&z=<zoom>
+                                if (text.contains("\nLocation: geo:")){
+                                    //OSMAnd Syntax: <Point Name>\nLocation: geo: <lat>,<long>?z=<zoom> http://osmand.net/go?lat=<lat>&long=<long>&z=<zoom>
                                     try {
-                                        String[] parts = text.split(",");
+                                        String[] parts = text.split("\n");
+                                        parts = parts[1].split(",");
                                         String lat = parts[0].split(":")[2];
                                         String lon = parts[1].split("\\?")[0];
                                         sendingLocation = new TLRPC.TL_messageMediaGeo();
