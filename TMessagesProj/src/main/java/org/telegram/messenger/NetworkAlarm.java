@@ -51,7 +51,7 @@ public class NetworkAlarm extends BroadcastReceiver {
         if (android.os.Build.VERSION.SDK_INT >= 19) {
             am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + timeout, pi);
         } else {
-            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + timeout, 1000, pi);
+            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + timeout, pi);
         }
 
         FileLog.d("tmessages", "NetworkAlarm:setAlarm exit");

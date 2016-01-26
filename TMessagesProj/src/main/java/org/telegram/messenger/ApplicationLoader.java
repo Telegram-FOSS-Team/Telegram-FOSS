@@ -37,6 +37,7 @@ import java.io.RandomAccessFile;
 
 public class ApplicationLoader extends Application {
     private static NetworkAlarm networkAlarm = null;
+    private static PendingIntent pendingIntent;
 
     private static Drawable cachedWallpaper;
     private static int selectedColor;
@@ -270,21 +271,31 @@ public class ApplicationLoader extends Application {
 
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
-        SharedPreferences preferences = applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
-        if (preferences.getBoolean("pushService", true)) {
-            networkAlarm = new NetworkAlarm();
-            startPushService();
-        } else {
-            networkAlarm = null;
-            stopPushService();
-        }
+        startPushService();
     }
 
     public static void startPushService() {
+        SharedPreferences preferences = applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
+        if (preferences.getBoolean("pushService", true)) {
+            networkAlarm = new NetworkAlarm();
+        } else {
+            AlarmManager am = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
+            Intent i = new Intent(applicationContext, ApplicationLoader.class);
+            pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, i, 0);
+
+            am.cancel(pendingIntent);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
+        }
         applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
     }
 
     public static void stopPushService() {
+        if (networkAlarm != null) {
+            networkAlarm = null;
+        } else {
+            AlarmManager am = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
+            am.cancel(pendingIntent);
+        }
         applicationContext.stopService(new Intent(applicationContext, NotificationsService.class));
     }
 

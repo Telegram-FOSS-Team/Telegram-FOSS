@@ -334,37 +334,12 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                     NotificationsController.getInstance().setBadgeEnabled(!enabled);
                 } else if (i == notificationsServiceRow) {
                     final SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Activity.MODE_PRIVATE);
+                    final SharedPreferences.Editor editor = preferences.edit();
                     enabled = preferences.getBoolean("pushService", true);
-                    if (!enabled) {
-                        final SharedPreferences.Editor editor = preferences.edit();
-                        editor.putBoolean("pushService", !enabled);
-                        editor.commit();
-                        ApplicationLoader.startPushService();
-                    } else {
-                        if (getParentActivity() == null) {
-                            return;
-                        }
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-                        builder.setMessage(LocaleController.getString("NotificationsServiceDisableInfo", R.string.NotificationsServiceDisableInfo));
-                        builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
-                        builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                ApplicationLoader.stopPushService();
-                                final SharedPreferences.Editor editor = preferences.edit();
-                                editor.putBoolean("pushService", false);
-                                editor.commit();
-                                listView.invalidateViews();
-                            }
-                        });
-                        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ((TextCheckCell) view).setChecked(true);
-                            }
-                        });
-                        showDialog(builder.create());
-                    }
+                    editor.putBoolean("pushService", !enabled);
+                    editor.commit();
+                    ApplicationLoader.stopPushService();
+                    ApplicationLoader.startPushService();
                 } else if (i == messageLedRow || i == groupLedRow) {
                     if (getParentActivity() == null) {
                         return;
@@ -713,7 +688,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                 } else if (i == androidAutoAlertRow) {
                     checkCell.setTextAndCheck("Android Auto", preferences.getBoolean("EnableAutoNotifications", false), true);
                 } else if (i == notificationsServiceRow) {
-                    checkCell.setTextAndCheck(LocaleController.getString("NotificationsService", R.string.NotificationsService), preferences.getBoolean("pushService", true), false);
+                    checkCell.setTextAndCheck("Smart Push", preferences.getBoolean("pushService", true), false);
                 } else if (i == badgeNumberRow) {
                     checkCell.setTextAndCheck(LocaleController.getString("BadgeNumber", R.string.BadgeNumber), preferences.getBoolean("badgeNumber", true), true);
                 } else if (i == inchatSoundRow) {
