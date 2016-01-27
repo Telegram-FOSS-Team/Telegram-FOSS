@@ -139,11 +139,16 @@ int ConnectionsManager::callEvents(int64_t now) {
     }
     DEBUG_D("schedule next epoll wakeup in %d ms", timeToPushPing);
 
-    JNIEnv *env = 0;
-    if (javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
-        DEBUG_E("can't get jnienv");
+    if (networkAvailable) {
+        DEBUG_D("setting network alarm to wake us in %d ms", timeToPushPing);
+        JNIEnv *env = 0;
+        if (javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
+            DEBUG_E("can't get jnienv");
+        }
+        env->CallStaticVoidMethod(jclass_ApplicationLoader, jclass_ApplicationLoader_setAlarm, (jint) timeToPushPing);
+    } else {
+        DEBUG_D("omitting network alarm since there's no available connection");
     }
-    env->CallStaticVoidMethod(jclass_ApplicationLoader, jclass_ApplicationLoader_setAlarm, (jint) timeToPushPing);
 
     return timeToPushPing;
 }
