@@ -75,6 +75,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LaunchActivity extends Activity implements ActionBarLayout.ActionBarLayoutDelegate, NotificationCenter.NotificationCenterDelegate, DialogsActivity.MessagesActivityDelegate {
 
@@ -615,37 +617,13 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                     text = intent.getCharSequenceExtra(Intent.EXTRA_TEXT).toString();
                                 }
                                 String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-                                if (text.contains("\nLocation: geo:")){
-                                    //OSMAnd Syntax: <Point Name>\nLocation: geo: <lat>,<long>?z=<zoom> http://osmand.net/go?lat=<lat>&long=<long>&z=<zoom>
-                                    try {
-                                        String[] parts = text.split("\n");
-                                        parts = parts[1].split(",");
-                                        String lat = parts[0].split(":")[2];
-                                        String lon = parts[1].split("\\?")[0];
-                                        sendingLocation = new TLRPC.TL_messageMediaGeo();
-                                        sendingLocation.geo = new TLRPC.TL_geoPoint();
-                                        sendingLocation.geo.lat = Double.parseDouble(lat);
-                                        sendingLocation.geo._long = Double.parseDouble(lon);
-                                    }
-                                    catch (IndexOutOfBoundsException e){
-                                        Toast.makeText(this, "Unsupported location content", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                                else if (text.startsWith("geo:")){
-                                    //Orux Maps Syntax: geo:Lat,Long,zoom\nhttp://maps.google.com/maps?q=Lat,Long
-                                    try {
-                                        String[] parts = text.split("\n");
-                                        parts = parts[0].split(",");
-                                        String lat = parts[0].split(":")[1];
-                                        String lon = parts[1];
-                                        sendingLocation = new TLRPC.TL_messageMediaGeo();
-                                        sendingLocation.geo = new TLRPC.TL_geoPoint();
-                                        sendingLocation.geo.lat = Double.parseDouble(lat);
-                                        sendingLocation.geo._long = Double.parseDouble(lon);
-                                    }
-                                    catch (IndexOutOfBoundsException e){
-                                        Toast.makeText(this, "Unsupported location content", Toast.LENGTH_SHORT).show();
-                                    }
+                                Pattern r = Pattern.compile("geo: ?(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)(,|\\?z=)(-?\\d+)");
+                                Matcher m = r.matcher(text);
+                                if(m.find()){
+                                    sendingLocation = new TLRPC.TL_messageMediaGeo();
+                                    sendingLocation.geo = new TLRPC.TL_geoPoint();
+                                    sendingLocation.geo.lat = Double.parseDouble(m.group(1));
+                                    sendingLocation.geo._long = Double.parseDouble(m.group(2));
                                 }
                                 else if (text != null && text.length() != 0) {
                                     if ((text.startsWith("http://") || text.startsWith("https://")) && subject != null && subject.length() != 0) {
