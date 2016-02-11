@@ -1154,7 +1154,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             stringBuilder.append("=");
             stringBuilder.append(entry.getValue());
         }
-        preferences.edit().putString("emojis", stringBuilder.toString()).commit();
+        preferences.edit().putString("emojis2", stringBuilder.toString()).commit();
     }
 
     private void saveRecentStickers() {
@@ -1343,7 +1343,8 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
 
         if (preferences.contains("emojis")) {
             try {
-                str = preferences.getString("recents", "");
+                emojiUseHistory.clear();
+                str = preferences.getString("emojis", "");
                 if (str != null && str.length() > 0) {
                     String[] args = str.split(",");
                     for (int i = 0; i < args.length; i++) {
@@ -1354,13 +1355,13 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                 FileLog.e("tmessages", e);
             }
             sortEmoji();
-            preferences.edit().remove("recents").commit();
+            preferences.edit().remove("emojis").commit();
             saveRecentEmoji();
             adapters.get(0).notifyDataSetChanged();
         } else {
             try {
                 emojiUseHistory.clear();
-                str = preferences.getString("emojis", "");
+                str = preferences.getString("emojis2", "");
                 if (str != null && str.length() > 0) {
                     String[] args = str.split(",");
                     for (String arg : args) {
