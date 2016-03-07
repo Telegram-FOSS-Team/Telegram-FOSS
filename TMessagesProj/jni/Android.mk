@@ -31,7 +31,6 @@ local_c_includes := \
         $(LOCAL_PATH)/$(FFMPEG_PATH) \
 	$(LOCAL_PATH)/$(FFMPEG_PATH)/config/$(TARGET_ARCH_ABI)
 
-#include $(LOCAL_PATH)/openssl/android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
     LOCAL_SRC_FILES += $(local_armv7_files)
@@ -142,7 +141,6 @@ local_c_includes := \
         $(LOCAL_PATH)/$(FFMPEG_PATH) \
 	$(LOCAL_PATH)/$(FFMPEG_PATH)/config/$(TARGET_ARCH_ABI)
 
-#include $(LOCAL_PATH)/openssl/android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
     LOCAL_SRC_FILES += $(local_armv7_files)
@@ -294,7 +292,6 @@ local_c_includes := \
         $(LOCAL_PATH)/$(FFMPEG_PATH) \
 	$(LOCAL_PATH)/$(FFMPEG_PATH)/config/$(TARGET_ARCH_ABI)
 
-#include $(LOCAL_PATH)/openssl/android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
     LOCAL_SRC_FILES += $(local_armv7_files)
