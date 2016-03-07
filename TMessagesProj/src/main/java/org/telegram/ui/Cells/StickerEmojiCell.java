@@ -35,7 +35,7 @@ public class StickerEmojiCell extends FrameLayout {
     private boolean scaled;
     private float scale;
     private long time = 0;
-    private AccelerateInterpolator interpolator = new AccelerateInterpolator(0.5f);
+    private static AccelerateInterpolator interpolator = new AccelerateInterpolator(0.5f);
 
     public StickerEmojiCell(Context context) {
         super(context);
@@ -62,7 +62,8 @@ public class StickerEmojiCell extends FrameLayout {
 
             if (showEmoji) {
                 boolean set = false;
-                for (TLRPC.DocumentAttribute attribute : document.attributes) {
+                for (int a = 0; a < document.attributes.size(); a++) {
+                    TLRPC.DocumentAttribute attribute = document.attributes.get(a);
                     if (attribute instanceof TLRPC.TL_documentAttributeSticker) {
                         if (attribute.alt != null && attribute.alt.length() > 0) {
                             /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */

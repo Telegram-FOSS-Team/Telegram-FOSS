@@ -43,6 +43,7 @@ import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationCompat.ViewProxy;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.EmojiData;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
@@ -112,12 +113,57 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
 
             setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
-                    sendEmoji(-1);
+                    sendEmoji(null);
                 }
             });
             setOnLongClickListener(new OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
+                    String code = (String) view.getTag();
+                    if (EmojiData.emojiColoredMap.containsKey(code)) {
+                        touched = true;
+                        touchedX = lastX;
+                        touchedY = lastY;
+
+                        String color = emojiColor.get(code);
+                        if (color != null) {
+                            switch (color) {
+                                case "\uD83C\uDFFB":
+                                    pickerView.setSelection(1);
+                                    break;
+                                case "\uD83C\uDFFC":
+                                    pickerView.setSelection(2);
+                                    break;
+                                case "\uD83C\uDFFD":
+                                    pickerView.setSelection(3);
+                                    break;
+                                case "\uD83C\uDFFE":
+                                    pickerView.setSelection(4);
+                                    break;
+                                case "\uD83C\uDFFF":
+                                    pickerView.setSelection(5);
+                                    break;
+                            }
+                        } else {
+                            pickerView.setSelection(0);
+                        }
+                        view.getLocationOnScreen(location);
+                        int x = emojiSize * pickerView.getSelection() + AndroidUtilities.dp(4 * pickerView.getSelection() - (AndroidUtilities.isTablet() ? 5 : 1));
+                        if (location[0] - x < AndroidUtilities.dp(5)) {
+                            x += (location[0] - x) - AndroidUtilities.dp(5);
+                        } else if (location[0] - x + popupWidth > AndroidUtilities.displaySize.x - AndroidUtilities.dp(5)) {
+                            x += (location[0] - x + popupWidth) - (AndroidUtilities.displaySize.x - AndroidUtilities.dp(5));
+                        }
+                        int xOffset = -x;
+                        int yOffset = view.getTop() < 0 ? view.getTop() : 0;
+
+                        pickerView.setEmoji(code, AndroidUtilities.dp(AndroidUtilities.isTablet() ? 30 : 22) - xOffset + (int) AndroidUtilities.dpf2(0.5f));
+
+                        pickerViewPopup.setFocusable(true);
+                        pickerViewPopup.showAsDropDown(view, xOffset, -view.getMeasuredHeight() - popupHeight + (view.getMeasuredHeight() - emojiSize) / 2 - yOffset);
+                        view.getParent().requestDisallowInterceptTouchEvent(true);
+                        return true;
+                    }
                     return false;
                 }
             });
@@ -125,16 +171,22 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             setScaleType(ImageView.ScaleType.CENTER);
         }
 
-        private void sendEmoji(long override) {
-            long code = override != -1 ? override : (long) getTag();
-            if (override == -1) {
+        private void sendEmoji(String override) {
+            String code = override != null ? override : (String) getTag();
+            if (override == null) {
+                if (pager.getCurrentItem() != 0) {
+                    String color = emojiColor.get(code);
+                    if (color != null) {
+                        code += color;
+                    }
+                }
                 Integer count = emojiUseHistory.get(code);
                 if (count == null) {
                     count = 0;
                 }
                 if (count == 0 && emojiUseHistory.size() > 50) {
                     for (int a = recentEmoji.size() - 1; a >= 0; a--) {
-                        long emoji = recentEmoji.get(a);
+                        String emoji = recentEmoji.get(a);
                         emojiUseHistory.remove(emoji);
                         recentEmoji.remove(a);
                         if (emojiUseHistory.size() <= 50) {
@@ -149,11 +201,11 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                 saveRecentEmoji();
                 adapters.get(0).notifyDataSetChanged();
                 if (listener != null) {
-                    listener.onEmojiSelected(convert(code));
+                    listener.onEmojiSelected(Emoji.fixEmoji(code));
                 }
             } else {
                 if (listener != null) {
-                    listener.onEmojiSelected(convert(override));
+                    listener.onEmojiSelected(Emoji.fixEmoji(override));
                 }
             }
 
@@ -189,8 +241,14 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                                 color = "\uD83C\uDFFF";
                                 break;
                         }
-                        long code = (long) getTag();
+                        String code = (String) getTag();
                         if (pager.getCurrentItem() != 0) {
+                            if (color != null) {
+                                emojiColor.put(code, color);
+                                code += color;
+                            } else {
+                                emojiColor.remove(code);
+                            }
                             //setImageDrawable(Emoji.getEmojiBigDrawable(code));
                             int bigImgSize;
                             if (AndroidUtilities.isTablet()) {
@@ -198,11 +256,11 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                             } else {
                                 bigImgSize = AndroidUtilities.dp(32);
                             }
-                            setImageDrawable(TextDrawable.builder().beginConfig().textColor(Color.BLACK).fontSize(bigImgSize).endConfig().buildRect(convert(code), Color.TRANSPARENT));
-
-                            sendEmoji(-1);
+                            setImageDrawable(TextDrawable.builder().beginConfig().textColor(Color.BLACK).fontSize(bigImgSize).endConfig().buildRect(code, Color.TRANSPARENT));
+                            sendEmoji(null);
+                            saveEmojiColors();
                         } else {
-                            sendEmoji(code);
+                            sendEmoji(code + (color != null ? color : ""));
                         }
                     }
                     touched = false;
@@ -446,10 +504,10 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
     }
 
     private ArrayList<EmojiGridAdapter> adapters = new ArrayList<>();
-    private HashMap<Long, Integer> emojiUseHistory = new HashMap<>();
+    private HashMap<String, Integer> emojiUseHistory = new HashMap<>();
     private static HashMap<String, String> emojiColor = new HashMap<>();
-    private ArrayList<Long> recentEmoji = new ArrayList<>();
-    private HashMap<Long, Integer> stickersUseHistory = new HashMap<>();
+    private ArrayList<String> recentEmoji = new ArrayList<>();
+    private ArrayList<Long> newRecentStickers = new ArrayList<>();
     private ArrayList<TLRPC.Document> recentStickers = new ArrayList<>();
     private ArrayList<TLRPC.TL_messages_stickerSet> stickerSets = new ArrayList<>();
     private ArrayList<MediaController.SearchImage> recentImages;
@@ -479,8 +537,8 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
     private FlowLayoutManager flowLayoutManager;
     private GifsAdapter gifsAdapter;
     private AdapterView.OnItemClickListener stickersOnItemClickListener;
-    private Runnable openStickerPreviewRunnable;
-    private StickerEmojiCell currentStickerPreviewCell;
+
+
     private EmojiColorPickerView pickerView;
     private EmojiPopupWindow pickerViewPopup;
     private int popupWidth;
@@ -492,8 +550,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
     private int gifTabBum = -2;
     private boolean switchToGifTab;
 
-    private int startX;
-    private int startY;
+
 
     private int oldWidth;
     private int lastNotifyWidth;
@@ -512,7 +569,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
         showStickers = needStickers;
         showGifs = needGif;
 
-        for (int i = 0; i < EmojiData.data.length + 1; i++) {
+        for (int i = 0; i < EmojiData.dataColored.length + 1; i++) {
             GridView gridView = new GridView(context);
             if (AndroidUtilities.isTablet()) {
                 gridView.setColumnWidth(AndroidUtilities.dp(60));
@@ -533,45 +590,8 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             stickersGridView = new GridView(context) {
                 @Override
                 public boolean onInterceptTouchEvent(MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        int x = (int) event.getX();
-                        int y = (int) event.getY();
-                        int count = stickersGridView.getChildCount();
-                        for (int a = 0; a < count; a++) {
-                            View view = stickersGridView.getChildAt(a);
-                            int top = view.getTop();
-                            int bottom = view.getBottom();
-                            int left = view.getLeft();
-                            int right = view.getRight();
-                            if (top > y || bottom < y || left > x || right < x) {
-                                continue;
-                            }
-                            if (!(view instanceof StickerEmojiCell) || !((StickerEmojiCell) view).showingBitmap()) {
-                                return super.onInterceptTouchEvent(event);
-                            }
-                            startX = x;
-                            startY = y;
-                            currentStickerPreviewCell = (StickerEmojiCell) view;
-                            openStickerPreviewRunnable = new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (openStickerPreviewRunnable == null) {
-                                        return;
-                                    }
-                                    stickersGridView.setOnItemClickListener(null);
-                                    stickersGridView.requestDisallowInterceptTouchEvent(true);
-                                    openStickerPreviewRunnable = null;
-                                    StickerPreviewViewer.getInstance().setParentActivity((Activity) getContext());
-                                    StickerPreviewViewer.getInstance().setKeyboardHeight(EmojiView.this.getMeasuredHeight());
-                                    StickerPreviewViewer.getInstance().open(currentStickerPreviewCell.getSticker());
-                                    currentStickerPreviewCell.setScaled(true);
-                                }
-                            };
-                            AndroidUtilities.runOnUIThread(openStickerPreviewRunnable, 200);
-                            return true;
-                        }
-                    }
-                    return false;
+                    boolean result = StickerPreviewViewer.getInstance().onInterceptTouchEvent(event, stickersGridView, EmojiView.this.getMeasuredHeight());
+                    return super.onInterceptTouchEvent(event) || result;
                 }
 
                 @Override
@@ -594,67 +614,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             stickersGridView.setOnTouchListener(new OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    if (openStickerPreviewRunnable != null || StickerPreviewViewer.getInstance().isVisible()) {
-                        if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_POINTER_UP) {
-                            AndroidUtilities.runOnUIThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    stickersGridView.setOnItemClickListener(stickersOnItemClickListener);
-                                }
-                            }, 150);
-                            if (openStickerPreviewRunnable != null) {
-                                AndroidUtilities.cancelRunOnUIThread(openStickerPreviewRunnable);
-                                openStickerPreviewRunnable = null;
-                            } else if (StickerPreviewViewer.getInstance().isVisible()) {
-                                StickerPreviewViewer.getInstance().close();
-                                if (currentStickerPreviewCell != null) {
-                                    currentStickerPreviewCell.setScaled(false);
-                                    currentStickerPreviewCell = null;
-                                }
-                            }
-                        } else if (event.getAction() != MotionEvent.ACTION_DOWN) {
-                            if (StickerPreviewViewer.getInstance().isVisible()) {
-                                if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                                    int x = (int) event.getX();
-                                    int y = (int) event.getY();
-                                    int count = stickersGridView.getChildCount();
-                                    for (int a = 0; a < count; a++) {
-                                        View view = stickersGridView.getChildAt(a);
-                                        int top = view.getTop();
-                                        int bottom = view.getBottom();
-                                        int left = view.getLeft();
-                                        int right = view.getRight();
-                                        if (top > y || bottom < y || left > x || right < x) {
-                                            continue;
-                                        }
-                                        if (!(view instanceof StickerEmojiCell) || view == currentStickerPreviewCell) {
-                                            break;
-                                        }
-                                        if (currentStickerPreviewCell != null) {
-                                            currentStickerPreviewCell.setScaled(false);
-                                        }
-                                        currentStickerPreviewCell = (StickerEmojiCell) view;
-                                        StickerPreviewViewer.getInstance().setKeyboardHeight(EmojiView.this.getMeasuredHeight());
-                                        StickerPreviewViewer.getInstance().open(currentStickerPreviewCell.getSticker());
-                                        currentStickerPreviewCell.setScaled(true);
-                                        return true;
-                                    }
-                                }
-                                return true;
-                            } else if (openStickerPreviewRunnable != null) {
-                                if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                                    if (Math.hypot(startX - event.getX(), startY - event.getY()) > AndroidUtilities.dp(10)) {
-                                        AndroidUtilities.cancelRunOnUIThread(openStickerPreviewRunnable);
-                                        openStickerPreviewRunnable = null;
-                                    }
-                                } else {
-                                    AndroidUtilities.cancelRunOnUIThread(openStickerPreviewRunnable);
-                                    openStickerPreviewRunnable = null;
-                                }
-                            }
-                        }
-                    }
-                    return false;
+                    return StickerPreviewViewer.getInstance().onTouch(event, stickersGridView, EmojiView.this.getMeasuredHeight(), stickersOnItemClickListener);
                 }
             });
             stickersOnItemClickListener = new AdapterView.OnItemClickListener() {
@@ -663,35 +623,23 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                     if (!(view instanceof StickerEmojiCell)) {
                         return;
                     }
-                    if (openStickerPreviewRunnable != null) {
-                        AndroidUtilities.cancelRunOnUIThread(openStickerPreviewRunnable);
-                        openStickerPreviewRunnable = null;
-                    }
-                    if (currentStickerPreviewCell != null) {
-                        currentStickerPreviewCell.setScaled(false);
-                        currentStickerPreviewCell = null;
-                    }
+                    StickerPreviewViewer.getInstance().reset();
                     StickerEmojiCell cell = (StickerEmojiCell) view;
                     if (cell.isDisabled()) {
                         return;
                     }
                     cell.disable();
                     TLRPC.Document document = cell.getSticker();
-                    Integer count = stickersUseHistory.get(document.id);
-                    if (count == null) {
-                        count = 0;
-                    }
-                    if (count == 0 && stickersUseHistory.size() > 19) {
-                        for (int a = recentStickers.size() - 1; a >= 0; a--) {
-                            TLRPC.Document sticker = recentStickers.get(a);
-                            stickersUseHistory.remove(sticker.id);
-                            recentStickers.remove(a);
-                            if (stickersUseHistory.size() <= 19) {
-                                break;
-                            }
+                    int index = newRecentStickers.indexOf(document.id);
+                    if (index == -1) {
+                        newRecentStickers.add(0, document.id);
+                        if (newRecentStickers.size() > 20) {
+                            newRecentStickers.remove(newRecentStickers.size() - 1);
                         }
+                    } else if (index != 0) {
+                        newRecentStickers.remove(index);
+                        newRecentStickers.add(0, document.id);
                     }
-                    stickersUseHistory.put(document.id, ++count);
 
                     saveRecentStickers();
                     if (listener != null) {
@@ -723,12 +671,6 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                                 size.height = attribute.h;
                                 break;
                             }
-                        }
-                        if (size.width == 0) {
-                            size.width = 100;
-                        }
-                        if (size.height == 0) {
-                            size.height = 100;
                         }
                         return size;
                     }
@@ -782,7 +724,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                             }
                         });
                         builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
-                        builder.show();
+                        builder.show().setCanceledOnTouchOutside(true);
                         return true;
                     }
                 });
@@ -1146,7 +1088,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
     private void saveRecentEmoji() {
         SharedPreferences preferences = getContext().getSharedPreferences("emoji", Activity.MODE_PRIVATE);
         StringBuilder stringBuilder = new StringBuilder();
-        for (HashMap.Entry<Long, Integer> entry : emojiUseHistory.entrySet()) {
+        for (HashMap.Entry<String, Integer> entry : emojiUseHistory.entrySet()) {
             if (stringBuilder.length() != 0) {
                 stringBuilder.append(",");
             }
@@ -1157,10 +1099,10 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
         preferences.edit().putString("emojis2", stringBuilder.toString()).commit();
     }
 
-    private void saveRecentStickers() {
-        SharedPreferences.Editor editor = getContext().getSharedPreferences("emoji", Activity.MODE_PRIVATE).edit();
+    private void saveEmojiColors() {
+        SharedPreferences preferences = getContext().getSharedPreferences("emoji", Activity.MODE_PRIVATE);
         StringBuilder stringBuilder = new StringBuilder();
-        for (HashMap.Entry<Long, Integer> entry : stickersUseHistory.entrySet()) {
+        for (HashMap.Entry<String, String> entry : emojiColor.entrySet()) {
             if (stringBuilder.length() != 0) {
                 stringBuilder.append(",");
             }
@@ -1168,8 +1110,19 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             stringBuilder.append("=");
             stringBuilder.append(entry.getValue());
         }
-        editor.putString("stickers", stringBuilder.toString());
+        preferences.edit().putString("color", stringBuilder.toString()).commit();
+    }
 
+    private void saveRecentStickers() {
+        SharedPreferences.Editor editor = getContext().getSharedPreferences("emoji", Activity.MODE_PRIVATE).edit();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int a = 0; a < newRecentStickers.size(); a++) {
+            if (stringBuilder.length() != 0) {
+                stringBuilder.append(",");
+            }
+            stringBuilder.append(newRecentStickers.get(a));
+        }
+        editor.putString("stickers2", stringBuilder.toString());
         editor.commit();
     }
 
@@ -1184,12 +1137,12 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
 
     private void sortEmoji() {
         recentEmoji.clear();
-        for (HashMap.Entry<Long, Integer> entry : emojiUseHistory.entrySet()) {
+        for (HashMap.Entry<String, Integer> entry : emojiUseHistory.entrySet()) {
             recentEmoji.add(entry.getKey());
         }
-        Collections.sort(recentEmoji, new Comparator<Long>() {
+        Collections.sort(recentEmoji, new Comparator<String>() {
             @Override
-            public int compare(Long lhs, Long rhs) {
+            public int compare(String lhs, String rhs) {
                 Integer count1 = emojiUseHistory.get(lhs);
                 Integer count2 = emojiUseHistory.get(rhs);
                 if (count1 == null) {
@@ -1217,43 +1170,28 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             return;
         }
         recentStickers.clear();
-        HashMap<Long, Integer> hashMap = new HashMap<>();
-        for (HashMap.Entry<Long, Integer> entry : stickersUseHistory.entrySet()) {
-            TLRPC.Document sticker = StickersQuery.getStickerById(entry.getKey());
+        for (int a = 0; a < newRecentStickers.size(); a++) {
+            TLRPC.Document sticker = StickersQuery.getStickerById(newRecentStickers.get(a));
             if (sticker != null) {
                 recentStickers.add(sticker);
-                hashMap.put(sticker.id, entry.getValue());
             }
         }
-        if (stickersUseHistory.size() != hashMap.size()) {
-            stickersUseHistory = hashMap;
-            saveRecentStickers();
-        }
-        Collections.sort(recentStickers, new Comparator<TLRPC.Document>() {
-            @Override
-            public int compare(TLRPC.Document lhs, TLRPC.Document rhs) {
-                Integer count1 = stickersUseHistory.get(lhs.id);
-                Integer count2 = stickersUseHistory.get(rhs.id);
-                if (count1 == null) {
-                    count1 = 0;
-                }
-                if (count2 == null) {
-                    count2 = 0;
-                }
-                if (count1 > count2) {
-                    return -1;
-                } else if (count1 < count2) {
-                    return 1;
-                }
-                return 0;
-            }
-        });
         while (recentStickers.size() > 20) {
             recentStickers.remove(recentStickers.size() - 1);
+        }
+        if (newRecentStickers.size() != recentStickers.size()) {
+            newRecentStickers.clear();
+            for (int a = 0; a < recentStickers.size(); a++) {
+                newRecentStickers.add(recentStickers.get(a).id);
+            }
+            saveRecentStickers();
         }
     }
 
     private void updateStickerTabs() {
+        if (scrollSlidingTabStrip == null) {
+            return;
+        }
         recentTabBum = -2;
         gifTabBum = -2;
 
@@ -1337,66 +1275,118 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
     }
 
     public void loadRecents() {
-        String str;
         SharedPreferences preferences = getContext().getSharedPreferences("emoji", Activity.MODE_PRIVATE);
         lastGifLoadTime = preferences.getLong("lastGifLoadTime", 0);
 
-        if (preferences.contains("emojis")) {
-            try {
-                emojiUseHistory.clear();
+        String str;
+        try {
+            emojiUseHistory.clear();
+            if (preferences.contains("emojis")) {
                 str = preferences.getString("emojis", "");
                 if (str != null && str.length() > 0) {
                     String[] args = str.split(",");
-                    for (int i = 0; i < args.length; i++) {
-                        emojiUseHistory.put(Long.parseLong(args[i]), args.length - i);
+                    for (String arg : args) {
+                        String[] args2 = arg.split("=");
+                        long value = Long.parseLong(args2[0]);
+                        String string = "";
+                        for (int a = 0; a < 4; a++) {
+                            char ch = (char) value;
+                            string = String.valueOf(ch) + string;
+                            value >>= 16;
+                            if (value == 0) {
+                                break;
+                            }
+                        }
+                        if (string.length() > 0) {
+                            emojiUseHistory.put(string, Integer.parseInt(args2[1]));
+                        }
                     }
                 }
-            } catch (Exception e) {
-                FileLog.e("tmessages", e);
-            }
-            sortEmoji();
-            preferences.edit().remove("emojis").commit();
-            saveRecentEmoji();
-            adapters.get(0).notifyDataSetChanged();
-        } else {
-            try {
-                emojiUseHistory.clear();
+                preferences.edit().remove("emojis").commit();
+                saveRecentEmoji();
+            } else {
                 str = preferences.getString("emojis2", "");
                 if (str != null && str.length() > 0) {
                     String[] args = str.split(",");
                     for (String arg : args) {
                         String[] args2 = arg.split("=");
-                        emojiUseHistory.put(Long.parseLong(args2[0]), Integer.parseInt(args2[1]));
+                        emojiUseHistory.put(args2[0], Integer.parseInt(args2[1]));
                     }
                 }
-                if (emojiUseHistory.isEmpty()) {
-                    long[] newRecent = new long[]{0x00000000D83DDE02L, 0x00000000D83DDE18L, 0x0000000000002764L, 0x00000000D83DDE0DL, 0x00000000D83DDE0AL, 0x00000000D83DDE01L,
-                            0x00000000D83DDC4DL, 0x000000000000263AL, 0x00000000D83DDE14L, 0x00000000D83DDE04L, 0x00000000D83DDE2DL, 0x00000000D83DDC8BL,
-                            0x00000000D83DDE12L, 0x00000000D83DDE33L, 0x00000000D83DDE1CL, 0x00000000D83DDE48L, 0x00000000D83DDE09L, 0x00000000D83DDE03L,
-                            0x00000000D83DDE22L, 0x00000000D83DDE1DL, 0x00000000D83DDE31L, 0x00000000D83DDE21L, 0x00000000D83DDE0FL, 0x00000000D83DDE1EL,
-                            0x00000000D83DDE05L, 0x00000000D83DDE1AL, 0x00000000D83DDE4AL, 0x00000000D83DDE0CL, 0x00000000D83DDE00L, 0x00000000D83DDE0BL,
-                            0x00000000D83DDE06L, 0x00000000D83DDC4CL, 0x00000000D83DDE10L, 0x00000000D83DDE15L};
-                    for (int i = 0; i < newRecent.length; i++) {
-                        emojiUseHistory.put(newRecent[i], newRecent.length - i);
-                    }
-                    saveRecentEmoji();
-                }
-                sortEmoji();
-                adapters.get(0).notifyDataSetChanged();
-            } catch (Exception e) {
-                FileLog.e("tmessages", e);
             }
+            if (emojiUseHistory.isEmpty()) {
+                String[] newRecent = new String[]{
+                        "\uD83D\uDE02", "\uD83D\uDE18", "\u2764", "\uD83D\uDE0D", "\uD83D\uDE0A", "\uD83D\uDE01",
+                        "\uD83D\uDC4D", "\u263A", "\uD83D\uDE14", "\uD83D\uDE04", "\uD83D\uDE2D", "\uD83D\uDC8B",
+                        "\uD83D\uDE12", "\uD83D\uDE33", "\uD83D\uDE1C", "\uD83D\uDE48", "\uD83D\uDE09", "\uD83D\uDE03",
+                        "\uD83D\uDE22", "\uD83D\uDE1D", "\uD83D\uDE31", "\uD83D\uDE21", "\uD83D\uDE0F", "\uD83D\uDE1E",
+                        "\uD83D\uDE05", "\uD83D\uDE1A", "\uD83D\uDE4A", "\uD83D\uDE0C", "\uD83D\uDE00", "\uD83D\uDE0B",
+                        "\uD83D\uDE06", "\uD83D\uDC4C", "\uD83D\uDE10", "\uD83D\uDE15"};
+                for (int i = 0; i < newRecent.length; i++) {
+                    emojiUseHistory.put(newRecent[i], newRecent.length - i);
+                }
+                saveRecentEmoji();
+            }
+            sortEmoji();
+            adapters.get(0).notifyDataSetChanged();
+        } catch (Exception e) {
+            FileLog.e("tmessages", e);
+        }
+
+        try {
+            str = preferences.getString("color", "");
+            if (str != null && str.length() > 0) {
+                String[] args = str.split(",");
+                for (int a = 0; a < args.length; a++) {
+                    String arg = args[a];
+                    String[] args2 = arg.split("=");
+                    emojiColor.put(args2[0], args2[1]);
+                }
+            }
+        } catch (Exception e) {
+            FileLog.e("tmessages", e);
         }
 
         if (showStickers) {
             try {
-                stickersUseHistory.clear();
+                newRecentStickers.clear();
                 str = preferences.getString("stickers", "");
                 if (str != null && str.length() > 0) {
                     String[] args = str.split(",");
-                    for (String arg : args) {
+                    final HashMap<Long, Integer> stickersUseHistory = new HashMap<>();
+                    for (int a = 0; a < args.length; a++) {
+                        String arg = args[a];
                         String[] args2 = arg.split("=");
-                        stickersUseHistory.put(Long.parseLong(args2[0]), Integer.parseInt(args2[1]));
+                        Long key = Long.parseLong(args2[0]);
+                        stickersUseHistory.put(key, Integer.parseInt(args2[1]));
+                        newRecentStickers.add(key);
+                    }
+                    Collections.sort(newRecentStickers, new Comparator<Long>() {
+                        @Override
+                        public int compare(Long lhs, Long rhs) {
+                            Integer count1 = stickersUseHistory.get(lhs);
+                            Integer count2 = stickersUseHistory.get(rhs);
+                            if (count1 == null) {
+                                count1 = 0;
+                            }
+                            if (count2 == null) {
+                                count2 = 0;
+                            }
+                            if (count1 > count2) {
+                                return -1;
+                            } else if (count1 < count2) {
+                                return 1;
+                            }
+                            return 0;
+                        }
+                    });
+                    preferences.edit().remove("stickers").commit();
+                    saveRecentStickers();
+                } else {
+                    str = preferences.getString("stickers2", "");
+                    String[] args = str.split(",");
+                    for (int a = 0; a < args.length; a++) {
+                        newRecentStickers.add(Long.parseLong(args[a]));
                     }
                 }
                 sortStickers();
@@ -1445,14 +1435,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
         if (StickerPreviewViewer.getInstance().isVisible()) {
             StickerPreviewViewer.getInstance().close();
         }
-        if (openStickerPreviewRunnable != null) {
-            AndroidUtilities.cancelRunOnUIThread(openStickerPreviewRunnable);
-            openStickerPreviewRunnable = null;
-        }
-        if (currentStickerPreviewCell != null) {
-            currentStickerPreviewCell.setScaled(false);
-            currentStickerPreviewCell = null;
-        }
+        StickerPreviewViewer.getInstance().reset();
     }
 
     public void setListener(Listener value) {
@@ -1473,6 +1456,13 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
         if (stickersGridAdapter != null) {
             NotificationCenter.getInstance().addObserver(this, NotificationCenter.stickersDidLoaded);
             NotificationCenter.getInstance().addObserver(this, NotificationCenter.recentImagesDidLoaded);
+            AndroidUtilities.runOnUIThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateStickerTabs();
+                    reloadStickersAdapter();
+                }
+            });
         }
     }
 
@@ -1503,13 +1493,16 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
         }
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+    public void onDestroy() {
         if (stickersGridAdapter != null) {
             NotificationCenter.getInstance().removeObserver(this, NotificationCenter.stickersDidLoaded);
             NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recentImagesDidLoaded);
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         if (pickerViewPopup != null && pickerViewPopup.isShowing()) {
             pickerViewPopup.dismiss();
         }
@@ -1593,7 +1586,9 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                 int previousCount = recentImages != null ? recentImages.size() : 0;
                 recentImages = (ArrayList<MediaController.SearchImage>) args[1];
                 loadingRecent = false;
-                gifsAdapter.notifyDataSetChanged();
+                if (gifsAdapter != null) {
+                    gifsAdapter.notifyDataSetChanged();
+                }
                 if (previousCount != recentImages.size()) {
                     updateStickerTabs();
                 }
@@ -1759,7 +1754,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             if (emojiPage == -1) {
                 return recentEmoji.size();
             }
-            return EmojiData.data[emojiPage].length;
+            return EmojiData.dataColored[emojiPage].length;
         }
 
         public Object getItem(int i) {
@@ -1776,11 +1771,16 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             if (imageView == null) {
                 imageView = new ImageViewEmoji(getContext());
             }
-            long code;
+            String code;
+            String coloredCode;
             if (emojiPage == -1) {
-                code = recentEmoji.get(i);
+                coloredCode = code = recentEmoji.get(i);
             } else {
-                code = EmojiData.data[emojiPage][i];
+                coloredCode = code = EmojiData.dataColored[emojiPage][i];
+                String color = emojiColor.get(code);
+                if (color != null) {
+                    coloredCode += color;
+                }
             }
             /*
              * Telegram-FOSS - Draw native Emojis using TextDrawable. See:
@@ -1795,7 +1795,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
             } else {
                 bigImgSize = AndroidUtilities.dp(32);
             }
-            imageView.setImageDrawable(TextDrawable.builder().beginConfig().textColor(Color.BLACK).fontSize(bigImgSize).endConfig().buildRect(convert(code), Color.TRANSPARENT));
+            imageView.setImageDrawable(TextDrawable.builder().beginConfig().textColor(Color.BLACK).fontSize(bigImgSize).endConfig().buildRect(coloredCode, Color.TRANSPARENT));
             return imageView;
         }
 
