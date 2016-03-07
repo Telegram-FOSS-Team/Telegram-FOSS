@@ -20,7 +20,7 @@
  - New privacy settings
   - Control who can add you to groups and channels with granular precision
  - New photo editor. Added rotate, fade, tint and curves tools
- - Telegram FOSS Changes:
+ - **Telegram FOSS Changes:**
   - Don't set network alarm if there's no network connection.
   - Upgrade to openssl-1.0.1s.
   - Fix always clearing recent emojis.
