@@ -10,10 +10,6 @@ This version of Telegram is available on FDroid:
 
 [![Fdroid](https://f-droid.org/wiki/images/0/06/F-Droid-button_get-it-on.png)](https://f-droid.org/repository/browse/?fdid=org.telegram.messenger)
 
-### Donations
-
-If you like the work I'm doing maintaining this FOSS friendly version of Telegram, please consider [buying me a beer](https://sinrega.org/?page_id=241).
-
 ### Versioning
 
 This repository contains tags to make tracking versions easier.
