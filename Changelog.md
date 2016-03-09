@@ -1,3 +1,6 @@
+### v3.6.1a (Telegram-FOSS)
+ - Fix emoji not displaying in chat window
+
 ### v3.6.1
  - Bug fixes
 
