@@ -752,8 +752,7 @@ public class MessageObject {
                     FileLog.e("tmessages", e);
                 }
             }
-            /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-            //linkDescription = Emoji.replaceEmoji(linkDescription, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
+            linkDescription = Emoji.replaceEmoji(linkDescription, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
         }
     }
 
@@ -762,9 +761,7 @@ public class MessageObject {
             return;
         }
         if (messageOwner.media != null && messageOwner.media.caption != null && messageOwner.media.caption.length() > 0) {
-            /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-            //caption = Emoji.replaceEmoji(messageOwner.media.caption, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
-            caption = Spannable.Factory.getInstance().newSpannable(messageOwner.media.caption.toString());
+            caption = Emoji.replaceEmoji(messageOwner.media.caption, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
             if (containsUrls(caption)) {
                 try {
                     Linkify.addLinks((Spannable) caption, Linkify.WEB_URLS | Linkify.PHONE_NUMBERS);
@@ -847,10 +844,6 @@ public class MessageObject {
                 messageOwner instanceof TLRPC.TL_message_secret ||
                 isOut() && messageOwner.send_state != MESSAGE_SEND_STATE_SENT ||
                 messageOwner.id < 0 || messageOwner.media instanceof TLRPC.TL_messageMediaUnsupported);
-
-        if(!(messageText instanceof Spannable)){
-            messageText = Spannable.Factory.getInstance().newSpannable(messageText.toString());
-        }
 
         if (useManualParse) {
             addLinks(messageText);

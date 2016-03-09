@@ -612,8 +612,7 @@ public class ChatActivityEnterView extends FrameLayoutFixed implements Notificat
                     for (int i = 0; i < spans.length; i++) {
                         editable.removeSpan(spans[i]);
                     }
-                    /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                    //Emoji.replaceEmoji(editable, messageEditText.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20), false);
+                    Emoji.replaceEmoji(editable, messageEditText.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20), false);
                     processChange = false;
                 }
             }
@@ -1894,9 +1893,7 @@ public class ChatActivityEnterView extends FrameLayoutFixed implements Notificat
                 }
                 try {
                     innerTextChange = 2;
-                    /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-                    //CharSequence localCharSequence = Emoji.replaceEmoji(symbol, messageEditText.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20), false);
-                    CharSequence localCharSequence = symbol;
+                    CharSequence localCharSequence = Emoji.replaceEmoji(symbol, messageEditText.getPaint().getFontMetricsInt(), AndroidUtilities.dp(20), false);
                     messageEditText.setText(messageEditText.getText().insert(i, localCharSequence));
                     int j = i + localCharSequence.length();
                     messageEditText.setSelection(j, j);

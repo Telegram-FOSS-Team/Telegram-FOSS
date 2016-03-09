@@ -25,6 +25,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
@@ -92,8 +93,7 @@ public class AboutLinkCell extends FrameLayout {
         oldText = text;
         stringBuilder = new SpannableStringBuilder(oldText);
         MessageObject.addLinks(stringBuilder, false);
-        /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-        //Emoji.replaceEmoji(stringBuilder, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
+        Emoji.replaceEmoji(stringBuilder, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
         requestLayout();
         if (resId == 0) {
             imageView.setImageDrawable(null);
