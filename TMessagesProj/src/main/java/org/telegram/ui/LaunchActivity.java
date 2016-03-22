@@ -128,7 +128,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                 return;
             }
             if (intent != null && !intent.getBooleanExtra("fromIntro", false)) {
-                SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("logininfo", MODE_PRIVATE);
+                SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("logininfo2", MODE_PRIVATE);
                 Map<String, ?> state = preferences.getAll();
                 if (state.isEmpty()) {
                     Intent intent2 = new Intent(this, IntroActivity.class);
@@ -296,6 +296,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     args.putBoolean("onlyUsers", true);
                     args.putBoolean("destroyAfterSelect", true);
                     args.putBoolean("createSecretChat", true);
+                    args.putBoolean("allowBots", false);
                     presentFragment(new ContactsActivity(args));
                     drawerLayoutContainer.closeDrawer(false);
                 } else if (position == 4) {
@@ -776,7 +777,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                             if (scheme != null) {
                                 if ((scheme.equals("http") || scheme.equals("https"))) {
                                     String host = data.getHost().toLowerCase();
-                                    if (host.equals("telegram.me")) {
+                                    if (host.equals("telegram.me") || host.equals("telegram.dog")) {
                                         String path = data.getPath();
                                         if (path != null && path.length() > 1) {
                                             path = path.substring(1);
@@ -890,16 +891,20 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             if (push_user_id != 0) {
                 Bundle args = new Bundle();
                 args.putInt("user_id", push_user_id);
-                ChatActivity fragment = new ChatActivity(args);
-                if (actionBarLayout.presentFragment(fragment, false, true, true)) {
-                    pushOpened = true;
+                if (mainFragmentsStack.isEmpty() || MessagesController.checkCanOpenChat(args, mainFragmentsStack.get(mainFragmentsStack.size() - 1))) {
+                    ChatActivity fragment = new ChatActivity(args);
+                    if (actionBarLayout.presentFragment(fragment, false, true, true)) {
+                        pushOpened = true;
+                    }
                 }
             } else if (push_chat_id != 0) {
                 Bundle args = new Bundle();
                 args.putInt("chat_id", push_chat_id);
-                ChatActivity fragment = new ChatActivity(args);
-                if (actionBarLayout.presentFragment(fragment, false, true, true)) {
-                    pushOpened = true;
+                if (mainFragmentsStack.isEmpty() || MessagesController.checkCanOpenChat(args, mainFragmentsStack.get(mainFragmentsStack.size() - 1))) {
+                    ChatActivity fragment = new ChatActivity(args);
+                    if (actionBarLayout.presentFragment(fragment, false, true, true)) {
+                        pushOpened = true;
+                    }
                 }
             } else if (push_enc_id != 0) {
                 Bundle args = new Bundle();
@@ -1079,12 +1084,14 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                         fragment.setDelegate(new DialogsActivity.MessagesActivityDelegate() {
                                             @Override
                                             public void didSelectDialog(DialogsActivity fragment, long did, boolean param) {
-                                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
-                                                MessagesController.getInstance().addUserToChat(-(int) did, user, null, 0, botChat, null);
                                                 Bundle args = new Bundle();
                                                 args.putBoolean("scrollToTopOnResume", true);
                                                 args.putInt("chat_id", -(int) did);
-                                                actionBarLayout.presentFragment(new ChatActivity(args), true, false, true);
+                                                if (mainFragmentsStack.isEmpty() || MessagesController.checkCanOpenChat(args, mainFragmentsStack.get(mainFragmentsStack.size() - 1))) {
+                                                    NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
+                                                    MessagesController.getInstance().addUserToChat(-(int) did, user, null, 0, botChat, null);
+                                                    actionBarLayout.presentFragment(new ChatActivity(args), true, false, true);
+                                                }
                                             }
                                         });
                                         presentFragment(fragment);
@@ -1101,9 +1108,11 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                         if (messageId != null) {
                                             args.putInt("message_id", messageId);
                                         }
-                                        ChatActivity fragment = new ChatActivity(args);
-                                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
-                                        actionBarLayout.presentFragment(fragment, false, true, true);
+                                        if (mainFragmentsStack.isEmpty() || MessagesController.checkCanOpenChat(args, mainFragmentsStack.get(mainFragmentsStack.size() - 1))) {
+                                            ChatActivity fragment = new ChatActivity(args);
+                                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
+                                            actionBarLayout.presentFragment(fragment, false, true, true);
+                                        }
                                     }
                                 } else {
                                     try {
@@ -1142,9 +1151,11 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                             MessagesStorage.getInstance().putUsersAndChats(null, chats, false, true);
                                             Bundle args = new Bundle();
                                             args.putInt("chat_id", invite.chat.id);
-                                            ChatActivity fragment = new ChatActivity(args);
-                                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
-                                            actionBarLayout.presentFragment(fragment, false, true, true);
+                                            if (mainFragmentsStack.isEmpty() || MessagesController.checkCanOpenChat(args, mainFragmentsStack.get(mainFragmentsStack.size() - 1))) {
+                                                ChatActivity fragment = new ChatActivity(args);
+                                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
+                                                actionBarLayout.presentFragment(fragment, false, true, true);
+                                            }
                                         } else {
                                             AlertDialog.Builder builder = new AlertDialog.Builder(LaunchActivity.this);
                                             builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
@@ -1208,9 +1219,11 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                                 MessagesController.getInstance().putChats(updates.chats, false);
                                                 Bundle args = new Bundle();
                                                 args.putInt("chat_id", chat.id);
-                                                ChatActivity fragment = new ChatActivity(args);
-                                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
-                                                actionBarLayout.presentFragment(fragment, false, true, true);
+                                                if (mainFragmentsStack.isEmpty() || MessagesController.checkCanOpenChat(args, mainFragmentsStack.get(mainFragmentsStack.size() - 1))) {
+                                                    ChatActivity fragment = new ChatActivity(args);
+                                                    NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
+                                                    actionBarLayout.presentFragment(fragment, false, true, true);
+                                                }
                                             }
                                         }
                                     } else {
@@ -1246,11 +1259,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             fragment.setDelegate(new DialogsActivity.MessagesActivityDelegate() {
                 @Override
                 public void didSelectDialog(DialogsActivity fragment, long did, boolean param) {
-                    NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
-                    SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("dialog_" + did, message);
-                    editor.commit();
                     Bundle args = new Bundle();
                     args.putBoolean("scrollToTopOnResume", true);
                     args.putBoolean("hasUrl", hasUrl);
@@ -1269,7 +1277,14 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     } else {
                         args.putInt("enc_id", high_id);
                     }
-                    actionBarLayout.presentFragment(new ChatActivity(args), true, false, true);
+                    if (MessagesController.checkCanOpenChat(args, fragment)) {
+                        NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
+                        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("dialog_" + did, message);
+                        editor.commit();
+                        actionBarLayout.presentFragment(new ChatActivity(args), true, false, true);
+                    }
                 }
             });
             presentFragment(fragment, false, true);
@@ -1346,6 +1361,9 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                 }
             } else {
                 args.putInt("enc_id", high_id);
+            }
+            if (!MessagesController.checkCanOpenChat(args, dialogsFragment)) {
+                return;
             }
             ChatActivity fragment = new ChatActivity(args);
 
@@ -1506,7 +1524,12 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         actionBarLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                needLayout();
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        needLayout();
+                    }
+                });
                 if (actionBarLayout != null) {
                     if (Build.VERSION.SDK_INT < 16) {
                         actionBarLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);

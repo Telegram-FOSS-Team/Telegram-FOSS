@@ -1,6 +1,6 @@
 ## Telegram-FOSS
 
-[Telegram](http://telegram.org) is a messaging app with a focus on speed and security. It’s superfast, simple and free.
+[Telegram](https://telegram.org) is a messaging app with a focus on speed and security. It’s superfast, simple and free.
 
 This is an unofficial, FOSS friendly fork of the original [Telegram App for Android](https://github.com/DrKLO/Telegram).
 
@@ -21,9 +21,9 @@ Versions are in form "v$UPSTREAM$RELEASE" where:
 
 ### API, Protocol documentation
 
-Telegram API manuals: http://core.telegram.org/api
+Telegram API manuals: https://core.telegram.org/api
 
-MTproto protocol manuals: http://core.telegram.org/mtproto
+MTproto protocol manuals: https://core.telegram.org/mtproto
 
 ### Building
 
