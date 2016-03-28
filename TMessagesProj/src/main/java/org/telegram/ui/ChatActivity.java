@@ -7722,9 +7722,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                     FileLog.e("tmessages", e);
                                 }
                             }
-                            LocationActivity fragment = new LocationActivity();
-                            fragment.setMessageObject(message);
-                            presentFragment(fragment);
                         } else if (message.type == 9 || message.type == 0) {
                             File f = null;
                             String fileName = message.getFileName();
