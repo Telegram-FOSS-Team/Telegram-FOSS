@@ -1,3 +1,12 @@
+### v3.7.0
+ - PUBLIC GROUPS, PINNED POSTS, 5,000 MEMBERS
+  - Groups can now have 5,000 members (up from 1,000)
+  - Groups of any size may be converted to supergroups
+ - New tools for supergroup admins:
+  - Make your group public by setting up a public link – anyone will be able to view the chat and join it
+  - Pin messages to keep important updates visible and notify all members
+  - Select messages to delete, report as spam, block users, or remove all messages from a user
+
 ### v3.6.1a (Telegram-FOSS)
  - Fix emoji not displaying in chat window
 
