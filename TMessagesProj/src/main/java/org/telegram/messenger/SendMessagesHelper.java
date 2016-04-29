@@ -3256,7 +3256,7 @@ public class SendMessagesHelper implements NotificationCenter.NotificationCenter
                             @Override
                             public void run() {
                                 if (location != null) {
-                                    SendMessagesHelper.getInstance().sendMessage(location, dialog_id, null, asAdmin);
+                                    SendMessagesHelper.getInstance().sendMessage(location, dialog_id, null, asAdmin, null, null);
                                 }
                             }
                         });
