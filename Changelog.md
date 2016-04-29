@@ -2,8 +2,8 @@
  - Fully redesigned chat screens, optimized colors, beautiful progress bars, revamped attachments.
  - Tap on any sticker to view its pack and add it to your collection. Preview and send stickers from the pack preview menu.
  - Introducing Bot API 2.0, the biggest update to our bot platform since June 2015. Try out these sample bots to see what's coming your way soon: @music, @sticker, @youtube, @foursquare
- - ** Telegram FOSS:**
-  - Bots can ask for accessing your location now, we therefore include the corresponding Android permission. This is opt in behaviour.
+ - **Telegram FOSS:**
+  - Bots can ask for accessing your location now, we therefore include the corresponding Android permission. This is opt-in behaviour.
 
 
 ### v3.7.0
