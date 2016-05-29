@@ -10,7 +10,7 @@ This version of Telegram is available on FDroid:
 
 [<img src="https://f-droid.org/badge/get-it-on.png"
       alt="Get it on F-Droid"
-      height="80">](https://f-droid.org/app/org.telegram.mesenger)
+      height="80">](https://f-droid.org/app/org.telegram.messenger)
 
 ### Versioning
 
