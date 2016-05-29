@@ -8,7 +8,9 @@ Several proprietary parts were removed from the original Telegram client, includ
 
 This version of Telegram is available on FDroid: 
 
-[![Fdroid](https://f-droid.org/wiki/images/0/06/F-Droid-button_get-it-on.png)](https://f-droid.org/repository/browse/?fdid=org.telegram.messenger)
+[<img src="https://f-droid.org/badge/get-it-on.png"
+      alt="Get it on F-Droid"
+      height="80">](https://f-droid.org/app/org.telegram.mesenger)
 
 ### Versioning
 
