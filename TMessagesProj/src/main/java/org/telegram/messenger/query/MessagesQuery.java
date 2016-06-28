@@ -8,6 +8,7 @@
 
 package org.telegram.messenger.query;
 
+import android.text.Spannable;
 import android.text.TextUtils;
 
 import org.telegram.SQLite.SQLiteCursor;
@@ -19,11 +20,13 @@ import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.FileLog;
+import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.Components.URLSpanUserMention;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,24 +60,25 @@ public class MessagesQuery {
 
             SQLiteCursor cursor = MessagesStorage.getInstance().getDatabase().queryFinalized(String.format(Locale.US, "SELECT data, mid, date FROM messages WHERE mid = %d", messageId));
             if (cursor.next()) {
-                NativeByteBuffer data = new NativeByteBuffer(cursor.byteArrayLength(0));
-                if (data != null && cursor.byteBufferValue(0, data) != 0) {
+                NativeByteBuffer data = cursor.byteBufferValue(0);
+                if (data != null) {
                     result = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
+                    data.reuse();
                     result.id = cursor.intValue(1);
                     result.date = cursor.intValue(2);
                     result.dialog_id = -channelId;
                     MessagesStorage.addUsersAndChatsFromMessage(result, usersToLoad, chatsToLoad);
                 }
-                data.reuse();
             }
             cursor.dispose();
 
             if (result == null) {
                 cursor = MessagesStorage.getInstance().getDatabase().queryFinalized(String.format(Locale.US, "SELECT data FROM chat_pinned WHERE uid = %d", channelId));
                 if (cursor.next()) {
-                    NativeByteBuffer data = new NativeByteBuffer(cursor.byteArrayLength(0));
-                    if (data != null && cursor.byteBufferValue(0, data) != 0) {
+                    NativeByteBuffer data = cursor.byteBufferValue(0);
+                    if (data != null) {
                         result = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
+                        data.reuse();
                         if (result.id != mid) {
                             result = null;
                         } else {
@@ -82,7 +86,6 @@ public class MessagesQuery {
                             MessagesStorage.addUsersAndChatsFromMessage(result, usersToLoad, chatsToLoad);
                         }
                     }
-                    data.reuse();
                 }
                 cursor.dispose();
             }
@@ -213,13 +216,13 @@ public class MessagesQuery {
                     try {
                         SQLiteCursor cursor = MessagesStorage.getInstance().getDatabase().queryFinalized(String.format(Locale.US, "SELECT m.data, m.mid, m.date, r.random_id FROM randoms as r INNER JOIN messages as m ON r.mid = m.mid WHERE r.random_id IN(%s)", TextUtils.join(",", replyMessages)));
                         while (cursor.next()) {
-                            NativeByteBuffer data = new NativeByteBuffer(cursor.byteArrayLength(0));
-                            if (data != null && cursor.byteBufferValue(0, data) != 0) {
+                            NativeByteBuffer data = cursor.byteBufferValue(0);
+                            if (data != null) {
                                 TLRPC.Message message = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
+                                data.reuse();
                                 message.id = cursor.intValue(1);
                                 message.date = cursor.intValue(2);
                                 message.dialog_id = dialogId;
-
 
                                 ArrayList<MessageObject> arrayList = replyMessageRandomOwners.remove(cursor.longValue(3));
                                 if (arrayList != null) {
@@ -231,7 +234,6 @@ public class MessagesQuery {
                                     }
                                 }
                             }
-                            data.reuse();
                         }
                         cursor.dispose();
                         if (!replyMessageRandomOwners.isEmpty()) {
@@ -299,9 +301,10 @@ public class MessagesQuery {
 
                         SQLiteCursor cursor = MessagesStorage.getInstance().getDatabase().queryFinalized(String.format(Locale.US, "SELECT data, mid, date FROM messages WHERE mid IN(%s)", stringBuilder.toString()));
                         while (cursor.next()) {
-                            NativeByteBuffer data = new NativeByteBuffer(cursor.byteArrayLength(0));
-                            if (data != null && cursor.byteBufferValue(0, data) != 0) {
+                            NativeByteBuffer data = cursor.byteBufferValue(0);
+                            if (data != null) {
                                 TLRPC.Message message = TLRPC.Message.TLdeserialize(data, data.readInt32(false), false);
+                                data.reuse();
                                 message.id = cursor.intValue(1);
                                 message.date = cursor.intValue(2);
                                 message.dialog_id = dialogId;
@@ -309,7 +312,6 @@ public class MessagesQuery {
                                 result.add(message);
                                 replyMessages.remove((Integer) message.id);
                             }
-                            data.reuse();
                         }
                         cursor.dispose();
 
@@ -436,5 +438,32 @@ public class MessagesQuery {
                 }
             }
         });
+    }
+
+    public static ArrayList<TLRPC.MessageEntity> getEntities(CharSequence message) {
+        if (message == null) {
+            return null;
+        }
+        ArrayList<TLRPC.MessageEntity> entities = null;
+        if (message instanceof Spannable) {
+            Spannable spannable = (Spannable) message;
+            URLSpanUserMention spans[] = spannable.getSpans(0, message.length(), URLSpanUserMention.class);
+            if (spans != null && spans.length > 0) {
+                entities = new ArrayList<>();
+                for (int b = 0; b < spans.length; b++) {
+                    TLRPC.TL_inputMessageEntityMentionName entity = new TLRPC.TL_inputMessageEntityMentionName();
+                    entity.user_id = MessagesController.getInputUser(Utilities.parseInt(spans[b].getURL()));
+                    if (entity.user_id != null) {
+                        entity.offset = spannable.getSpanStart(spans[b]);
+                        entity.length = Math.min(spannable.getSpanEnd(spans[b]), message.length()) - entity.offset;
+                        if (message.charAt(entity.offset + entity.length - 1) == ' ') {
+                            entity.length--;
+                        }
+                        entities.add(entity);
+                    }
+                }
+            }
+        }
+        return entities;
     }
 }

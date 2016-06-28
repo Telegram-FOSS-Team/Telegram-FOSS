@@ -24,8 +24,8 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:23.3.0'
-    compile 'com.googlecode.mp4parser:isoparser:1.0.+'
+    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.googlecode.mp4parser:isoparser:1.0.6'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
@@ -78,7 +78,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 787
+    defaultConfig.versionCode = 821
 
     sourceSets.main {
         jniLibs.srcDir 'libs'
@@ -127,9 +127,9 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 10
+        minSdkVersion 14
         targetSdkVersion 23
-        versionName "3.8.1"
+        versionName "3.10.1"
     }
 }
 

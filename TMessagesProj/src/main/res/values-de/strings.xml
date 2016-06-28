@@ -66,7 +66,11 @@
     <string name="MuteDisable">Dauerhaft Stumm</string>
     <string name="Hashtags">HASHTAGS</string>
     <string name="Recent">LETZTE</string>
+    <string name="ChatHints">CHATS</string>
+    <string name="ChatHintsDelete">Lösche %1$s aus Vorschlägen?</string>
     <string name="LinkPreview">Linkvorschau</string>
+    <string name="Draft">Entwurf</string>
+    <string name="HistoryCleared">Verlauf wurde gelöscht</string>
     <!--channels-->
     <string name="GroupType">Gruppenart</string>
     <string name="ChannelType">Kanalart</string>
@@ -105,8 +109,6 @@
     <string name="NoBlockedGroup">Blockierte Nutzer können nur durch Admins erneut hinzugefügt werden. Einladungslinks funktionieren nicht.</string>
     <string name="NewChannel">Neuer Kanal</string>
     <string name="EnterChannelName">Kanalname</string>
-    <string name="Comments">Kommentare</string>
-    <string name="CommentsInfo">Wenn du Kommentare aktivierst, können sich alle an der Diskussion beteiligen.</string>
     <string name="AddMutual">Kontakte zum Kanal hinzufügen</string>
     <string name="ChannelUsernameHelp">Jeder kann diesen Link teilen und deinen Kanal in der Telegramsuche finden.</string>
     <string name="MegaUsernameHelp">Jeder kann diesen Link teilen und deine Gruppe in der Telegramsuche finden.</string>
@@ -131,11 +133,8 @@
     <string name="LeaveChannelMenu">Kanal verlassen</string>
     <string name="ChannelSettings">Einstellungen</string>
     <string name="ChannelJoin">BEITRETEN</string>
-    <string name="OpenChannelProfile">Info</string>
     <string name="ChannelBroadcast">Broadcast</string>
     <string name="ChannelSilentBroadcast">Lautloser Broadcast</string>
-    <string name="ChannelComment">Kommentar</string>
-    <string name="ShowDiscussion">Kommentare zeigen</string>
     <string name="ChannelAlertTitle">Was ist ein Kanal?</string>
     <string name="ChannelAlertText">In einem Kanal kannst du deine Nachrichten an ein großes Publikum schicken.</string>
     <string name="ChannelAlertCreate">KANAL ERSTELLEN</string>
@@ -206,6 +205,7 @@
     <string name="ChannelMessageGroupAudio">%1$s hat eine Sprachnachricht an den Kanal %2$s gesendet</string>
     <string name="ChannelMessageGroupMusic">%1$s hat ein Musikstück an den Kanal %2$s gesendet</string>
     <string name="ChannelMessageGroupSticker">%1$s hat einen Sticker an den Kanal %2$s gesendet</string>
+    <string name="ChannelMessageGroupStickerEmoji">%1$s hat einen %3$s Sticker an den Kanal %2$s gesendet</string>
     <string name="ChannelMessageNoText">%1$s hat eine Nachricht gesendet</string>
     <string name="ChannelMessagePhoto">%1$s hat ein Bild gesendet</string>
     <string name="ChannelMessageVideo">%1$s hat ein Video gesendet</string>
@@ -216,6 +216,7 @@
     <string name="ChannelMessageAudio">%1$s hat eine Sprachnachricht gesendet</string>
     <string name="ChannelMessageMusic">%1$s hat ein Musikstück gesendet</string>
     <string name="ChannelMessageSticker">%1$s hat einen Sticker gesendet</string>
+    <string name="ChannelMessageStickerEmoji">%1$s hat einen %2$s Sticker gesendet</string>
     <string name="WhoCanAddMembers">Wer kann Mitglieder einladen?</string>
     <string name="WhoCanAddMembersAllMembers">Alle Mitglieder</string>
     <string name="WhoCanAddMembersAdmins">Nur Admins</string>
@@ -301,7 +302,7 @@
     <string name="SetTimer">Selbstzerstörungs-Timer setzen</string>
     <string name="ServiceNotifications">Servicemeldungen</string>
     <string name="GettingLinkInfo">Lade Linkvorschau...</string>
-    <string name="OpenInBrowser">Im Browser öffnen</string>
+    <string name="OpenInBrowser">ÖFFNEN MIT...</string>
     <string name="CopyUrl">URL kopieren</string>
     <string name="SendItems">%1$s senden</string>
     <string name="OpenUrlAlert">URL %1$s öffnen?</string>
@@ -333,6 +334,12 @@
     <string name="ReportChatOther">Sonstiges</string>
     <string name="ReportChatDescription">Beschreibung</string>
     <string name="PinnedMessage">Angeheftete Nachricht</string>
+    <string name="EditedMessage">bearbeitet</string>
+    <string name="AttachBotsHelp">Runterscrollen für Bots</string>
+    <string name="TimeToEdit">%1$s</string>
+    <string name="TimeToEditExpired">Bearbeitungszeit leider abgelaufen.</string>
+    <string name="AddShortcut">Verknüpfung hinzufügen</string>
+    <string name="ShortcutAdded">Zum Startbildschirm hinzugefügt</string>
     <!--notification-->
     <string name="MessageLifetimeChanged">%1$s hat den Selbstzerstörungs-Timer auf %2$s gesetzt</string>
     <string name="MessageLifetimeChangedOutgoing">Du hast den Selbstzerstörungs-Timer auf %1$s gesetzt</string>
@@ -350,6 +357,7 @@
     <string name="NotificationMessageAudio">%1$s hat dir eine Sprachnachricht gesendet</string>
     <string name="NotificationMessageMusic">%1$s hat dir ein Musikstück gesendet</string>
     <string name="NotificationMessageSticker">%1$s hat dir einen Sticker gesendet</string>
+    <string name="NotificationMessageStickerEmoji">%1$s hat dir einen %2$s Sticker gesendet</string>
     <string name="NotificationMessageGroupText">%1$s @ %2$s: %3$s</string>
     <string name="NotificationMessageGroupNoText">%1$s hat eine Nachricht an die Gruppe %2$s gesendet</string>
     <string name="NotificationMessageGroupPhoto">%1$s hat ein Bild an die Gruppe %2$s gesendet</string>
@@ -361,6 +369,7 @@
     <string name="NotificationMessageGroupAudio">%1$s hat eine Sprachnachricht an die Gruppe %2$s gesendet</string>
     <string name="NotificationMessageGroupMusic">%1$s hat ein Musikstück an die Gruppe %2$s gesendet</string>
     <string name="NotificationMessageGroupSticker">%1$s hat einen Sticker an die Gruppe %2$s gesendet</string>
+    <string name="NotificationMessageGroupStickerEmoji">%1$s hat einen %3$s Sticker an die Gruppe %2$s gesendet</string>
     <string name="NotificationInvitedToGroup">%1$s hat dich in die Gruppe %2$s eingeladen</string>
     <string name="NotificationEditedGroupName">%1$s hat den Namen der Gruppe %2$s geändert</string>
     <string name="NotificationEditedGroupPhoto">%1$s hat das Bild der Gruppe %2$s geändert</string>
@@ -384,6 +393,7 @@
     <string name="NotificationActionPinnedVideo">%1$s hat ein Video in der Gruppe %2$s angeheftet</string>
     <string name="NotificationActionPinnedFile">%1$s hat eine Datei in der Gruppe %2$s angeheftet</string>
     <string name="NotificationActionPinnedSticker">%1$s hat einen Sticker in der Gruppe %2$s angeheftet</string>
+    <string name="NotificationActionPinnedStickerEmoji">%1$s hat einen %3$s Sticker in der Gruppe %2$s angeheftet</string>
     <string name="NotificationActionPinnedVoice">%1$s hat eine Sprachnachricht in der Gruppe %2$s angeheftet</string>
     <string name="NotificationActionPinnedContact">%1$s hat einen Kontakt in der Gruppe %2$s angeheftet</string>
     <string name="NotificationActionPinnedGeo">%1$s hat einen Standort in der Gruppe %2$s angeheftet</string>
@@ -395,6 +405,7 @@
     <string name="NotificationActionPinnedVideoChannel">%1$s hat ein Video angeheftet</string>
     <string name="NotificationActionPinnedFileChannel">%1$s hat eine Datei angeheftet</string>
     <string name="NotificationActionPinnedStickerChannel">%1$s hat einen Sticker angeheftet</string>
+    <string name="NotificationActionPinnedStickerEmojiChannel">%1$s hat einen %2$s Sticker angeheftet</string>
     <string name="NotificationActionPinnedVoiceChannel">%1$s hat eine Sprachnachricht angeheftet</string>
     <string name="NotificationActionPinnedContactChannel">%1$s hat einen Kontakt angeheftet</string>
     <string name="NotificationActionPinnedGeoChannel">%1$s hat einen Stamdort angeheftet</string>
@@ -454,8 +465,8 @@
     <string name="ConvertGroupMenu">In Supergruppe ändern</string>
     <string name="ConvertGroupAlertWarning">Warnung</string>
     <string name="ConvertGroupAlert">Du kannst die Supergruppe nicht mehr in eine normale Gruppe ändern.</string>
-    <string name="ConvertGroupInfo"><![CDATA[<b>]]>Gruppenlimit erreicht.<![CDATA[</b>]]>\n\nFür weitere Funktionen und um das Limit aufzuheben in Supergruppe ändern:\n\n• Bis zu %1$s sind nun möglich\n• Neue Mitglieder sehen gesamten Verlauf\n• Mitglieder können eigene Nachrichten bearbeiten\n• Gruppenersteller kann die Gruppe öffentlich machen</string>
-    <string name="ConvertGroupInfo2"><![CDATA[<b>]]>In Supergruppen:<![CDATA[</b>]]>\n\n• Neue Mitglieder sehen gesamten Verlauf\n• Nachrichten werden bei allen gelöscht\n• Jeder kann eigene Nachrichten bearbeiten\n• Gründer kann Gruppe öffentlich machen</string>
+    <string name="ConvertGroupInfo"><![CDATA[<b>]]>Gruppenlimit erreicht.<![CDATA[</b>]]>\n\nFür weitere Funktionen und um das Limit aufzuheben in Supergruppe ändern:\n\n• Bis zu %1$s sind nun möglich\n• Neue Mitglieder sehen gesamten Verlauf\n• Gelöschte Nachrichten werden bei allen Mitgliedern entfernt\n•Gruppenersteller kann die Gruppe öffentlich machen</string>
+    <string name="ConvertGroupInfo2"><![CDATA[<b>]]>In Supergruppen:<![CDATA[</b>]]>\n\n• Neue Mitglieder sehen gesamten Verlauf\n• Nachrichten werden bei allen gelöscht\n• Gründer kann Gruppe öffentlich machen</string>
     <string name="ConvertGroupInfo3"><![CDATA[<b>]]>Wichtig:<![CDATA[</b>]]> Die Änderung kann nicht rückgängig gemacht werden.</string>
     <!--contact info view-->
     <string name="ShareContact">Teilen</string>
@@ -1024,12 +1035,6 @@
     <string name="messages_few">%1$d Nachrichten</string>
     <string name="messages_many">%1$d Nachrichten</string>
     <string name="messages_other">%1$d Nachrichten</string>
-    <string name="comments_zero">%1$d Kommentare</string>
-    <string name="comments_one">%1$d Kommentar</string>
-    <string name="comments_two">%1$d Kommentare</string>
-    <string name="comments_few">%1$d Kommentare</string>
-    <string name="comments_many">%1$d Kommentare</string>
-    <string name="comments_other">%1$d Kommentare</string>
     <string name="items_zero">keine Objekte</string>
     <string name="items_one">%1$d Objekt</string>
     <string name="items_two">%1$d Objekte</string>

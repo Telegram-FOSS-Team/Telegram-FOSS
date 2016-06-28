@@ -481,16 +481,12 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
                             }
                         }
 
-                        if (bitmapDrawable instanceof AnimatedFileDrawable) {
-                            drawRegion.set(imageX, imageY, imageX + imageW, imageY + imageH);
+                        if (bitmapW / scaleH > imageW) {
+                            bitmapW /= scaleH;
+                            drawRegion.set(imageX - (bitmapW - imageW) / 2, imageY, imageX + (bitmapW + imageW) / 2, imageY + imageH);
                         } else {
-                            if (bitmapW / scaleH > imageW) {
-                                bitmapW /= scaleH;
-                                drawRegion.set(imageX - (bitmapW - imageW) / 2, imageY, imageX + (bitmapW + imageW) / 2, imageY + imageH);
-                            } else {
-                                bitmapH /= scaleW;
-                                drawRegion.set(imageX, imageY - (bitmapH - imageH) / 2, imageX + imageW, imageY + (bitmapH + imageH) / 2);
-                            }
+                            bitmapH /= scaleW;
+                            drawRegion.set(imageX, imageY - (bitmapH - imageH) / 2, imageX + imageW, imageY + (bitmapH + imageH) / 2);
                         }
                         if (orientation % 360 == 90 || orientation % 360 == 270) {
                             int width = (drawRegion.right - drawRegion.left) / 2;
@@ -656,6 +652,8 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     public Bitmap getBitmap() {
         if (currentImage instanceof AnimatedFileDrawable) {
             return ((AnimatedFileDrawable) currentImage).getAnimatedBitmap();
+        } else if (staticThumb instanceof AnimatedFileDrawable) {
+            return ((AnimatedFileDrawable) staticThumb).getAnimatedBitmap();
         } else if (currentImage instanceof BitmapDrawable) {
             return ((BitmapDrawable) currentImage).getBitmap();
         } else if (currentThumb instanceof BitmapDrawable) {
@@ -669,6 +667,8 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     public int getBitmapWidth() {
         if (currentImage instanceof AnimatedFileDrawable) {
             return orientation % 360 == 0 || orientation % 360 == 180 ? currentImage.getIntrinsicWidth() : currentImage.getIntrinsicHeight();
+        } else if (staticThumb instanceof AnimatedFileDrawable) {
+            return orientation % 360 == 0 || orientation % 360 == 180 ? staticThumb.getIntrinsicWidth() : staticThumb.getIntrinsicHeight();
         }
         Bitmap bitmap = getBitmap();
         return orientation % 360 == 0 || orientation % 360 == 180 ? bitmap.getWidth() : bitmap.getHeight();
@@ -677,6 +677,8 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     public int getBitmapHeight() {
         if (currentImage instanceof AnimatedFileDrawable) {
             return orientation % 360 == 0 || orientation % 360 == 180 ? currentImage.getIntrinsicHeight() : currentImage.getIntrinsicWidth();
+        } else if (staticThumb instanceof AnimatedFileDrawable) {
+            return orientation % 360 == 0 || orientation % 360 == 180 ? staticThumb.getIntrinsicHeight() : staticThumb.getIntrinsicWidth();
         }
         Bitmap bitmap = getBitmap();
         return orientation % 360 == 0 || orientation % 360 == 180 ? bitmap.getHeight() : bitmap.getWidth();
@@ -876,6 +878,10 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
         return currentImage instanceof AnimatedFileDrawable && ((AnimatedFileDrawable) currentImage).isRunning();
     }
 
+    public AnimatedFileDrawable getAnimation() {
+        return currentImage instanceof AnimatedFileDrawable ? (AnimatedFileDrawable) currentImage : null;
+    }
+
     protected Integer getTag(boolean thumb) {
         if (thumb) {
             return thumbTag;
@@ -994,15 +1000,11 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
         if (key != null && (newKey == null || !newKey.equals(key)) && image != null) {
             if (image instanceof AnimatedFileDrawable) {
                 AnimatedFileDrawable fileDrawable = (AnimatedFileDrawable) image;
-                fileDrawable.stop();
                 fileDrawable.recycle();
             } else if (image instanceof BitmapDrawable) {
                 Bitmap bitmap = ((BitmapDrawable) image).getBitmap();
                 boolean canDelete = ImageLoader.getInstance().decrementUseCount(key);
                 if (!ImageLoader.getInstance().isInCache(key)) {
-                    if (ImageLoader.getInstance().runtimeHack != null) {
-                        ImageLoader.getInstance().runtimeHack.trackAlloc(bitmap.getRowBytes() * bitmap.getHeight());
-                    }
                     if (canDelete) {
                         bitmap.recycle();
                     }

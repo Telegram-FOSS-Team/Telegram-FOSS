@@ -20,9 +20,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -288,23 +285,34 @@ public class ApplicationLoader extends Application {
     public void onCreate() {
         super.onCreate();
 
-        if (Build.VERSION.SDK_INT < 11) {
-            java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
-            java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
-        }
-
         applicationContext = getApplicationContext();
         NativeLoader.initNativeLibs(ApplicationLoader.applicationContext);
         ConnectionsManager.native_setJava(Build.VERSION.SDK_INT == 14 || Build.VERSION.SDK_INT == 15);
-
-        if (Build.VERSION.SDK_INT >= 14) {
-            new ForegroundDetector(this);
-        }
+        new ForegroundDetector(this);
 
         applicationHandler = new Handler(applicationContext.getMainLooper());
 
         startPushService();
     }
+
+    /*public static void sendRegIdToBackend(final String token) {
+        Utilities.stageQueue.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                UserConfig.pushString = token;
+                UserConfig.registeredForPush = false;
+                UserConfig.saveConfig(false);
+                if (UserConfig.getClientUserId() != 0) {
+                    AndroidUtilities.runOnUIThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MessagesController.getInstance().registerForPush(token);
+                        }
+                    });
+                }
+            }
+        });
+    }*/
 
     public static void startPushService() {
         SharedPreferences preferences = applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);

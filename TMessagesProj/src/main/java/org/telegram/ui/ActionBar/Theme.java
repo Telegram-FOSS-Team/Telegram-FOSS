@@ -55,7 +55,13 @@ public class Theme {
     public static final int ACTION_BAR_VIOLET_SELECTOR_COLOR = 0xff735fbe;
     public static final int ACTION_BAR_YELLOW_SELECTOR_COLOR = 0xffef9f09;
 
+    public static final int ATTACH_SHEET_TEXT_COLOR = 0xff757575;
 
+    public static final int DIALOGS_MESSAGE_TEXT_COLOR = 0xff8f8f8f;
+    public static final int DIALOGS_NAME_TEXT_COLOR = 0xff4d83b3;
+    public static final int DIALOGS_ATTACH_TEXT_COLOR = 0xff4d83b3;
+    public static final int DIALOGS_PRINTING_TEXT_COLOR = 0xff4d83b3;
+    public static final int DIALOGS_DRAFT_TEXT_COLOR = 0xffdd4b39;
 
     public static final int CHAT_UNREAD_TEXT_COLOR = 0xff5695cc;
     public static final int CHAT_ADD_CONTACT_TEXT_COLOR = 0xff4a82b5;
@@ -64,6 +70,7 @@ public class Theme {
     public static final int CHAT_BOTTOM_CHAT_OVERLAY_TEXT_COLOR = 0xff3a8ccf;
     public static final int CHAT_GIF_HINT_TEXT_COLOR = 0xffffffff;
     public static final int CHAT_EMPTY_VIEW_TEXT_COLOR = 0xffffffff;
+    public static final int CHAT_SEARCH_COUNT_TEXT_COLOR = 0xff4e9ad4;
 
     public static final int INAPP_PLAYER_PERFORMER_TEXT_COLOR = 0xff2f3438;
     public static final int INAPP_PLAYER_TITLE_TEXT_COLOR = 0xff2f3438;
@@ -95,6 +102,7 @@ public class Theme {
 
     public static final int SECRET_CHAT_INFO_TEXT_COLOR = 0xffffffff;
 
+    public static final int MSG_SELECTED_BACKGROUND_COLOR = 0x6633b5e5;
     public static final int MSG_WEB_PREVIEW_DURATION_TEXT_COLOR = 0xffffffff;
     public static final int MSG_SECRET_TIME_TEXT_COLOR = 0xffe4e2e0;
     public static final int MSG_STICKER_NAME_TEXT_COLOR = 0xffffffff;
@@ -180,6 +188,7 @@ public class Theme {
     public static final int MSG_TEXT_COLOR = 0xff000000;
     public static final int MSG_LINK_TEXT_COLOR = 0xff2678b6;
     public static final int MSG_LINK_SELECT_BACKGROUND_COLOR = 0x3362a9e3;
+    public static final int MSG_TEXT_SELECT_BACKGROUND_COLOR = 0x6662a9e3;
 
 
     public static Drawable backgroundDrawableIn;
@@ -331,15 +340,6 @@ public class Theme {
             geoInDrawable = context.getResources().getDrawable(R.drawable.location_b);
             geoOutDrawable = context.getResources().getDrawable(R.drawable.location_g);
 
-            attachButtonDrawables[0] = context.getResources().getDrawable(R.drawable.attach_camera_states);
-            attachButtonDrawables[1] = context.getResources().getDrawable(R.drawable.attach_gallery_states);
-            attachButtonDrawables[2] = context.getResources().getDrawable(R.drawable.attach_video_states);
-            attachButtonDrawables[3] = context.getResources().getDrawable(R.drawable.attach_audio_states);
-            attachButtonDrawables[4] = context.getResources().getDrawable(R.drawable.attach_file_states);
-            attachButtonDrawables[5] = context.getResources().getDrawable(R.drawable.attach_contact_states);
-            attachButtonDrawables[6] = context.getResources().getDrawable(R.drawable.attach_location_states);
-            attachButtonDrawables[7] = context.getResources().getDrawable(R.drawable.attach_hide_states);
-
             cornerOuter[0] = context.getResources().getDrawable(R.drawable.corner_out_tl);
             cornerOuter[1] = context.getResources().getDrawable(R.drawable.corner_out_tr);
             cornerOuter[2] = context.getResources().getDrawable(R.drawable.corner_out_br);
@@ -365,6 +365,19 @@ public class Theme {
                 cornerInner[a].setColorFilter(colorFilter);
             }
             timeStickerBackgroundDrawable.setColorFilter(colorFilter);
+        }
+    }
+
+    public static void loadChatResources(Context context) {
+        if (attachButtonDrawables[0] == null) {
+            attachButtonDrawables[0] = context.getResources().getDrawable(R.drawable.attach_camera_states);
+            attachButtonDrawables[1] = context.getResources().getDrawable(R.drawable.attach_gallery_states);
+            attachButtonDrawables[2] = context.getResources().getDrawable(R.drawable.attach_video_states);
+            attachButtonDrawables[3] = context.getResources().getDrawable(R.drawable.attach_audio_states);
+            attachButtonDrawables[4] = context.getResources().getDrawable(R.drawable.attach_file_states);
+            attachButtonDrawables[5] = context.getResources().getDrawable(R.drawable.attach_contact_states);
+            attachButtonDrawables[6] = context.getResources().getDrawable(R.drawable.attach_location_states);
+            attachButtonDrawables[7] = context.getResources().getDrawable(R.drawable.attach_hide_states);
         }
     }
 
@@ -411,9 +424,7 @@ public class Theme {
             stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, new ColorDrawable(color));
             stateListDrawable.addState(new int[]{android.R.attr.state_focused}, new ColorDrawable(color));
             stateListDrawable.addState(new int[]{android.R.attr.state_selected}, new ColorDrawable(color));
-            if (Build.VERSION.SDK_INT >= 11) {
-                stateListDrawable.addState(new int[]{android.R.attr.state_activated}, new ColorDrawable(color));
-            }
+            stateListDrawable.addState(new int[]{android.R.attr.state_activated}, new ColorDrawable(color));
             stateListDrawable.addState(new int[]{}, new ColorDrawable(0x00000000));
             return stateListDrawable;
         }

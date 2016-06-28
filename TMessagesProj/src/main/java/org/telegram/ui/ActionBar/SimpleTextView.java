@@ -41,14 +41,6 @@ public class SimpleTextView extends View implements Drawable.Callback {
     private int textHeight;
     private boolean wasLayout;
 
-    public enum Alignment {
-        ALIGN_NORMAL,
-        ALIGN_OPPOSITE,
-        ALIGN_CENTER,
-        ALIGN_LEFT,
-        ALIGN_RIGHT
-    }
-
     public SimpleTextView(Context context) {
         super(context);
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
@@ -71,7 +63,9 @@ public class SimpleTextView extends View implements Drawable.Callback {
             return;
         }
         textPaint.setTextSize(newSize);
-        recreateLayoutMaybe();
+        if (!recreateLayoutMaybe()) {
+            invalidate();
+        }
     }
 
     public void setGravity(int value) {
@@ -97,7 +91,7 @@ public class SimpleTextView extends View implements Drawable.Callback {
         return textPaint;
     }
 
-    private void createLayout(int width) {
+    private boolean createLayout(int width) {
         if (text != null) {
             try {
                 if (leftDrawable != null) {
@@ -111,7 +105,7 @@ public class SimpleTextView extends View implements Drawable.Callback {
                 width -= getPaddingLeft() + getPaddingRight();
                 CharSequence string = TextUtils.ellipsize(text, textPaint, width, TextUtils.TruncateAt.END);
                 if (layout != null && TextUtils.equals(layout.getText(), string)) {
-                    return;
+                    return false;
                 }
                 layout = new StaticLayout(string, 0, string.length(), textPaint, width + AndroidUtilities.dp(8), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
@@ -123,7 +117,7 @@ public class SimpleTextView extends View implements Drawable.Callback {
                     } else if (layout.getLineLeft(0) == 0) {
                         offsetX = width - textWidth;
                     } else {
-                        offsetX = 0;
+                        offsetX = -AndroidUtilities.dp(8);
                     }
                 }
             } catch (Exception e) {
@@ -134,6 +128,8 @@ public class SimpleTextView extends View implements Drawable.Callback {
             textWidth = 0;
             textHeight = 0;
         }
+        invalidate();
+        return true;
     }
 
     @Override
@@ -143,7 +139,7 @@ public class SimpleTextView extends View implements Drawable.Callback {
         createLayout(width - getPaddingLeft() - getPaddingRight());
 
         int finalHeight;
-        if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.EXACTLY) {
+        if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY) {
             finalHeight = height;
         } else {
             finalHeight = textHeight;
@@ -153,9 +149,7 @@ public class SimpleTextView extends View implements Drawable.Callback {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if (changed) {
-            wasLayout = true;
-        }
+        wasLayout = true;
     }
 
     public int getTextWidth() {
@@ -193,7 +187,9 @@ public class SimpleTextView extends View implements Drawable.Callback {
         if (drawable != null) {
             drawable.setCallback(this);
         }
-        recreateLayoutMaybe();
+        if (!recreateLayoutMaybe()) {
+            invalidate();
+        }
     }
 
     public void setRightDrawable(Drawable drawable) {
@@ -207,7 +203,9 @@ public class SimpleTextView extends View implements Drawable.Callback {
         if (drawable != null) {
             drawable.setCallback(this);
         }
-        recreateLayoutMaybe();
+        if (!recreateLayoutMaybe()) {
+            invalidate();
+        }
     }
 
     public void setText(CharSequence value) {
@@ -223,16 +221,18 @@ public class SimpleTextView extends View implements Drawable.Callback {
             return;
         }
         drawablePadding = value;
-        recreateLayoutMaybe();
+        if (!recreateLayoutMaybe()) {
+            invalidate();
+        }
     }
 
-    private void recreateLayoutMaybe() {
+    private boolean recreateLayoutMaybe() {
         if (wasLayout) {
-            createLayout(getMeasuredWidth());
-            invalidate();
+            return createLayout(getMeasuredWidth());
         } else {
             requestLayout();
         }
+        return true;
     }
 
     public CharSequence getText() {
@@ -276,6 +276,15 @@ public class SimpleTextView extends View implements Drawable.Callback {
 
     @Override
     public void invalidateDrawable(Drawable who) {
-        invalidate();
+        if (who == leftDrawable) {
+            invalidate(leftDrawable.getBounds());
+        } else if (who == rightDrawable) {
+            invalidate(rightDrawable.getBounds());
+        }
+    }
+
+    @Override
+    public boolean hasOverlappingRendering() {
+        return false;
     }
 }

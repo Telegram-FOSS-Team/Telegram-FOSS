@@ -21,7 +21,7 @@ import java.util.zip.ZipFile;
 
 public class NativeLoader {
 
-    private final static int LIB_VERSION = 21;
+    private final static int LIB_VERSION = 22;
     private final static String LIB_NAME = "tmessages." + LIB_VERSION;
     private final static String LIB_SO_NAME = "lib" + LIB_NAME + ".so";
     private final static String LOCALE_LIB_SO_NAME = "lib" + LIB_NAME + "loc.so";
@@ -75,11 +75,9 @@ public class NativeLoader {
             }
             out.close();
 
-            if (Build.VERSION.SDK_INT >= 9) {
-                destLocalFile.setReadable(true, false);
-                destLocalFile.setExecutable(true, false);
-                destLocalFile.setWritable(true);
-            }
+            destLocalFile.setReadable(true, false);
+            destLocalFile.setExecutable(true, false);
+            destLocalFile.setWritable(true);
 
             try {
                 System.load(destLocalFile.getAbsolutePath());
@@ -142,10 +140,12 @@ public class NativeLoader {
                 folder = "x86";
             }
 
-            if (Build.VERSION.SDK_INT == 8) {
-                File destFile = new File(context.getApplicationInfo().dataDir + "/lib", LIB_SO_NAME);
+
+            File destFile = getNativeLibraryDir(context);
+            if (destFile != null) {
+                destFile = new File(destFile, LIB_SO_NAME);
                 if (destFile.exists()) {
-                    FileLog.d("tmessages", "Load normal lib");
+                    FileLog.d("tmessages", "load normal lib");
                     try {
                         System.loadLibrary(LIB_NAME);
                         init(crashDir, BuildVars.DEBUG_VERSION);
@@ -153,31 +153,6 @@ public class NativeLoader {
                         return;
                     } catch (Error e) {
                         FileLog.e("tmessages", e);
-                    }
-                } else {
-                    try {
-                        System.loadLibrary(LIB_NAME);
-                        init(crashDir, BuildVars.DEBUG_VERSION);
-                        nativeLoaded = true;
-                        return;
-                    } catch (Error e) {
-                        FileLog.e("tmessages", e);
-                    }
-                }
-            } else {
-                File destFile = getNativeLibraryDir(context);
-                if (destFile != null) {
-                    destFile = new File(destFile, LIB_SO_NAME);
-                    if (destFile.exists()) {
-                        FileLog.d("tmessages", "load normal lib");
-                        try {
-                            System.loadLibrary(LIB_NAME);
-                            init(crashDir, BuildVars.DEBUG_VERSION);
-                            nativeLoaded = true;
-                            return;
-                        } catch (Error e) {
-                            FileLog.e("tmessages", e);
-                        }
                     }
                 }
             }
