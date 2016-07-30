@@ -1672,13 +1672,9 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             passcodeView.onPause();
         }
         ConnectionsManager.getInstance().setAppPaused(true, false);
-<<<<<<< HEAD
-=======
-        AndroidUtilities.unregisterUpdates();
         if (PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().onPause();
         }
->>>>>>> upstream/master
     }
 
     @Override
