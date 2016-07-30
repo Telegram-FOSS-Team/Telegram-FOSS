@@ -709,7 +709,6 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                 } else if (i == androidAutoAlertRow) {
                     checkCell.setTextAndCheck("Android Auto", preferences.getBoolean("EnableAutoNotifications", false), true);
                 } else if (i == notificationsServiceRow) {
-                    //old: checkCell.setTextAndCheck("Smart Push", preferences.getBoolean("pushService", true), false);
                     checkCell.setTextAndValueAndCheck(LocaleController.getString("NotificationsService", R.string.NotificationsService), LocaleController.getString("NotificationsServiceInfo", R.string.NotificationsServiceInfo), preferences.getBoolean("pushService", true), true, true);
                 } else if (i == notificationsServiceConnectionRow) {
                     checkCell.setTextAndValueAndCheck(LocaleController.getString("NotificationsServiceConnection", R.string.NotificationsServiceConnection), LocaleController.getString("NotificationsServiceConnectionInfo", R.string.NotificationsServiceConnectionInfo), preferences.getBoolean("pushConnection", true), true, true);
