@@ -20,6 +20,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -126,6 +128,12 @@ public class ApplicationLoader extends Application {
                     if (serviceMessageColor == 0) {
                         calcBackgroundColor();
                     }
+                    AndroidUtilities.runOnUIThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            NotificationCenter.getInstance().postNotificationName(NotificationCenter.didSetNewWallpapper);
+                        }
+                    });
                 }
             }
         });
@@ -344,7 +352,7 @@ public class ApplicationLoader extends Application {
         super.onConfigurationChanged(newConfig);
         try {
             LocaleController.getInstance().onDeviceConfigurationChange(newConfig);
-            AndroidUtilities.checkDisplaySize();
+            AndroidUtilities.checkDisplaySize(applicationContext, newConfig);
         } catch (Exception e) {
             e.printStackTrace();
         }
