@@ -270,7 +270,9 @@ public class ApplicationLoader extends Application {
         }
 
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Activity.MODE_PRIVATE);
-        boolean enablePushConnection = preferences.getBoolean("pushConnection", true);
+        // Telegram-FOSS: Unconditionally enable push connection
+        //boolean enablePushConnection = preferences.getBoolean("pushConnection", true);
+        boolean enablePushConnection = true;
 
         MessagesController.getInstance();
         ConnectionsManager.getInstance().init(BuildVars.BUILD_VERSION, TLRPC.LAYER, BuildVars.APP_ID, deviceModel, systemVersion, appVersion, langCode, configPath, FileLog.getNetworkLogPath(), UserConfig.getClientUserId(), enablePushConnection);
@@ -324,7 +326,9 @@ public class ApplicationLoader extends Application {
     public static void startPushService() {
         SharedPreferences preferences = applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
 
-        if (preferences.getBoolean("pushService", true)) {
+        // Telegram-FOSS: unconditionally enable push service
+        //if (preferences.getBoolean("pushService", true)) {
+        if (true) {
             AlarmManager am = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
             Intent i = new Intent(applicationContext, ApplicationLoader.class);
             pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, i, 0);
