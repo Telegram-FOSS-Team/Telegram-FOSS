@@ -754,15 +754,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                 }
                             }
                             String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-                            Pattern r = Pattern.compile("geo: ?(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)(,|\\?z=)(-?\\d+)");
-                            Matcher m = r.matcher(text);
-                            if(m.find()){
-                                sendingLocation = new TLRPC.TL_messageMediaGeo();
-                                sendingLocation.geo = new TLRPC.TL_geoPoint();
-                                sendingLocation.geo.lat = Double.parseDouble(m.group(1));
-                                sendingLocation.geo._long = Double.parseDouble(m.group(2));
-                            }
-                            else if (text != null && text.length() != 0) {
+                            if (text != null && text.length() != 0) {
                                 if ((text.startsWith("http://") || text.startsWith("https://")) && subject != null && subject.length() != 0) {
                                     text = subject + "\n" + text;
                                 }
