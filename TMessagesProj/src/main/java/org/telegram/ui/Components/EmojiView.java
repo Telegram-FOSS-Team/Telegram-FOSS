@@ -20,7 +20,6 @@ import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.graphics.Color;
 import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -59,8 +58,6 @@ import org.telegram.ui.Cells.EmptyCell;
 import org.telegram.ui.Cells.FeaturedStickerSetInfoCell;
 import org.telegram.ui.Cells.StickerEmojiCell;
 import org.telegram.ui.StickerPreviewViewer;
-
-import com.amulyakhare.textdrawable.TextDrawable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -265,14 +262,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                             } else {
                                 emojiColor.remove(code);
                             }
-                            //setImageDrawable(Emoji.getEmojiBigDrawable(code));
-                            int bigImgSize;
-                            if (AndroidUtilities.isTablet()) {
-                                bigImgSize = AndroidUtilities.dp(40);
-                            } else {
-                                bigImgSize = AndroidUtilities.dp(32);
-                            }
-                            setImageDrawable(TextDrawable.builder().beginConfig().textColor(Color.BLACK).fontSize(bigImgSize).endConfig().buildRect(code, Color.TRANSPARENT));
+                            setImageDrawable(Emoji.getEmojiBigDrawable(code));
                             sendEmoji(null);
                             saveEmojiColors();
                         } else {
@@ -503,16 +493,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                         }
                         code = addColorToCode(code, color);
                     }
-
-                    int bigImgSize;
-                    if (AndroidUtilities.isTablet()) {
-                        bigImgSize = AndroidUtilities.dp(40);
-                    } else {
-                        bigImgSize = AndroidUtilities.dp(32);
-                    }
-                    Drawable drawable = TextDrawable.builder().beginConfig().textColor(Color.BLACK).fontSize(bigImgSize).endConfig().buildRect(code, Color.TRANSPARENT);
-
-                    //Drawable drawable = Emoji.getEmojiBigDrawable(code);
+                    Drawable drawable = Emoji.getEmojiBigDrawable(code);
                     if (drawable != null) {
                         drawable.setBounds(x, y, x + emojiSize, y + emojiSize);
                         drawable.draw(canvas);
@@ -2089,20 +2070,8 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                     coloredCode = addColorToCode(coloredCode, color);
                 }
             }
-            /*
-             * Telegram-FOSS - Draw native Emojis using TextDrawable. See:
-             *  - https://github.com/Jamesits/Moegram/commit/8e52c6222cf00bc9a86d52fed4c06558f48c345c
-             *  - https://github.com/amulyakhare/TextDrawable
-             */
-            //imageView.setImageDrawable(Emoji.getEmojiBigDrawable(code));
+            imageView.setImageDrawable(Emoji.getEmojiBigDrawable(coloredCode));
             imageView.setTag(code);
-            int bigImgSize;
-            if (AndroidUtilities.isTablet()) {
-                bigImgSize = AndroidUtilities.dp(40);
-            } else {
-                bigImgSize = AndroidUtilities.dp(32);
-            }
-            imageView.setImageDrawable(TextDrawable.builder().beginConfig().textColor(Color.BLACK).fontSize(bigImgSize).endConfig().buildRect(coloredCode, Color.TRANSPARENT));
             return imageView;
         }
 

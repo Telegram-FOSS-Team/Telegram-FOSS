@@ -342,10 +342,6 @@ public class Emoji {
         } else {
             s = Spannable.Factory.getInstance().newSpannable(cs.toString());
         }
-
-        /* Telegram-FOSS - Disable emoji replacement, falling back to native emojis. */
-
-/*
         long buf = 0;
         int emojiCount = 0;
         char c;
@@ -466,7 +462,6 @@ public class Emoji {
             FileLog.e("tmessages", e);
             return cs;
         }
-*/
         return s;
     }
 

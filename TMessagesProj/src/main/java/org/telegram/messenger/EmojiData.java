@@ -333,8 +333,7 @@ public class EmojiData {
             dataCharsMap.put(dataChars[a], true);
         }
         for (int a = 0; a < emojiColored.length; a++) {
-            //Disable colored emoji.
-            //emojiColoredMap.put(emojiColored[a], true);
+            emojiColoredMap.put(emojiColored[a], true);
         }
         dataColored[1] = data[1];
         dataColored[3] = data[3];
