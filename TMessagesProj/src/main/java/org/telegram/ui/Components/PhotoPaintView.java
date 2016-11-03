@@ -11,7 +11,6 @@ import android.graphics.*;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Looper;
-import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -26,10 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimatorListenerAdapterProxy;
 import org.telegram.messenger.ApplicationLoader;
@@ -38,7 +33,6 @@ import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
-import org.telegram.messenger.Utilities;
 import org.telegram.messenger.query.StickersQuery;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
@@ -46,7 +40,6 @@ import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Components.Paint.PhotoFace;
 import org.telegram.ui.Components.Paint.Views.EditTextOutline;
 import org.telegram.ui.Components.Paint.Views.EntitiesContainerView;
 import org.telegram.ui.Components.Paint.Views.EntityView;
@@ -116,7 +109,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
     private Animator colorPickerAnimator;
 
     private DispatchQueue queue;
-    private ArrayList<PhotoFace> faces;
+    //private ArrayList<PhotoFace> faces;
 
     private final static int gallery_menu_done = 1;
     private final static int gallery_menu_undo = 2;
@@ -410,7 +403,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
     public void init() {
         renderView.setVisibility(View.VISIBLE);
-        detectFaces();
+        // Telegram-FOSS: Face recognition requires non-free libraries
+        //detectFaces();
     }
 
     public void shutdown() {
@@ -1339,6 +1333,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         popupWindow.startAnimation();
     }
 
+    // Telegram-FOSS: Face recognition requires non-free libraries
+    /*
     private int getFrameRotation() {
         switch (orientation) {
             case 90: {
@@ -1401,6 +1397,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             }
         });
     }
+    */
 
     private StickerPosition calculateStickerPosition(TLRPC.Document document) {
         TLRPC.TL_maskCoords maskCoords = null;
@@ -1414,6 +1411,9 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         }
 
         StickerPosition defaultPosition = new StickerPosition(centerPositionForEntity(), 0.75f, 0.0f);
+        // Telegram-FOSS: Face recognition requires non-free libraries
+        return defaultPosition;
+        /*
         if (maskCoords == null || faces == null || faces.size() == 0) {
             return defaultPosition;
         } else {
@@ -1443,8 +1443,11 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
             return new StickerPosition(new Point(x, y), scale, angle);
         }
+        */
     }
 
+    // Telegram-FOSS: Face recognition requires non-free libraries
+    /*
     private PhotoFace getRandomFaceWithVacantAnchor(int anchor, long documentId, TLRPC.TL_maskCoords maskCoords) {
         if (anchor < 0 || anchor > 3 || faces.isEmpty()) {
             return null;
@@ -1493,6 +1496,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
         return false;
     }
+    */
 
     private class StickerPosition {
         private Point position;
