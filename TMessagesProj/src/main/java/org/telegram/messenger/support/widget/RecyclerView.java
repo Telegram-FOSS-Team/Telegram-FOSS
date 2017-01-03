@@ -1766,6 +1766,9 @@ public class RecyclerView extends ViewGroup implements ScrollingView, NestedScro
                 MotionEvent cancelEvent = MotionEvent.obtain(now, now,
                         MotionEvent.ACTION_CANCEL, 0.0f, 0.0f, 0);
                 onTouchEvent(cancelEvent);
+				if (cancelEvent != null) {
+					cancelEvent.recycle();
+				}
                 mLayoutFrozen = true;
                 mIgnoreMotionEventTillDown = true;
                 stopScroll();
