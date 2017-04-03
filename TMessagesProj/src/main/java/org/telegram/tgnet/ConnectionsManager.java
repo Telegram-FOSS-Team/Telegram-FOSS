@@ -82,7 +82,7 @@ public class ConnectionsManager {
             wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "lock");
             wakeLock.setReferenceCounted(false);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -119,7 +119,7 @@ public class ConnectionsManager {
         Utilities.stageQueue.postRunnable(new Runnable() {
             @Override
             public void run() {
-                FileLog.d("tmessages", "send request " + object + " with token = " + requestToken);
+                FileLog.d("send request " + object + " with token = " + requestToken);
                 try {
                     NativeByteBuffer buffer = new NativeByteBuffer(object.getObjectSize());
                     object.serializeToStream(buffer);
@@ -141,7 +141,7 @@ public class ConnectionsManager {
                                     error.text = errorText;
                                     FileLog.e("tmessages", object + " got error " + error.code + " " + error.text);
                                 }
-                                FileLog.d("tmessages", "java received " + resp + " error = " + error);
+                                FileLog.d("java received " + resp + " error = " + error);
                                 final TLObject finalResponse = resp;
                                 final TLRPC.TL_error finalError = error;
                                 Utilities.stageQueue.postRunnable(new Runnable() {
@@ -154,12 +154,12 @@ public class ConnectionsManager {
                                     }
                                 });
                             } catch (Exception e) {
-                                FileLog.e("tmessages", e);
+                                FileLog.e(e);
                             }
                         }
                     }, onQuickAck, flags, datacenterId, connetionType, immediate, requestToken);
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });
@@ -249,7 +249,7 @@ public class ConnectionsManager {
             if (appPaused) {
                 return;
             }
-            FileLog.e("tmessages", "reset app pause time");
+            FileLog.e("reset app pause time");
             if (lastPauseTime != 0 && System.currentTimeMillis() - lastPauseTime > 5000) {
                 ContactsController.getInstance().checkContacts();
             }
@@ -264,12 +264,12 @@ public class ConnectionsManager {
             buff.reused = true;
             final TLObject message = TLClassStore.Instance().TLdeserialize(buff, buff.readInt32(true), true);
             if (message instanceof TLRPC.Updates) {
-                FileLog.d("tmessages", "java received " + message);
+                FileLog.d("java received " + message);
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
                         if (getInstance().wakeLock.isHeld()) {
-                            FileLog.d("tmessages", "release wakelock");
+                            FileLog.d("release wakelock");
                             getInstance().wakeLock.release();
                         }
                     }
@@ -282,7 +282,7 @@ public class ConnectionsManager {
                 });
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -340,7 +340,7 @@ public class ConnectionsManager {
                 });
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -351,10 +351,10 @@ public class ConnectionsManager {
                 try {
                     if (!getInstance().wakeLock.isHeld()) {
                         getInstance().wakeLock.acquire(10000);
-                        FileLog.d("tmessages", "acquire wakelock");
+                        FileLog.d("acquire wakelock");
                     }
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });
@@ -406,7 +406,7 @@ public class ConnectionsManager {
                 return true;
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return false;
     }
@@ -444,24 +444,24 @@ public class ConnectionsManager {
                     if (!networkInterface.isUp() || networkInterface.isLoopback() || networkInterface.getInterfaceAddresses().isEmpty()) {
                         continue;
                     }
-                    FileLog.e("tmessages", "valid interface: " + networkInterface);
+                    FileLog.e("valid interface: " + networkInterface);
                     List<InterfaceAddress> interfaceAddresses = networkInterface.getInterfaceAddresses();
                     for (int a = 0; a < interfaceAddresses.size(); a++) {
                         InterfaceAddress address = interfaceAddresses.get(a);
                         InetAddress inetAddress = address.getAddress();
                         if (BuildVars.DEBUG_VERSION) {
-                            FileLog.e("tmessages", "address: " + inetAddress.getHostAddress());
+                            FileLog.e("address: " + inetAddress.getHostAddress());
                         }
                         if (inetAddress.isLinkLocalAddress() || inetAddress.isLoopbackAddress() || inetAddress.isMulticastAddress()) {
                             continue;
                         }
                         if (BuildVars.DEBUG_VERSION) {
-                            FileLog.e("tmessages", "address is good");
+                            FileLog.e("address is good");
                         }
                     }
                 }
             } catch (Throwable e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
         }
         try {
@@ -495,7 +495,7 @@ public class ConnectionsManager {
                 return true;
             }
         } catch (Throwable e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
 
         return false;
@@ -520,7 +520,7 @@ public class ConnectionsManager {
                 }
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
             return true;
         }
         return false;
