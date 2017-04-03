@@ -9,9 +9,6 @@ configurations {
 }
 
 dependencies {
-    compile 'com.google.android.gms:play-services-gcm:10.2.0'
-    compile 'com.google.android.gms:play-services-maps:10.2.0'
-    compile 'com.google.android.gms:play-services-vision:10.2.0'
     compile 'com.android.support:support-core-ui:25.3.0'
     compile 'com.android.support:support-compat:25.3.0'
     compile 'com.android.support:support-core-utils:25.3.0'
@@ -169,5 +166,3 @@ android {
         }
     }
 }
-
-apply plugin: 'com.google.gms.google-services'
