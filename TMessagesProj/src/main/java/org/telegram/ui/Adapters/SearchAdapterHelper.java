@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2016.
+ * Copyright Nikolai Kudashov, 2013-2017.
  */
 
 package org.telegram.ui.Adapters;
@@ -11,8 +11,8 @@ package org.telegram.ui.Adapters;
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLitePreparedStatement;
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.FileLog;
+import org.telegram.messenger.MessagesStorage;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
@@ -25,23 +25,30 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BaseSearchAdapter extends BaseFragmentAdapter {
+public class SearchAdapterHelper {
 
-    protected static class HashtagObject {
+    public static class HashtagObject {
         String hashtag;
         int date;
     }
 
-    protected ArrayList<TLObject> globalSearch = new ArrayList<>();
+    public interface SearchAdapterHelperDelegate {
+        void onDataSetChanged();
+        void onSetHashtags(ArrayList<HashtagObject> arrayList, HashMap<String, HashtagObject> hashMap);
+    }
+
+    private SearchAdapterHelperDelegate delegate;
+
     private int reqId = 0;
     private int lastReqId;
-    protected String lastFoundUsername = null;
+    private String lastFoundUsername = null;
+    private ArrayList<TLObject> globalSearch = new ArrayList<>();
 
-    protected ArrayList<HashtagObject> hashtags;
-    protected HashMap<String, HashtagObject> hashtagsByText;
-    protected boolean hashtagsLoadedFromDb = false;
+    private ArrayList<HashtagObject> hashtags;
+    private HashMap<String, HashtagObject> hashtagsByText;
+    private boolean hashtagsLoadedFromDb = false;
 
-    public void queryServerSearch(final String query, final boolean allowChats, final boolean allowBots) {
+    public void queryServerSearch(final String query, final boolean allowChats, final boolean allowBots, final boolean allowSelf) {
         if (reqId != 0) {
             ConnectionsManager.getInstance().cancelRequest(reqId, true);
             reqId = 0;
@@ -49,7 +56,7 @@ public class BaseSearchAdapter extends BaseFragmentAdapter {
         if (query == null || query.length() < 5) {
             globalSearch.clear();
             lastReqId = 0;
-            notifyDataSetChanged();
+            delegate.onDataSetChanged();
             return;
         }
         TLRPC.TL_contacts_search req = new TLRPC.TL_contacts_search();
@@ -72,13 +79,14 @@ public class BaseSearchAdapter extends BaseFragmentAdapter {
                                     }
                                 }
                                 for (int a = 0; a < res.users.size(); a++) {
-                                    if (!allowBots && res.users.get(a).bot) {
+                                    TLRPC.User user = res.users.get(a);
+                                    if (!allowBots && user.bot || !allowSelf && user.self) {
                                         continue;
                                     }
                                     globalSearch.add(res.users.get(a));
                                 }
                                 lastFoundUsername = query;
-                                notifyDataSetChanged();
+                                delegate.onDataSetChanged();
                             }
                         }
                         reqId = 0;
@@ -88,7 +96,14 @@ public class BaseSearchAdapter extends BaseFragmentAdapter {
         }, ConnectionsManager.RequestFlagFailOnServerErrors);
     }
 
-    public void loadRecentHashtags() {
+    public void unloadRecentHashtags() {
+        hashtagsLoadedFromDb = false;
+    }
+
+    public boolean loadRecentHashtags() {
+        if (hashtagsLoadedFromDb) {
+            return true;
+        }
         MessagesStorage.getInstance().getStorageQueue().postRunnable(new Runnable() {
             @Override
             public void run() {
@@ -123,13 +138,18 @@ public class BaseSearchAdapter extends BaseFragmentAdapter {
                         }
                     });
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });
+        return false;
     }
 
-    public void addHashtagsFromMessage(String message) {
+    public void setDelegate(SearchAdapterHelperDelegate searchAdapterHelperDelegate) {
+        delegate = searchAdapterHelperDelegate;
+    }
+
+    public void addHashtagsFromMessage(CharSequence message) {
         if (message == null) {
             return;
         }
@@ -142,7 +162,7 @@ public class BaseSearchAdapter extends BaseFragmentAdapter {
             if (message.charAt(start) != '@' && message.charAt(start) != '#') {
                 start++;
             }
-            String hashtag = message.substring(start, end);
+            String hashtag = message.subSequence(start, end).toString();
             if (hashtagsByText == null) {
                 hashtagsByText = new HashMap<>();
                 hashtags = new ArrayList<>();
@@ -191,10 +211,22 @@ public class BaseSearchAdapter extends BaseFragmentAdapter {
                         MessagesStorage.getInstance().getDatabase().commitTransaction();
                     }
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });
+    }
+
+    public ArrayList<TLObject> getGlobalSearch() {
+        return globalSearch;
+    }
+
+    public ArrayList<HashtagObject> getHashtags() {
+        return hashtags;
+    }
+
+    public String getLastFoundUsername() {
+        return lastFoundUsername;
     }
 
     public void clearRecentHashtags() {
@@ -206,15 +238,16 @@ public class BaseSearchAdapter extends BaseFragmentAdapter {
                 try {
                     MessagesStorage.getInstance().getDatabase().executeFast("DELETE FROM hashtag_recent_v2 WHERE 1").stepThis().dispose();
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });
     }
 
-    protected void setHashtags(ArrayList<HashtagObject> arrayList, HashMap<String, HashtagObject> hashMap) {
+    public void setHashtags(ArrayList<HashtagObject> arrayList, HashMap<String, HashtagObject> hashMap) {
         hashtags = arrayList;
         hashtagsByText = hashMap;
         hashtagsLoadedFromDb = true;
+        delegate.onSetHashtags(arrayList, hashMap);
     }
 }
