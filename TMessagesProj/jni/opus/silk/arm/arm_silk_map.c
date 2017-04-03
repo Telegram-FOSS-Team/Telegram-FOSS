@@ -1,5 +1,5 @@
 /***********************************************************************
-Copyright (c) 2006-2011, Skype Limited. All rights reserved.
+Copyright (C) 2014 Vidyo
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
 are met:
@@ -24,58 +24,32 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ***********************************************************************/
-
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
-#include "SigProc_FLP.h"
+#include "NSQ.h"
 
-/* Solve the normal equations using the Levinson-Durbin recursion */
-silk_float silk_levinsondurbin_FLP(         /* O    prediction error energy                                     */
-    silk_float          A[],                /* O    prediction coefficients    [order]                          */
-    const silk_float    corr[],             /* I    input auto-correlations [order + 1]                         */
-    const opus_int      order               /* I    prediction order                                            */
-)
-{
-    opus_int   i, mHalf, m;
-    silk_float min_nrg, nrg, t, km, Atmp1, Atmp2;
+#if defined(OPUS_HAVE_RTCD)
 
-    min_nrg = 1e-12f * corr[ 0 ] + 1e-9f;
-    nrg = corr[ 0 ];
-    nrg = silk_max_float(min_nrg, nrg);
-    A[ 0 ] = corr[ 1 ] / nrg;
-    nrg -= A[ 0 ] * corr[ 1 ];
-    nrg = silk_max_float(min_nrg, nrg);
+# if (defined(OPUS_ARM_MAY_HAVE_NEON_INTR) && \
+ !defined(OPUS_ARM_PRESUME_NEON_INTR))
 
-    for( m = 1; m < order; m++ )
-    {
-        t = corr[ m + 1 ];
-        for( i = 0; i < m; i++ ) {
-            t -= A[ i ] * corr[ m - i ];
-        }
+/*There is no table for silk_noise_shape_quantizer_short_prediction because the
+   NEON version takes different parameters than the C version.
+  Instead RTCD is done via if statements at the call sites.
+  See NSQ_neon.h for details.*/
 
-        /* reflection coefficient */
-        km = t / nrg;
+opus_int32
+ (*const SILK_NSQ_NOISE_SHAPE_FEEDBACK_LOOP_IMPL[OPUS_ARCHMASK+1])(
+ const opus_int32 *data0, opus_int32 *data1, const opus_int16 *coef,
+ opus_int order) = {
+  silk_NSQ_noise_shape_feedback_loop_c,    /* ARMv4 */
+  silk_NSQ_noise_shape_feedback_loop_c,    /* EDSP */
+  silk_NSQ_noise_shape_feedback_loop_c,    /* Media */
+  silk_NSQ_noise_shape_feedback_loop_neon, /* NEON */
+};
 
-        /* residual energy */
-        nrg -= km * t;
-        nrg = silk_max_float(min_nrg, nrg);
+# endif
 
-        mHalf = m >> 1;
-        for( i = 0; i < mHalf; i++ ) {
-            Atmp1 = A[ i ];
-            Atmp2 = A[ m - i - 1 ];
-            A[ m - i - 1 ] -= km * Atmp1;
-            A[ i ]         -= km * Atmp2;
-        }
-        if( m & 1 ) {
-            A[ mHalf ]     -= km * A[ mHalf ];
-        }
-        A[ m ] = km;
-    }
-
-    /* return the residual energy */
-    return nrg;
-}
-
+#endif /* OPUS_HAVE_RTCD */
