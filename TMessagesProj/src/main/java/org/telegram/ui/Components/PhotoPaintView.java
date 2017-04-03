@@ -1,10 +1,10 @@
 package org.telegram.ui.Components;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.*;
@@ -26,19 +26,20 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.AnimatorListenerAdapterProxy;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.Bitmaps;
 import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
+import org.telegram.messenger.Utilities;
 import org.telegram.messenger.query.StickersQuery;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.Paint.Views.EditTextOutline;
 import org.telegram.ui.Components.Paint.Views.EntitiesContainerView;
@@ -109,7 +110,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
     private Animator colorPickerAnimator;
 
     private DispatchQueue queue;
-    //private ArrayList<PhotoFace> faces;
 
     private final static int gallery_menu_done = 1;
     private final static int gallery_menu_undo = 2;
@@ -259,7 +259,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         cancelTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
         cancelTextView.setTextColor(0xffffffff);
         cancelTextView.setGravity(Gravity.CENTER);
-        cancelTextView.setBackgroundDrawable(Theme.createBarSelectorDrawable(Theme.ACTION_BAR_PICKER_SELECTOR_COLOR, false));
+        cancelTextView.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_PICKER_SELECTOR_COLOR, 0));
         cancelTextView.setPadding(AndroidUtilities.dp(20), 0, AndroidUtilities.dp(20), 0);
         cancelTextView.setText(LocaleController.getString("Cancel", R.string.Cancel).toUpperCase());
         cancelTextView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
@@ -269,7 +269,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         doneTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
         doneTextView.setTextColor(0xff51bdf3);
         doneTextView.setGravity(Gravity.CENTER);
-        doneTextView.setBackgroundDrawable(Theme.createBarSelectorDrawable(Theme.ACTION_BAR_PICKER_SELECTOR_COLOR, false));
+        doneTextView.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_PICKER_SELECTOR_COLOR, 0));
         doneTextView.setPadding(AndroidUtilities.dp(20), 0, AndroidUtilities.dp(20), 0);
         doneTextView.setText(LocaleController.getString("Done", R.string.Done).toUpperCase());
         doneTextView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
@@ -278,7 +278,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         ImageView stickerButton = new ImageView(context);
         stickerButton.setScaleType(ImageView.ScaleType.CENTER);
         stickerButton.setImageResource(R.drawable.photo_sticker);
-        stickerButton.setBackgroundDrawable(Theme.createBarSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
+        stickerButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
         toolsView.addView(stickerButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 0, 0, 56, 0));
         stickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -290,7 +290,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         paintButton = new ImageView(context);
         paintButton.setScaleType(ImageView.ScaleType.CENTER);
         paintButton.setImageResource(R.drawable.photo_paint);
-        paintButton.setBackgroundDrawable(Theme.createBarSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
+        paintButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
         toolsView.addView(paintButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER));
         paintButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -302,7 +302,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         ImageView textButton = new ImageView(context);
         textButton.setScaleType(ImageView.ScaleType.CENTER);
         textButton.setImageResource(R.drawable.photo_paint_text);
-        textButton.setBackgroundDrawable(Theme.createBarSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
+        textButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR));
         toolsView.addView(textButton, LayoutHelper.createFrame(54, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 56, 0, 0, 0));
         textButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -314,7 +314,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         actionBar = new ActionBar(context);
         actionBar.setBackgroundColor(Theme.ACTION_BAR_PHOTO_VIEWER_COLOR);
         actionBar.setOccupyStatusBar(Build.VERSION.SDK_INT >= 21);
-        actionBar.setItemsBackgroundColor(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR);
+        actionBar.setTitleColor(0xffffffff);
+        actionBar.setItemsBackgroundColor(Theme.ACTION_BAR_WHITE_SELECTOR_COLOR, false);
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setTitle(LocaleController.getString("PaintDraw", R.string.PaintDraw));
         addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
@@ -403,8 +404,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
     public void init() {
         renderView.setVisibility(View.VISIBLE);
-        // Telegram-FOSS: Face recognition requires non-free libraries
-        //detectFaces();
     }
 
     public void shutdown() {
@@ -476,7 +475,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                         try {
                             c.setBitmap(null);
                         } catch (Exception e) {
-                            FileLog.e("tmessages", e);
+                            FileLog.e(e);
                         }
                         b.recycle();
                     } else {
@@ -542,7 +541,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             colorPickerAnimator = ObjectAnimator.ofFloat(colorPicker, "alpha", colorPicker.getAlpha(), 1.0f);
             colorPickerAnimator.setStartDelay(200);
             colorPickerAnimator.setDuration(200);
-            colorPickerAnimator.addListener(new AnimatorListenerAdapterProxy() {
+            colorPickerAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     if (colorPickerAnimator != null) {
@@ -568,7 +567,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         } else {
             animator = ObjectAnimator.ofFloat(dimView, "alpha", 1.0f, 0.0f);
         }
-        animator.addListener(new AnimatorListenerAdapterProxy() {
+        animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (!visible) {
@@ -599,7 +598,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         } else {
             animator = ObjectAnimator.ofFloat(textDimView, "alpha", 1.0f, 0.0f);
         }
-        animator.addListener(new AnimatorListenerAdapterProxy() {
+        animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (!visible) {
@@ -909,7 +908,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
         Animator a = ObjectAnimator.ofFloat(stickersView, "alpha", 1.0f, 0.0f);
         a.setDuration(200);
-        a.addListener(new AnimatorListenerAdapterProxy() {
+        a.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animator) {
                 stickersView.setVisibility(GONE);
@@ -1075,8 +1074,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                 parent.setOrientation(LinearLayout.HORIZONTAL);
 
                 TextView deleteView = new TextView(getContext());
-                deleteView.setTextColor(0xff212121);
-                deleteView.setBackgroundResource(R.drawable.list_selector);
+                deleteView.setTextColor(Theme.getColor(Theme.key_actionBarDefaultSubmenuItem));
+                deleteView.setBackgroundDrawable(Theme.getSelectorDrawable(false));
                 deleteView.setGravity(Gravity.CENTER_VERTICAL);
                 deleteView.setPadding(AndroidUtilities.dp(16), 0, AndroidUtilities.dp(14), 0);
                 deleteView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
@@ -1096,8 +1095,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
                 if (entityView instanceof TextPaintView) {
                     TextView editView = new TextView(getContext());
-                    editView.setTextColor(0xff212121);
-                    editView.setBackgroundResource(R.drawable.list_selector);
+                    editView.setTextColor(Theme.getColor(Theme.key_actionBarDefaultSubmenuItem));
+                    editView.setBackgroundDrawable(Theme.getSelectorDrawable(false));
                     editView.setGravity(Gravity.CENTER_VERTICAL);
                     editView.setPadding(AndroidUtilities.dp(16), 0, AndroidUtilities.dp(16), 0);
                     editView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
@@ -1117,8 +1116,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                 }
 
                 TextView duplicateView = new TextView(getContext());
-                duplicateView.setTextColor(0xff212121);
-                duplicateView.setBackgroundResource(R.drawable.list_selector);
+                duplicateView.setTextColor(Theme.getColor(Theme.key_actionBarDefaultSubmenuItem));
+                duplicateView.setBackgroundDrawable(Theme.getSelectorDrawable(false));
                 duplicateView.setGravity(Gravity.CENTER_VERTICAL);
                 duplicateView.setPadding(AndroidUtilities.dp(14), 0, AndroidUtilities.dp(16), 0);
                 duplicateView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
@@ -1148,7 +1147,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
     private FrameLayout buttonForBrush(final int brush, int resource, boolean selected) {
         FrameLayout button = new FrameLayout(getContext());
-        button.setBackgroundResource(R.drawable.list_selector);
+        button.setBackgroundDrawable(Theme.getSelectorDrawable(false));
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1166,7 +1165,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
         if (selected) {
             ImageView check = new ImageView(getContext());
-            check.setImageResource(R.drawable.ic_ab_done_gray);
+            check.setImageResource(R.drawable.ic_ab_done);//TODO color
             check.setScaleType(ImageView.ScaleType.CENTER);
             button.addView(check, LayoutHelper.createFrame(50, LayoutHelper.MATCH_PARENT));
         }
@@ -1212,7 +1211,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                 return true;
             }
         };
-        button.setBackgroundResource(R.drawable.list_selector);
+        button.setBackgroundDrawable(Theme.getSelectorDrawable(false));
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1239,7 +1238,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
         if (selected) {
             ImageView check = new ImageView(getContext());
-            check.setImageResource(R.drawable.ic_ab_done_gray);
+            check.setImageResource(R.drawable.ic_ab_done); //TODO color
             check.setScaleType(ImageView.ScaleType.CENTER);
             button.addView(check, LayoutHelper.createFrame(50, LayoutHelper.MATCH_PARENT));
         }
@@ -1333,72 +1332,6 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         popupWindow.startAnimation();
     }
 
-    // Telegram-FOSS: Face recognition requires non-free libraries
-    /*
-    private int getFrameRotation() {
-        switch (orientation) {
-            case 90: {
-                return Frame.ROTATION_90;
-            }
-
-            case 180: {
-                return Frame.ROTATION_180;
-            }
-
-            case 270: {
-                return Frame.ROTATION_270;
-            }
-
-            default: {
-                return Frame.ROTATION_0;
-            }
-        }
-    }
-
-    private void detectFaces() {
-        queue.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    FaceDetector faceDetector = new FaceDetector.Builder(getContext())
-                            .setMode(FaceDetector.ACCURATE_MODE)
-                            .setLandmarkType(FaceDetector.ALL_LANDMARKS)
-                            .setTrackingEnabled(false).build();
-                    if (!faceDetector.isOperational()) {
-                        FileLog.e("tmessages", "face detection is not operational");
-                        return;
-                    }
-
-                    Frame frame = new Frame.Builder().setBitmap(bitmapToEdit).setRotation(getFrameRotation()).build();
-                    SparseArray<Face> faces;
-                    try {
-                        faces = faceDetector.detect(frame);
-                    } catch (Throwable e) {
-                        FileLog.e("tmessages", e);
-                        return;
-                    }
-                    ArrayList<PhotoFace> result = new ArrayList<>();
-                    Size targetSize = getPaintingSize();
-                    for (int i = 0; i < faces.size(); i++) {
-                        int key = faces.keyAt(i);
-                        Face f = faces.get(key);
-                        PhotoFace face = new PhotoFace(f, bitmapToEdit, targetSize, isSidewardOrientation());
-                        if (face.isSufficient()) {
-                            result.add(face);
-                        }
-                    }
-
-                    PhotoPaintView.this.faces = result;
-
-                    faceDetector.release();
-                } catch (Exception e) {
-                    FileLog.e("tmessages", e);
-                }
-            }
-        });
-    }
-    */
-
     private StickerPosition calculateStickerPosition(TLRPC.Document document) {
         TLRPC.TL_maskCoords maskCoords = null;
 
@@ -1411,92 +1344,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         }
 
         StickerPosition defaultPosition = new StickerPosition(centerPositionForEntity(), 0.75f, 0.0f);
-        // Telegram-FOSS: Face recognition requires non-free libraries
         return defaultPosition;
-        /*
-        if (maskCoords == null || faces == null || faces.size() == 0) {
-            return defaultPosition;
-        } else {
-            int anchor = maskCoords.n;
-
-            PhotoFace face = getRandomFaceWithVacantAnchor(anchor, document.id, maskCoords);
-            if (face == null) {
-                return defaultPosition;
-            }
-
-            Point referencePoint = face.getPointForAnchor(anchor);
-            float referenceWidth = face.getWidthForAnchor(anchor);
-            float angle = face.getAngle();
-            Size baseSize = baseStickerSize();
-
-            float scale = (float) (referenceWidth / baseSize.width * maskCoords.zoom);
-
-            float radAngle = (float) Math.toRadians(angle);
-            float xCompX = (float) (Math.sin(Math.PI / 2.0f - radAngle) * referenceWidth * maskCoords.x);
-            float xCompY = (float) (Math.cos(Math.PI / 2.0f - radAngle) * referenceWidth * maskCoords.x);
-
-            float yCompX = (float) (Math.cos(Math.PI / 2.0f + radAngle) * referenceWidth * maskCoords.y);
-            float yCompY = (float) (Math.sin(Math.PI / 2.0f + radAngle) * referenceWidth * maskCoords.y);
-
-            float x = referencePoint.x + xCompX + yCompX;
-            float y = referencePoint.y + xCompY + yCompY;
-
-            return new StickerPosition(new Point(x, y), scale, angle);
-        }
-        */
     }
-
-    // Telegram-FOSS: Face recognition requires non-free libraries
-    /*
-    private PhotoFace getRandomFaceWithVacantAnchor(int anchor, long documentId, TLRPC.TL_maskCoords maskCoords) {
-        if (anchor < 0 || anchor > 3 || faces.isEmpty()) {
-            return null;
-        }
-
-        int count = faces.size();
-        int randomIndex = Utilities.random.nextInt(count);
-        int remaining = count;
-
-        PhotoFace selectedFace = null;
-        for (int i = randomIndex; remaining > 0; i = (i + 1) % count, remaining--) {
-            PhotoFace face = faces.get(i);
-            if (!isFaceAnchorOccupied(face, anchor, documentId, maskCoords)) {
-                return face;
-            }
-        }
-
-        return selectedFace;
-    }
-
-    private boolean isFaceAnchorOccupied(PhotoFace face, int anchor, long documentId, TLRPC.TL_maskCoords maskCoords) {
-        Point anchorPoint = face.getPointForAnchor(anchor);
-        if (anchorPoint == null) {
-            return true;
-        }
-
-        float minDistance = face.getWidthForAnchor(0) * 1.1f;
-
-        for (int index = 0; index < entitiesView.getChildCount(); index++) {
-            View view = entitiesView.getChildAt(index);
-            if (!(view instanceof StickerView)) {
-                continue;
-            }
-
-            StickerView stickerView = (StickerView) view;
-            if (stickerView.getAnchor() != anchor) {
-                continue;
-            }
-
-            Point location = stickerView.getPosition();
-            float distance = (float)Math.hypot(location.x - anchorPoint.x, location.y - anchorPoint.y);
-            if ((documentId == stickerView.getSticker().id || faces.size() > 1) && distance < minDistance) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    */
 
     private class StickerPosition {
         private Point position;
