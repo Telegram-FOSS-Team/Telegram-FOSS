@@ -7,7 +7,7 @@
  */
 
 package org.telegram.ui;
-
+/*
 import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -1100,3 +1100,4 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         };
     }
 }
+*/

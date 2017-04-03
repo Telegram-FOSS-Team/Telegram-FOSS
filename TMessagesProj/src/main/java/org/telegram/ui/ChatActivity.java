@@ -3639,7 +3639,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 FileLog.e(e);
             }
         } else if (which == attach_location) {
-            if (!AndroidUtilities.isGoogleMapsInstalled(ChatActivity.this)) {
+            /*if (!AndroidUtilities.isGoogleMapsInstalled(ChatActivity.this)) {
                 return;
             }
             LocationActivity fragment = new LocationActivity();
@@ -3655,7 +3655,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                 }
             });
-            presentFragment(fragment);
+            presentFragment(fragment);*/
+            Toast.makeText(getParentActivity(), "Telegram-FOSS: Disabled for now.\nYou can share locations from OSMAnd.", Toast.LENGTH_LONG).show();
         } else if (which == attach_document) {
             if (Build.VERSION.SDK_INT >= 23 && getParentActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 getParentActivity().requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 4);
@@ -9340,12 +9341,29 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 alertUserOpenError(message);
                             }
                         } else if (message.type == 4) {
+                            /*
                             if (!AndroidUtilities.isGoogleMapsInstalled(ChatActivity.this)) {
                                 return;
                             }
                             LocationActivity fragment = new LocationActivity();
                             fragment.setMessageObject(message);
-                            presentFragment(fragment);
+                            presentFragment(fragment);*/
+
+                            /* Telegram-FOSS: Try to fire off a geo: intent */
+                            double lat = message.messageOwner.media.geo.lat;
+                            double lon = message.messageOwner.media.geo._long;
+                            //TODO: get actual message Sender, localization
+                            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                                    Uri.parse("geo:" + lat + "," + lon + "?z=15&q=" + lat + "," + lon + Uri.encode("(Shared by Telegram")));
+                            if(intent.resolveActivity(getParentActivity().getPackageManager()) != null) {
+                                try{
+                                    getParentActivity().startActivity(intent);
+                                }
+                                catch (Exception e){
+                                    Toast.makeText(getParentActivity(), "Error handling geo: intent", Toast.LENGTH_SHORT).show();
+                                    FileLog.e(e);
+                                }
+                            }
                         } else if (message.type == 9 || message.type == 0) {
                             if (message.getDocumentName().endsWith("attheme")) {
                                 File locFile = null;

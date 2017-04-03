@@ -86,12 +86,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LaunchActivity extends Activity implements ActionBarLayout.ActionBarLayoutDelegate, NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate {
 
     private boolean finished;
     private String videoPath;
     private String sendingText;
+    private TLRPC.TL_messageMediaGeo sendingLocation;
     private ArrayList<Uri> photoPathsArray;
     private ArrayList<String> documentsPathsArray;
     private ArrayList<Uri> documentsUrisArray;
@@ -768,12 +771,32 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                 }
                             }
                             String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-
+                            /*
                             if (text != null && text.length() != 0) {
                                 if ((text.startsWith("http://") || text.startsWith("https://")) && subject != null && subject.length() != 0) {
                                     text = subject + "\n" + text;
                                 }
                                 sendingText = text;
+                            } else if (subject != null && subject.length() > 0) {
+                                sendingText = subject;
+                            }
+                             */
+                            if (text != null && text.length() != 0) {
+                                if (text.startsWith("geo:")) {
+                                    Pattern r = Pattern.compile("geo: ?(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)(,|\\?z=)(-?\\d+)");
+                                    Matcher m = r.matcher(text);
+                                    if(m.find()){
+                                        sendingLocation = new TLRPC.TL_messageMediaGeo();
+                                        sendingLocation.geo = new TLRPC.TL_geoPoint();
+                                        sendingLocation.geo.lat = Double.parseDouble(m.group(1));
+                                        sendingLocation.geo._long = Double.parseDouble(m.group(2));
+                                    }
+                                } else {
+                                    if ((text.startsWith("http://") || text.startsWith("https://")) && subject != null && subject.length() != 0) {
+                                        text = subject + "\n" + text;
+                                    }
+                                    sendingText = text;
+                                }
                             } else if (subject != null && subject.length() > 0) {
                                 sendingText = subject;
                             }
@@ -821,7 +844,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                         }
                                     }
                                 }
-                            } else if (sendingText == null) {
+                            } else if (sendingText == null && sendingLocation == null) {
                                 error = true;
                             }
                         }
@@ -1154,7 +1177,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                 }
                 actionBarLayout.presentFragment(new AudioPlayerActivity(), false, true, true);
                 pushOpened = true;
-            } else if (videoPath != null || photoPathsArray != null || sendingText != null || documentsPathsArray != null || contactsToSend != null || documentsUrisArray != null) {
+            } else if (videoPath != null || photoPathsArray != null || sendingText != null || sendingLocation != null ||  documentsPathsArray != null || contactsToSend != null || documentsUrisArray != null) {
                 if (!AndroidUtilities.isTablet()) {
                     NotificationCenter.getInstance().postNotificationName(NotificationCenter.closeChats);
                 }
@@ -1715,6 +1738,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             photoPathsArray = null;
             videoPath = null;
             sendingText = null;
+            sendingLocation = null;
             documentsPathsArray = null;
             documentsOriginalPathsArray = null;
             contactsToSend = null;
@@ -2058,6 +2082,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             builder.setNegativeButton(LocaleController.getString("ShareYouLocationUnableManually", R.string.ShareYouLocationUnableManually), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
+                    /*
                     if (mainFragmentsStack.isEmpty()) {
                         return;
                     }
@@ -2075,7 +2100,9 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                             }
                         }
                     });
-                    presentFragment(fragment);
+                    presentFragment(fragment);*/
+
+                    Toast.makeText(getApplicationContext(),"Telegram-FOSS: Disabled for now.", Toast.LENGTH_LONG).show();
                 }
             });
             builder.setMessage(LocaleController.getString("ShareYouLocationUnable", R.string.ShareYouLocationUnable));
