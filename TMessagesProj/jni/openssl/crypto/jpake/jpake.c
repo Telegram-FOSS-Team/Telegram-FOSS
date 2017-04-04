@@ -4,6 +4,7 @@
 #include <openssl/sha.h>
 #include <openssl/err.h>
 #include <memory.h>
+#include <string.h>
 
 /*
  * In the definition, (xa, xb, xc, xd) are Alice's (x1, x2, x3, x4) or
@@ -115,6 +116,8 @@ JPAKE_CTX *JPAKE_CTX_new(const char *name, const char *peer_name,
                          const BIGNUM *secret)
 {
     JPAKE_CTX *ctx = OPENSSL_malloc(sizeof *ctx);
+    if (ctx == NULL)
+        return NULL;
 
     JPAKE_CTX_init(ctx, name, peer_name, p, g, q, secret);
 
@@ -150,6 +153,8 @@ static void hashbn(SHA_CTX *sha, const BIGNUM *bn)
     size_t l = BN_num_bytes(bn);
     unsigned char *bin = OPENSSL_malloc(l);
 
+    if (bin == NULL)
+        return;
     hashlength(sha, l);
     BN_bn2bin(bn, bin);
     SHA1_Update(sha, bin, l);

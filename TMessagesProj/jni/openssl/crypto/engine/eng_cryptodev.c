@@ -26,6 +26,7 @@
  *
  */
 
+#include <string.h>
 #include <openssl/objects.h>
 #include <openssl/engine.h>
 #include <openssl/evp.h>
@@ -54,10 +55,10 @@ void ENGINE_load_cryptodev(void)
 
 # include <sys/types.h>
 # include <crypto/cryptodev.h>
-# include <crypto/dh/dh.h>
-# include <crypto/dsa/dsa.h>
-# include <crypto/err/err.h>
-# include <crypto/rsa/rsa.h>
+# include <openssl/dh.h>
+# include <openssl/dsa.h>
+# include <openssl/err.h>
+# include <openssl/rsa.h>
 # include <sys/ioctl.h>
 # include <errno.h>
 # include <stdio.h>
@@ -160,6 +161,17 @@ static struct {
     {
         CRYPTO_AES_CBC, NID_aes_256_cbc, 16, 32,
     },
+# ifdef CRYPTO_AES_CTR
+    {
+        CRYPTO_AES_CTR, NID_aes_128_ctr, 14, 16,
+    },
+    {
+        CRYPTO_AES_CTR, NID_aes_192_ctr, 14, 24,
+    },
+    {
+        CRYPTO_AES_CTR, NID_aes_256_ctr, 14, 32,
+    },
+# endif
     {
         CRYPTO_BLF_CBC, NID_bf_cbc, 8, 16,
     },
@@ -630,6 +642,46 @@ const EVP_CIPHER cryptodev_aes_256_cbc = {
     NULL
 };
 
+# ifdef CRYPTO_AES_CTR
+const EVP_CIPHER cryptodev_aes_ctr = {
+    NID_aes_128_ctr,
+    16, 16, 14,
+    EVP_CIPH_CTR_MODE,
+    cryptodev_init_key,
+    cryptodev_cipher,
+    cryptodev_cleanup,
+    sizeof(struct dev_crypto_state),
+    EVP_CIPHER_set_asn1_iv,
+    EVP_CIPHER_get_asn1_iv,
+    NULL
+};
+
+const EVP_CIPHER cryptodev_aes_ctr_192 = {
+    NID_aes_192_ctr,
+    16, 24, 14,
+    EVP_CIPH_CTR_MODE,
+    cryptodev_init_key,
+    cryptodev_cipher,
+    cryptodev_cleanup,
+    sizeof(struct dev_crypto_state),
+    EVP_CIPHER_set_asn1_iv,
+    EVP_CIPHER_get_asn1_iv,
+    NULL
+};
+
+const EVP_CIPHER cryptodev_aes_ctr_256 = {
+    NID_aes_256_ctr,
+    16, 32, 14,
+    EVP_CIPH_CTR_MODE,
+    cryptodev_init_key,
+    cryptodev_cipher,
+    cryptodev_cleanup,
+    sizeof(struct dev_crypto_state),
+    EVP_CIPHER_set_asn1_iv,
+    EVP_CIPHER_get_asn1_iv,
+    NULL
+};
+# endif
 /*
  * Registered by the ENGINE when used to find out how to deal with
  * a particular NID in the ENGINE. this says what we'll do at the
@@ -667,6 +719,17 @@ cryptodev_engine_ciphers(ENGINE *e, const EVP_CIPHER **cipher,
     case NID_aes_256_cbc:
         *cipher = &cryptodev_aes_256_cbc;
         break;
+# ifdef CRYPTO_AES_CTR
+    case NID_aes_128_ctr:
+        *cipher = &cryptodev_aes_ctr;
+        break;
+    case NID_aes_192_ctr:
+        *cipher = &cryptodev_aes_ctr_192;
+        break;
+    case NID_aes_256_ctr:
+        *cipher = &cryptodev_aes_ctr_256;
+        break;
+# endif
     default:
         *cipher = NULL;
         break;
@@ -872,11 +935,15 @@ static int cryptodev_digest_copy(EVP_MD_CTX *to, const EVP_MD_CTX *from)
         return (0);
     }
 
+    dstate->mac_len = fstate->mac_len;
     if (fstate->mac_len != 0) {
         if (fstate->mac_data != NULL) {
             dstate->mac_data = OPENSSL_malloc(fstate->mac_len);
+            if (dstate->mac_data == NULL) {
+                printf("cryptodev_digest_init: malloc failed\n");
+                return 0;
+            }
             memcpy(dstate->mac_data, fstate->mac_data, fstate->mac_len);
-            dstate->mac_len = fstate->mac_len;
         }
     }
 
@@ -1002,8 +1069,7 @@ static void zapparams(struct crypt_kop *kop)
     int i;
 
     for (i = 0; i < kop->crk_iparams + kop->crk_oparams; i++) {
-        if (kop->crk_param[i].crp_p)
-            free(kop->crk_param[i].crp_p);
+        OPENSSL_free(kop->crk_param[i].crp_p);
         kop->crk_param[i].crp_p = NULL;
         kop->crk_param[i].crp_nbits = 0;
     }
@@ -1016,16 +1082,25 @@ cryptodev_asym(struct crypt_kop *kop, int rlen, BIGNUM *r, int slen,
     int fd, ret = -1;
 
     if ((fd = get_asym_dev_crypto()) < 0)
-        return (ret);
+        return ret;
 
     if (r) {
-        kop->crk_param[kop->crk_iparams].crp_p = calloc(rlen, sizeof(char));
+        kop->crk_param[kop->crk_iparams].crp_p = OPENSSL_malloc(rlen);
+        if (kop->crk_param[kop->crk_iparams].crp_p == NULL)
+            return ret;
+        memset(kop->crk_param[kop->crk_iparams].crp_p, 0, (size_t)rlen);
         kop->crk_param[kop->crk_iparams].crp_nbits = rlen * 8;
         kop->crk_oparams++;
     }
     if (s) {
-        kop->crk_param[kop->crk_iparams + 1].crp_p =
-            calloc(slen, sizeof(char));
+        kop->crk_param[kop->crk_iparams + 1].crp_p = OPENSSL_malloc(slen);
+        /* No need to free the kop->crk_iparams parameter if it was allocated,
+         * callers of this routine have to free allocated parameters through
+         * zapparams both in case of success and failure
+         */
+        if (kop->crk_param[kop->crk_iparams+1].crp_p == NULL)
+            return ret;
+        memset(kop->crk_param[kop->crk_iparams + 1].crp_p, 0, (size_t)slen);
         kop->crk_param[kop->crk_iparams + 1].crp_nbits = slen * 8;
         kop->crk_oparams++;
     }
@@ -1038,7 +1113,7 @@ cryptodev_asym(struct crypt_kop *kop, int rlen, BIGNUM *r, int slen,
         ret = 0;
     }
 
-    return (ret);
+    return ret;
 }
 
 static int

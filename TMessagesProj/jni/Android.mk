@@ -473,6 +473,20 @@ local_src_files := \
 	$(CRYPTO_PATH)/cmac/cm_ameth.c \
 	$(CRYPTO_PATH)/cmac/cm_pmeth.c \
 	$(CRYPTO_PATH)/cmac/cmac.c \
+    ${CRYPTO_PATH}/cms/cms_asn1.c \
+    ${CRYPTO_PATH}/cms/cms_att.c \
+    ${CRYPTO_PATH}/cms/cms_cd.c \
+    ${CRYPTO_PATH}/cms/cms_dd.c \
+    ${CRYPTO_PATH}/cms/cms_enc.c \
+    ${CRYPTO_PATH}/cms/cms_env.c \
+    ${CRYPTO_PATH}/cms/cms_err.c \
+    ${CRYPTO_PATH}/cms/cms_ess.c \
+    ${CRYPTO_PATH}/cms/cms_io.c \
+    ${CRYPTO_PATH}/cms/cms_kari.c \
+    ${CRYPTO_PATH}/cms/cms_lib.c \
+    ${CRYPTO_PATH}/cms/cms_pwri.c \
+    ${CRYPTO_PATH}/cms/cms_sd.c \
+    ${CRYPTO_PATH}/cms/cms_smime.c \
 	$(CRYPTO_PATH)/comp/c_rle.c \
 	$(CRYPTO_PATH)/comp/c_zlib.c \
 	$(CRYPTO_PATH)/comp/comp_err.c \
@@ -519,6 +533,8 @@ local_src_files := \
 	$(CRYPTO_PATH)/dh/dh_key.c \
 	$(CRYPTO_PATH)/dh/dh_lib.c \
 	$(CRYPTO_PATH)/dh/dh_pmeth.c \
+	$(CRYPTO_PATH)/dh/dh_rfc5114.c \
+	$(CRYPTO_PATH)/dh/dh_kdf.c \
 	$(CRYPTO_PATH)/dsa/dsa_ameth.c \
 	$(CRYPTO_PATH)/dsa/dsa_asn1.c \
 	$(CRYPTO_PATH)/dsa/dsa_depr.c \
@@ -567,6 +583,7 @@ local_src_files := \
 	$(CRYPTO_PATH)/ecdh/ech_key.c \
 	$(CRYPTO_PATH)/ecdh/ech_lib.c \
 	$(CRYPTO_PATH)/ecdh/ech_ossl.c \
+	$(CRYPTO_PATH)/ecdh/ech_kdf.c \
 	$(CRYPTO_PATH)/ecdsa/ecs_asn1.c \
 	$(CRYPTO_PATH)/ecdsa/ecs_err.c \
 	$(CRYPTO_PATH)/ecdsa/ecs_lib.c \
@@ -637,9 +654,13 @@ local_src_files := \
 	$(CRYPTO_PATH)/md5/md5_dgst.c \
 	$(CRYPTO_PATH)/md5/md5_one.c \
 	$(CRYPTO_PATH)/modes/cbc128.c \
+	$(CRYPTO_PATH)/modes/ccm128.c \
 	$(CRYPTO_PATH)/modes/cfb128.c \
 	$(CRYPTO_PATH)/modes/ctr128.c \
+	$(CRYPTO_PATH)/modes/gcm128.c \
 	$(CRYPTO_PATH)/modes/ofb128.c \
+	$(CRYPTO_PATH)/modes/wrap128.c \
+	$(CRYPTO_PATH)/modes/xts128.c \
 	$(CRYPTO_PATH)/objects/o_names.c \
 	$(CRYPTO_PATH)/objects/obj_dat.c \
 	$(CRYPTO_PATH)/objects/obj_err.c \
@@ -793,7 +814,8 @@ local_src_files := \
 	$(CRYPTO_PATH)/x509v3/v3_skey.c \
 	$(CRYPTO_PATH)/x509v3/v3_sxnet.c \
 	$(CRYPTO_PATH)/x509v3/v3_utl.c \
-	$(CRYPTO_PATH)/x509v3/v3err.c
+	$(CRYPTO_PATH)/x509v3/v3err.c \
+    $(CRYPTO_PATH)/x509v3/v3_scts.c
 
 local_c_includes := \
 	$(LOCAL_PATH)/openssl \
