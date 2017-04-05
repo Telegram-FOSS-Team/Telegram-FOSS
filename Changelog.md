@@ -5,29 +5,11 @@
 - **Telegram FOSS:**
   - Update to openssl 1.0.2k
 
-#### v3.17.1 (not released as FOSS version)
-
-- Use custom themes to change the appearance of the app.
-- Check out the new dark theme in Settings > Themes. See the @themes channel for more ideas.
-- Create your own themes using the new built-in editor.
-
 #### v3.17.0 (not released as FOSS version)
 
 - Use custom themes to change the appearance of the app.
 - Check out the new dark theme in Settings > Themes. See the @themes channel for more ideas.
 - Create your own themes using the new built-in editor.
-
-#### v3.16.1 (not released as FOSS version)
-
-- Delete recently sent messages for everyone.
-- Network Usage in 'Data and Storage' Settings.
-- App remembers scroll position when switching to another chat and back.
-- Messages from one sender are grouped together.
-- Added a floating date to the top of the screen when scrolling.
-- Recently downloaded files are shown when sharing a file.
-- Report spam from Secret chats.
-- Send GIFs directly from Gboard.
-- Android 7.1: Added fast action menu to home screen.
 
 #### v3.16.0 (not released as FOSS version)
 
