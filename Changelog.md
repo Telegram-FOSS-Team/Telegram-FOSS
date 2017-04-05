@@ -1,7 +1,71 @@
-### v3,18 (in Progress)
+### v3.18.0 (Work In Progress)
 
+- Telegram Calls are here: secure, crystal-clear, constantly improved by artificial intelligence. We are rolling them out in Europe today, the rest of the world will get calls within a few days.
+- Choose between 5 grades of video compression and preview the quality of your video before you send it.
 - **Telegram FOSS:**
   - Update to openssl 1.0.2k
+
+#### v3.17.1 (not released as FOSS version)
+
+- Use custom themes to change the appearance of the app.
+- Check out the new dark theme in Settings > Themes. See the @themes channel for more ideas.
+- Create your own themes using the new built-in editor.
+
+#### v3.17.0 (not released as FOSS version)
+
+- Use custom themes to change the appearance of the app.
+- Check out the new dark theme in Settings > Themes. See the @themes channel for more ideas.
+- Create your own themes using the new built-in editor.
+
+#### v3.16.1 (not released as FOSS version)
+
+- Delete recently sent messages for everyone.
+- Network Usage in 'Data and Storage' Settings.
+- App remembers scroll position when switching to another chat and back.
+- Messages from one sender are grouped together.
+- Added a floating date to the top of the screen when scrolling.
+- Recently downloaded files are shown when sharing a file.
+- Report spam from Secret chats.
+- Send GIFs directly from Gboard.
+- Android 7.1: Added fast action menu to home screen.
+
+#### v3.16.0 (not released as FOSS version)
+
+- Delete recently sent messages for everyone.
+- Network Usage in 'Data and Storage' Settings.
+- App remembers scroll position when switching to another chat and back.
+- Messages from one sender are grouped together.
+- Added a floating date to the top of the screen when scrolling.
+- Recently downloaded files are shown when sharing a file.
+- Report spam from Secret chats.
+- Send GIFs directly from Gboard.
+- Android 7.1: Added fast action menu to home screen.
+
+#### v3.15.0 (not released as FOSS version)
+
+- Pin important chats to the top of the list so that you never miss a new message.
+- Link your Telegram account with hundreds of services like Twitter, Instagram, Spotify, Gmail, and others. Control apps via Telegram, or get messages when something happens. Talk to @IFTTT to set up.
+- Rotate photos by any number of degrees in the photo editor.
+- View YouTube and Vimeo in Picture-in-Picture mode.
+
+#### v3.14.0 (not released as FOSS version)
+
+- Instant View for Medium articles and some other sites. No more waiting for the pages to load!
+- ‘Groups in common’ in user profiles.
+- ‘Jump to date’ in message search.
+- 'View Pack' for recent stickers.
+- Setting a passcode now hides your chats from the task-switcher.
+- Improved camera speed, video compression.
+- Improved interfaces.
+- Also introducing telegra.ph, a new publishing platform. You can now use telegra.ph to publish articles – it’s clean, simple and efficient.
+
+#### v3.13.2 (not released as FOSS version)
+
+- Major update to Telegram's Bot Platform: Bots can now offer you rich HTML5 experiences, like games.
+- Check out @gamebot for examples of what's coming.
+- You can use these bots in inline mode in any of your chats to share a game and compete with friends.
+- All games are loaded as ordinary web pages, so this update won't add a single byte to the size of our apps.
+- Added many small improvements to the sticker panel.
 
 ### v3.13.1
 - Major update to Telegram's Bot Platform: Bots can now offer you rich HTML5 experiences, like games.
