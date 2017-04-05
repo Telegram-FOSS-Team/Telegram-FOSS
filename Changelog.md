@@ -1,3 +1,8 @@
+### v3,18 (in Progress)
+
+- **Telegram FOSS:**
+ - Update to openssl 1.0.2k
+
 ### v3.13.1
 - Major update to Telegram's Bot Platform: Bots can now offer you rich HTML5 experiences, like games.
 - Check out @gamebot for examples of what's coming.
