@@ -12,13 +12,13 @@
 - **Telegram FOSS:**
   - Use emojiOne emoji set as a free replacement for Telegrams emoji.
 
-#### v3.12 (unreleased as FOSS version)
+#### v3.12 (not released as FOSS version)
 - Draw on your photos and apply stylish masks, stickers, and text. We're launching a platform for masks today; anyone can upload their own sets of masks, beards, glasses, and the like.
 - Create your own GIFs using the new "mute" feature after you record a video.
 - Access trending stickers directly from the stickers panel in any of your chats.
 - Added support for Android 7.0.
 
-#### v3.11 (unreleased as FOSS version)
+#### v3.11 (not released as FOSS version)
 - Trending stickers. Install noteworthy sets from the new tab in Settings.
 - Unused stickers archived automatically when you go over the 200 limit.
 - Group previews. Preview groups via invite link – see who else is in the group before joining.
@@ -37,14 +37,14 @@
 - **Telegram FOSS:**
   - Bots can ask for accessing your location now, we therefore include the corresponding Android permission. This is opt-in behaviour.
 
-#### v3.9.0 (unreleased as FOSS version)
+#### v3.9.0 (not released as FOSS version)
 - Edit your messages everywhere within 2 days after posting.
 - Mention people in groups by typing @ and selecting them from the list — even if they don't have a username.
 - Get to your friends faster with the new People list in Search.
 - Find inline bot shortcuts in the attachment menu.
 - Add chat shortcuts to home screen.
 
-#### v3.8.1 (unreleased as FOSS version)
+#### v3.8.1 (not released as FOSS version)
 - Fully redesigned chat screens, optimized colors, beautiful progress bars, revamped attachments.
 - Tap on any sticker to view its pack and add it to your collection. Preview and send stickers from the pack preview menu.
 - Introducing Bot API 2.0, the biggest update to our bot platform since June 2015. Try out these sample bots to see what's coming your way soon: @music, @sticker, @youtube, @foursquare
