@@ -2074,26 +2074,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                 public void onClick(DialogInterface dialogInterface, int i) {
                     /*Telegram FOSS: manual Location selection not available */
                     Toast.makeText(getApplicationContext(),"Telegram-FOSS: Disabled for now.", Toast.LENGTH_LONG).show();
-                    /*
-                    if (mainFragmentsStack.isEmpty()) {
-                        return;
-                    }
-                    BaseFragment lastFragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
-                    if (!AndroidUtilities.isGoogleMapsInstalled(lastFragment)) {
-                        return;
-                    }
-                    LocationActivity fragment = new LocationActivity();
-                    fragment.setDelegate(new LocationActivity.LocationActivityDelegate() {
-                        @Override
-                        public void didSelectLocation(TLRPC.MessageMedia location) {
-                            for (HashMap.Entry<String, MessageObject> entry : waitingForLocation.entrySet()) {
-                                MessageObject messageObject = entry.getValue();
-                                SendMessagesHelper.getInstance().sendMessage(location, messageObject.getDialogId(), messageObject, null, null);
-                            }
-                        }
-                    });
-                    presentFragment(fragment);
-                    */
                 }
             });
             builder.setMessage(LocaleController.getString("ShareYouLocationUnable", R.string.ShareYouLocationUnable));

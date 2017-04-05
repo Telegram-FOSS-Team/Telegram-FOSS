@@ -3639,24 +3639,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 FileLog.e(e);
             }
         } else if (which == attach_location) {
-            /* Telegram-FOSS  Disabled for now.*/
             Toast.makeText(getParentActivity(), "Telegram-FOSS: Disabled for now.\nYou can share locations from OSMAnd.", Toast.LENGTH_LONG).show();
-            /*AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
-            builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), new DialogInterface.OnClickListener() {
-                @Override
-                public void didSelectLocation(TLRPC.MessageMedia location) {
-                    SendMessagesHelper.getInstance().sendMessage(location, dialog_id, replyingMessageObject, null, null);
-                    moveScrollToLastMessage();
-                    showReplyPanel(false, null, null, null, false);
-                    DraftQuery.cleanDraft(dialog_id, true);
-                    if (paused) {
-                        scrollToTopOnResume = true;
-                    }
-            });
-            builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
-            builder.setMessage("Send current Location?");
-            showDialog(builder.create());*/
         } else if (which == attach_document) {
             if (Build.VERSION.SDK_INT >= 23 && getParentActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 getParentActivity().requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 4);
@@ -9353,7 +9336,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 }
                                 catch (Exception e){
                                     Toast.makeText(getParentActivity(), "Error handling geo: intent", Toast.LENGTH_SHORT).show();
-                                    FileLog.e("tmessages", e);
+                                    FileLog.e(e);
                                 }
                             }
                         } else if (message.type == 9 || message.type == 0) {
