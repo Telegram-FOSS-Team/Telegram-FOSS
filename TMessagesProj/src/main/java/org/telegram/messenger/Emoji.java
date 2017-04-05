@@ -42,11 +42,11 @@ public class Emoji {
     private static boolean loadingEmoji[][] = new boolean[5][splitCount];
 
     private static final int[][] cols = {
-            {12, 12, 12, 12},
+            {15, 15, 15, 15},
             {6, 6, 6, 6},
+            {8, 8, 8, 8},
             {9, 9, 9, 9},
-            {9, 9, 9, 9},
-            {8, 8, 8, 7}
+            {10, 10, 10, 10}
     };
 
     static {
@@ -129,7 +129,7 @@ public class Emoji {
                         imageFile.delete();
                     }
                 }
-                for (int a = 8; a < 10; a++) {
+                for (int a = 8; a < 11; a++) {
                     imageName = String.format(Locale.US, "v%d_emoji%.01fx_%d.png", a, scale, page);
                     imageFile = ApplicationLoader.applicationContext.getFileStreamPath(imageName);
                     if (imageFile.exists()) {
@@ -141,7 +141,7 @@ public class Emoji {
             }
             Bitmap bitmap = null;
             try {
-                InputStream is = ApplicationLoader.applicationContext.getAssets().open("emoji/" + String.format(Locale.US, "v10_emoji%.01fx_%d_%d.png", scale, page, page2));
+                InputStream is = ApplicationLoader.applicationContext.getAssets().open("emoji/" + String.format(Locale.US, "v11_emoji%.01fx_%d_%d.png", scale, page, page2));
                 BitmapFactory.Options opts = new BitmapFactory.Options();
                 opts.inJustDecodeBounds = false;
                 opts.inSampleSize = imageResize;
@@ -334,6 +334,7 @@ public class Emoji {
         if (MessagesController.getInstance().useSystemEmoji || cs == null || cs.length() == 0) {
             return cs;
         }
+        //String str = "\"\uD83D\uDC68\uD83C\uDFFB\u200D\uD83C\uDFA4\""
         //SpannableStringLight.isFieldsAvailable();
         //SpannableStringLight s = new SpannableStringLight(cs.toString());
         Spannable s;
@@ -349,11 +350,14 @@ public class Emoji {
         int startLength = 0;
         int previousGoodIndex = 0;
         StringBuilder emojiCode = new StringBuilder(16);
+        StringBuilder addionalCode = new StringBuilder(2);
         boolean nextIsSkinTone;
         EmojiDrawable drawable;
         EmojiSpan span;
         int length = cs.length();
         boolean doneEmoji = false;
+        int nextValidLength;
+        boolean nextValid;
         //s.setSpansCount(emojiCount);
 
         try {
@@ -367,7 +371,7 @@ public class Emoji {
                     startLength++;
                     buf <<= 16;
                     buf |= c;
-                } else if (emojiCode.length() > 0 && (c == 0x2640 || c == 0x2642)) {
+                } else if (emojiCode.length() > 0 && (c == 0x2640 || c == 0x2642 || c == 0x2695)) {
                     emojiCode.append(c);
                     startLength++;
                     buf = 0;
@@ -406,6 +410,14 @@ public class Emoji {
                         emojiOnly = null;
                     }
                 }
+                if (doneEmoji && i + 2 < length && cs.charAt(i + 1) == 0xD83C) {
+                    char next = cs.charAt(i + 2);
+                    if (next >= 0xDFFB && next <= 0xDFFF) {
+                        emojiCode.append(cs.subSequence(i + 1, i + 3));
+                        startLength += 2;
+                        i += 2;
+                    }
+                }
                 previousGoodIndex = i;
                 for (int a = 0; a < 3; a++) {
                     if (i + 1 < length) {
@@ -425,23 +437,17 @@ public class Emoji {
                         }
                     }
                 }
+                if (doneEmoji && i + 2 < length && cs.charAt(i + 1) == 0xD83C) {
+                    char next = cs.charAt(i + 2);
+                    if (next >= 0xDFFB && next <= 0xDFFF) {
+                        emojiCode.append(cs.subSequence(i + 1, i + 3));
+                        startLength += 2;
+                        i += 2;
+                    }
+                }
                 if (doneEmoji) {
                     if (emojiOnly != null) {
                         emojiOnly[0]++;
-                    }
-                    if (i + 2 < length) {
-                        if (cs.charAt(i + 1) == 0xD83C && cs.charAt(i + 2) >= 0xDFFB && cs.charAt(i + 2) <= 0xDFFF) {
-                            emojiCode.append(cs.subSequence(i + 1, i + 3));
-                            startLength += 2;
-                            i += 2;
-                        }
-                    }
-                    if (i + 2 < length) {
-                        if (cs.charAt(i + 1) == 0x200D && (cs.charAt(i + 2) == 0x2640 || cs.charAt(i + 2) == 0x2642)) {
-                            emojiCode.append(cs.subSequence(i + 1, i + 3));
-                            startLength += 2;
-                            i += 2;
-                        }
                     }
                     drawable = Emoji.getEmojiDrawable(emojiCode.subSequence(0, emojiCode.length()));
                     if (drawable != null) {
