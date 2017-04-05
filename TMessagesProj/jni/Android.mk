@@ -815,7 +815,7 @@ local_src_files := \
 	$(CRYPTO_PATH)/x509v3/v3_sxnet.c \
 	$(CRYPTO_PATH)/x509v3/v3_utl.c \
 	$(CRYPTO_PATH)/x509v3/v3err.c \
-    $(CRYPTO_PATH)/x509v3/v3_scts.c
+	$(CRYPTO_PATH)/x509v3/v3_scts.c
 
 local_c_includes := \
 	$(LOCAL_PATH)/openssl \
