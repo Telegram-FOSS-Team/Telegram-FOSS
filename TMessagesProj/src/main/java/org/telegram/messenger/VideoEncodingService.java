@@ -46,7 +46,11 @@ public class VideoEncodingService extends Service implements NotificationCenter.
                 Boolean enc = (Boolean) args[2];
                 currentProgress = (int)(progress * 100);
                 builder.setProgress(100, currentProgress, currentProgress == 0);
-                NotificationManagerCompat.from(ApplicationLoader.applicationContext).notify(4, builder.build());
+                try {
+                    NotificationManagerCompat.from(ApplicationLoader.applicationContext).notify(4, builder.build());
+                } catch (Throwable e) {
+                    FileLog.e(e);
+                }
             }
         } else if (id == NotificationCenter.stopEncodingService) {
             String filepath = (String)args[0];

@@ -20,6 +20,8 @@ public class VideoEditedInfo {
     public int resultHeight;
     public int bitrate;
     public String originalPath;
+    public long estimatedSize;
+    public long estimatedDuration;
 
     public String getString() {
         return String.format(Locale.US, "-1_%d_%d_%d_%d_%d_%d_%d_%d_%s", startTime, endTime, rotationValue, originalWidth, originalHeight, bitrate, resultWidth, resultHeight, originalPath);
