@@ -33,7 +33,6 @@ dependencies {
     compile 'com.android.support:support-v13:25.3.1'
     compile 'com.android.support:palette-v7:25.3.1'
     compile 'com.googlecode.mp4parser:isoparser:1.0.6'
-    compile 'com.stripe:stripe-android:2.0.2'
     compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
