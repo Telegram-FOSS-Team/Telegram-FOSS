@@ -9,7 +9,6 @@
 package org.telegram.messenger;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
@@ -170,10 +169,8 @@ public class ApplicationLoader extends Application {
         if (systemVersion.trim().length() == 0) {
             systemVersion = "SDK Unknown";
         }
-
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Activity.MODE_PRIVATE);
+        
         // Telegram-FOSS: Unconditionally enable push connection
-        //boolean enablePushConnection = preferences.getBoolean("pushConnection", true);
         boolean enablePushConnection = true;
 
         MessagesController.getInstance();
@@ -226,22 +223,15 @@ public class ApplicationLoader extends Application {
     }*/
 
     public static void startPushService() {
-        SharedPreferences preferences = applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
-
         // Telegram-FOSS: unconditionally enable push service
-        //if (preferences.getBoolean("pushService", true)) {
-        if (true) {
-            AlarmManager am = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
-            Intent i = new Intent(applicationContext, ApplicationLoader.class);
-            pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, i, 0);
+        
+        AlarmManager am = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent(applicationContext, ApplicationLoader.class);
+        pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, i, 0);
 
-            am.cancel(pendingIntent);
-            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
-
-            applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
-        } else {
-            stopPushService();
-        }
+        am.cancel(pendingIntent);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
+        applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
     }
 
     public static void stopPushService() {

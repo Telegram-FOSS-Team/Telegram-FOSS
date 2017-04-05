@@ -10,7 +10,6 @@ package org.telegram.messenger;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 
 public class NotificationsService extends Service {
@@ -35,11 +34,8 @@ public class NotificationsService extends Service {
         FileLog.e("service destroyed");
 
         // Telegram-FOSS: unconditionally enable push service
-        //SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
-        //if (preferences.getBoolean("pushService", true)) {
-        if (true) {
-            Intent intent = new Intent("org.telegram.start");
-            sendBroadcast(intent);
-        }
+        
+        Intent intent = new Intent("org.telegram.start");
+        sendBroadcast(intent);
     }
 }
