@@ -3,21 +3,20 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2016.
+ * Copyright Nikolai Kudashov, 2013-2017.
  */
 
 package org.telegram.messenger;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 
 public class NotificationsService extends Service {
 
     @Override
     public void onCreate() {
-        FileLog.e("tmessages", "service started");
+        FileLog.e("service started");
         ApplicationLoader.postInitApplication();
     }
 
@@ -32,14 +31,11 @@ public class NotificationsService extends Service {
     }
 
     public void onDestroy() {
-        FileLog.e("tmessages", "service destroyed");
+        FileLog.e("service destroyed");
 
         // Telegram-FOSS: unconditionally enable push service
-        //SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
-        //if (preferences.getBoolean("pushService", true)) {
-        if (true) {
-            Intent intent = new Intent("org.telegram.start");
-            sendBroadcast(intent);
-        }
+        
+        Intent intent = new Intent("org.telegram.start");
+        sendBroadcast(intent);
     }
 }

@@ -1,4 +1,4 @@
-## Telegram-FOSS
+# Telegram-FOSS
 
 [Telegram](https://telegram.org) is a messaging app with a focus on speed and security. It’s superfast, simple and free.
 
@@ -12,7 +12,7 @@ This version of Telegram is available on FDroid:
       alt="Get it on F-Droid"
       height="80">](https://f-droid.org/app/org.telegram.messenger)
 
-### Versioning
+## Versioning
 
 This repository contains tags to make tracking versions easier.
 
@@ -21,13 +21,13 @@ Versions are in form "v$UPSTREAM$RELEASE" where:
 * $UPSTREAM is the public, visible version of upstream.
 * $RELEASE is a letter ([a-z]) indicating minor releases between official versions (sometimes, upstream is updated without relating the changes to an specific version).
 
-### API, Protocol documentation
+## API, Protocol documentation
 
 Telegram API manuals: https://core.telegram.org/api
 
 MTproto protocol manuals: https://core.telegram.org/mtproto
 
-### Building
+## Building
 
 The project can be build with Android Studio or from the command line with gradle.
 
@@ -36,3 +36,4 @@ You also need the [Android-NDK](https://developer.android.com/ndk/downloads/inde
 
 If you want to publish a modified version of Telegram you should get **your own API key** form here: https://core.telegram.org/api/obtaining_api_id.
 Then update the file **src/main/java/org/telegram/messenger/BuildVars.java** accordingly.
+
