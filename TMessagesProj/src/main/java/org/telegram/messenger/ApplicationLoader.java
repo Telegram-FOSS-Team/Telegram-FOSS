@@ -170,7 +170,7 @@ public class ApplicationLoader extends Application {
                     }
                 }
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
 
             try {
@@ -181,7 +181,7 @@ public class ApplicationLoader extends Application {
                 fileOutputStream.write(bytes);
                 fileOutputStream.close();
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
             buffer.cleanup();
             preferences.edit().clear().commit();
@@ -201,7 +201,7 @@ public class ApplicationLoader extends Application {
             path.mkdirs();
             return path;
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return new File("/data/data/org.telegram.messenger/files");
     }
@@ -232,9 +232,9 @@ public class ApplicationLoader extends Application {
         try {
             PowerManager pm = (PowerManager)ApplicationLoader.applicationContext.getSystemService(Context.POWER_SERVICE);
             isScreenOn = pm.isScreenOn();
-            FileLog.e("tmessages", "screen state = " + isScreenOn);
+            FileLog.e("screen state = " + isScreenOn);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
 
         UserConfig.loadConfig();
@@ -284,7 +284,7 @@ public class ApplicationLoader extends Application {
         }
 
         ApplicationLoader app = (ApplicationLoader)ApplicationLoader.applicationContext;
-        FileLog.e("tmessages", "app initied");
+        FileLog.e("app initied");
 
         ContactsController.getInstance().checkAppAccount();
         MediaController.getInstance();

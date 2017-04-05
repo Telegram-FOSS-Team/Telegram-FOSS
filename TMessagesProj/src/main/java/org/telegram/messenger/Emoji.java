@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2016.
+ * Copyright Nikolai Kudashov, 2013-2017.
  */
 
 package org.telegram.messenger;
@@ -111,7 +111,7 @@ public class Emoji {
                     }
                 }
             }
-            FileLog.e("tmessages", q);*/
+            FileLog.e(q);*/
 
             String imageName;
             File imageFile;
@@ -137,7 +137,7 @@ public class Emoji {
                     }
                 }
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
             Bitmap bitmap = null;
             try {
@@ -148,7 +148,7 @@ public class Emoji {
                 bitmap = BitmapFactory.decodeStream(is, null, opts);
                 is.close();
             } catch (Throwable e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
 
             final Bitmap finalBitmap = bitmap;
@@ -160,7 +160,7 @@ public class Emoji {
                 }
             });
         } catch (Throwable x) {
-            FileLog.e("tmessages", "Error loading emoji", x);
+            FileLog.e("Error loading emoji", x);
         }
     }
 
@@ -209,7 +209,7 @@ public class Emoji {
     public static EmojiDrawable getEmojiDrawable(CharSequence code) {
         DrawableInfo info = rects.get(code);
         if (info == null) {
-            FileLog.e("tmessages", "No drawable for emoji " + code);
+            FileLog.e("No drawable for emoji " + code);
             return null;
         }
         EmojiDrawable ed = new EmojiDrawable(info);
@@ -459,7 +459,7 @@ public class Emoji {
                 }
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
             return cs;
         }
         return s;

@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2016.
+ * Copyright Nikolai Kudashov, 2013-2017.
  */
 
 package org.telegram.messenger;
@@ -778,7 +778,7 @@ public class SecretChatHelper {
                                             currentChat.key_hash = key_hash;
                                             MessagesStorage.getInstance().updateEncryptedChat(currentChat);
                                         } catch (Throwable e) {
-                                            FileLog.e("tmessages", e);
+                                            FileLog.e(e);
                                         }
                                     }
 
@@ -837,7 +837,7 @@ public class SecretChatHelper {
                         }
                     }, ConnectionsManager.RequestFlagInvokeAfter);
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });
@@ -857,7 +857,7 @@ public class SecretChatHelper {
                 chat.key_hash = key_hash;
                 MessagesStorage.getInstance().updateEncryptedChat(chat);
             } catch (Throwable e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
         }
         chat.layer = AndroidUtilities.setPeerLayerVersion(chat.layer, newPeerLayer);
@@ -1184,7 +1184,7 @@ public class SecretChatHelper {
                 } else if (serviceMessage.action instanceof TLRPC.TL_decryptedMessageActionRequestKey) {
                     if (chat.exchange_id != 0) {
                         if (chat.exchange_id > serviceMessage.action.exchange_id) {
-                            FileLog.e("tmessages", "we already have request key with higher exchange_id");
+                            FileLog.e("we already have request key with higher exchange_id");
                             return null;
                         } else {
                             sendAbortKeyMessage(chat, null, chat.exchange_id); //TODO don't send?
@@ -1335,10 +1335,10 @@ public class SecretChatHelper {
                     return null;
                 }
             } else {
-                FileLog.e("tmessages", "unknown message " + object);
+                FileLog.e("unknown message " + object);
             }
         } else {
-            FileLog.e("tmessages", "unknown TLObject");
+            FileLog.e("unknown TLObject");
         }
         return null;
     }
@@ -1451,7 +1451,7 @@ public class SecretChatHelper {
                     SendMessagesHelper.getInstance().processUnsentMessages(messages, new ArrayList<TLRPC.User>(), new ArrayList<TLRPC.Chat>(), encryptedChats);
                     MessagesStorage.getInstance().getDatabase().executeFast(String.format(Locale.US, "REPLACE INTO requested_holes VALUES(%d, %d, %d)", encryptedChat.id, sSeq, endSeq)).stepThis().dispose();
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });
@@ -1552,16 +1552,16 @@ public class SecretChatHelper {
                         }
                     }
                     if (layer.random_bytes.length < 15) {
-                        FileLog.e("tmessages", "got random bytes less than needed");
+                        FileLog.e("got random bytes less than needed");
                         return null;
                     }
-                    FileLog.e("tmessages", "current chat in_seq = " + chat.seq_in + " out_seq = " + chat.seq_out);
-                    FileLog.e("tmessages", "got message with in_seq = " + layer.in_seq_no + " out_seq = " + layer.out_seq_no);
+                    FileLog.e("current chat in_seq = " + chat.seq_in + " out_seq = " + chat.seq_out);
+                    FileLog.e("got message with in_seq = " + layer.in_seq_no + " out_seq = " + layer.out_seq_no);
                     if (layer.out_seq_no < chat.seq_in) {
                         return null;
                     }
                     if (chat.seq_in != layer.out_seq_no && chat.seq_in != layer.out_seq_no - 2) {
-                        FileLog.e("tmessages", "got hole");
+                        FileLog.e("got hole");
                         ArrayList<TL_decryptedMessageHolder> arr = secretHolesQueue.get(chat.id);
                         if (arr == null) {
                             arr = new ArrayList<>();
@@ -1614,10 +1614,10 @@ public class SecretChatHelper {
                 return messages;
             } else {
                 is.reuse();
-                FileLog.e("tmessages", String.format("fingerprint mismatch %x", fingerprint));
+                FileLog.e(String.format("fingerprint mismatch %x", fingerprint));
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
 
         return null;
@@ -1859,7 +1859,7 @@ public class SecretChatHelper {
                                             progressDialog.dismiss();
                                         }
                                     } catch (Exception e) {
-                                        FileLog.e("tmessages", e);
+                                        FileLog.e(e);
                                     }
                                 }
                             });
@@ -1900,7 +1900,7 @@ public class SecretChatHelper {
                                             try {
                                                 progressDialog.dismiss();
                                             } catch (Exception e) {
-                                                FileLog.e("tmessages", e);
+                                                FileLog.e(e);
                                             }
                                         }
                                         TLRPC.EncryptedChat chat = (TLRPC.EncryptedChat) response;
@@ -1941,7 +1941,7 @@ public class SecretChatHelper {
                                             try {
                                                 progressDialog.dismiss();
                                             } catch (Exception e) {
-                                                FileLog.e("tmessages", e);
+                                                FileLog.e(e);
                                             }
                                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                             builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
@@ -1964,7 +1964,7 @@ public class SecretChatHelper {
                                 try {
                                     progressDialog.dismiss();
                                 } catch (Exception e) {
-                                    FileLog.e("tmessages", e);
+                                    FileLog.e(e);
                                 }
                             }
                         }
@@ -1979,7 +1979,7 @@ public class SecretChatHelper {
                 try {
                     dialog.dismiss();
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });

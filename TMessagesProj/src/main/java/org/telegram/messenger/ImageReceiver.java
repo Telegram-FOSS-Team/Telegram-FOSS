@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2016.
+ * Copyright Nikolai Kudashov, 2013-2017.
  */
 
 package org.telegram.messenger;
@@ -478,7 +478,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
                             currentThumbKey = null;
                         }
                         setImage(currentImageLocation, currentHttpUrl, currentFilter, currentThumb, currentThumbLocation, currentThumbFilter, currentSize, currentExt, currentCacheOnly);
-                        FileLog.e("tmessages", e);
+                        FileLog.e(e);
                     }
                     canvas.restore();
                 } else {
@@ -523,7 +523,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
                                     currentThumbKey = null;
                                 }
                                 setImage(currentImageLocation, currentHttpUrl, currentFilter, currentThumb, currentThumbLocation, currentThumbFilter, currentSize, currentExt, currentCacheOnly);
-                                FileLog.e("tmessages", e);
+                                FileLog.e(e);
                             }
                         }
 
@@ -560,7 +560,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
                                     currentThumbKey = null;
                                 }
                                 setImage(currentImageLocation, currentHttpUrl, currentFilter, currentThumb, currentThumbLocation, currentThumbFilter, currentSize, currentExt, currentCacheOnly);
-                                FileLog.e("tmessages", e);
+                                FileLog.e(e);
                             }
                         }
                         canvas.restore();
@@ -575,7 +575,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
                     drawable.setAlpha(alpha);
                     drawable.draw(canvas);
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         }
@@ -657,7 +657,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
                 checkAlphaAnimation(animationNotReady);
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return false;
     }

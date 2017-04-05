@@ -102,6 +102,7 @@ public class AndroidUtilities {
     public static int leftBaseline;
     public static boolean usingHardwareInput;
     public static boolean isInMultiwindow;
+
     private static Boolean isTablet = null;
     private static int adjustOwnerClassGuid = 0;
 
@@ -132,7 +133,7 @@ public class AndroidUtilities {
                             + "\\-\\.\\+\\!\\*\\'\\(\\)\\,\\_])|(?:\\%[a-fA-F0-9]{2}))*)?"
                             + "(?:\\b|$)");
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -158,7 +159,7 @@ public class AndroidUtilities {
                 bitmapColor = ((ColorDrawable) drawable).getColor();
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
 
         double[] hsv = rgbToHsv((bitmapColor >> 16) & 0xff, (bitmapColor >> 8) & 0xff, bitmapColor & 0xff);
@@ -271,7 +272,7 @@ public class AndroidUtilities {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.apps.maps"));
                         fragment.getParentActivity().startActivityForResult(intent, 500);
                     } catch (Exception e) {
-                        FileLog.e("tmessages", e);
+                        FileLog.e(e);
                     }
                 }
             });
@@ -313,7 +314,7 @@ public class AndroidUtilities {
         }
         try {
             prevOrientation = activity.getRequestedOrientation();
-            WindowManager manager = (WindowManager)activity.getSystemService(Activity.WINDOW_SERVICE);
+            WindowManager manager = (WindowManager) activity.getSystemService(Activity.WINDOW_SERVICE);
             if (manager != null && manager.getDefaultDisplay() != null) {
                 int rotation = manager.getDefaultDisplay().getRotation();
                 int orientation = activity.getResources().getConfiguration().orientation;
@@ -345,7 +346,7 @@ public class AndroidUtilities {
                 }
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -359,7 +360,7 @@ public class AndroidUtilities {
                 prevOrientation = -10;
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -370,7 +371,7 @@ public class AndroidUtilities {
                     Typeface t = Typeface.createFromAsset(ApplicationLoader.applicationContext.getAssets(), assetPath);
                     typefaceCache.put(assetPath, t);
                 } catch (Exception e) {
-                    FileLog.e("Typefaces", "Could not get typeface '" + assetPath + "' because " + e.getMessage());
+                    FileLog.e("Could not get typeface '" + assetPath + "' because " + e.getMessage());
                     return null;
                 }
             }
@@ -411,10 +412,10 @@ public class AndroidUtilities {
             return;
         }
         try {
-            InputMethodManager inputManager = (InputMethodManager)view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager inputManager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -426,7 +427,7 @@ public class AndroidUtilities {
             InputMethodManager inputManager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             return inputManager.isActive(view);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return false;
     }
@@ -442,7 +443,7 @@ public class AndroidUtilities {
             }
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -451,7 +452,7 @@ public class AndroidUtilities {
         try {
             state = Environment.getExternalStorageState();
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         if (state == null || state.startsWith(Environment.MEDIA_MOUNTED)) {
             try {
@@ -460,7 +461,7 @@ public class AndroidUtilities {
                     return file;
                 }
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
         }
         try {
@@ -469,7 +470,7 @@ public class AndroidUtilities {
                 return file;
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return new File("");
     }
@@ -525,9 +526,9 @@ public class AndroidUtilities {
                     displaySize.y = newSize;
                 }
             }
-            FileLog.e("tmessages", "display size = " + displaySize.x + " " + displaySize.y + " " + displayMetrics.xdpi + "x" + displayMetrics.ydpi);
+            FileLog.e("display size = " + displaySize.x + " " + displaySize.y + " " + displayMetrics.xdpi + "x" + displayMetrics.ydpi);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -711,7 +712,7 @@ public class AndroidUtilities {
             mCursorDrawableRes.setAccessible(true);
             mCursorDrawableRes.setInt(editText, 0);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -815,7 +816,7 @@ public class AndroidUtilities {
                         bitmap = result;
                     }
                 } catch (Throwable e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
             if (bitmap != null) {
@@ -845,7 +846,7 @@ public class AndroidUtilities {
             addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
             ApplicationLoader.applicationContext.sendBroadcast(addIntent);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -855,7 +856,7 @@ public class AndroidUtilities {
             addIntent.setAction("com.android.launcher.action.UNINSTALL_SHORTCUT");
             ApplicationLoader.applicationContext.sendBroadcast(addIntent);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -880,7 +881,7 @@ public class AndroidUtilities {
                 return insets.bottom;
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return 0;
     }
@@ -898,11 +899,11 @@ public class AndroidUtilities {
                     size.set((Integer) mGetRawW.invoke(windowManager.getDefaultDisplay()), (Integer) mGetRawH.invoke(windowManager.getDefaultDisplay()));
                 } catch (Exception e) {
                     size.set(windowManager.getDefaultDisplay().getWidth(), windowManager.getDefaultDisplay().getHeight());
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return size;
     }
@@ -937,7 +938,7 @@ public class AndroidUtilities {
                     mEdgeGlowBottom.setColor(color);
                 }
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
         }
     }
@@ -1020,7 +1021,7 @@ public class AndroidUtilities {
             }
             return spannableStringBuilder;
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return new SpannableStringBuilder(str);
     }
@@ -1106,7 +1107,7 @@ public class AndroidUtilities {
             android.content.ClipData clip = android.content.ClipData.newPlainText("label", str);
             clipboard.setPrimaryClip(clip);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -1128,7 +1129,7 @@ public class AndroidUtilities {
             mediaScanIntent.setData(uri);
             ApplicationLoader.applicationContext.sendBroadcast(mediaScanIntent);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -1141,12 +1142,12 @@ public class AndroidUtilities {
             storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Telegram");
             if (!storageDir.mkdirs()) {
                 if (!storageDir.exists()){
-                    FileLog.d("tmessages", "failed to create directory");
+                    FileLog.d("failed to create directory");
                     return null;
                 }
             }
         } else {
-            FileLog.d("tmessages", "External storage is not mounted READ/WRITE.");
+            FileLog.d("External storage is not mounted READ/WRITE.");
         }
 
         return storageDir;
@@ -1199,7 +1200,7 @@ public class AndroidUtilities {
                 return uri.getPath();
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return null;
     }
@@ -1223,7 +1224,7 @@ public class AndroidUtilities {
                 return value;
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -1250,7 +1251,7 @@ public class AndroidUtilities {
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
             return new File(storageDir, "IMG_" + timeStamp + ".jpg");
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return null;
     }
@@ -1304,7 +1305,7 @@ public class AndroidUtilities {
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
             return new File(storageDir, "VID_" + timeStamp + ".mp4");
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return null;
     }
@@ -1334,7 +1335,7 @@ public class AndroidUtilities {
                     final int l = Character.digit((char) bytes[++i], 16);
                     buffer.write((char) ((u << 4) + l));
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                     return null;
                 }
             } else {
@@ -1345,7 +1346,7 @@ public class AndroidUtilities {
         try {
             buffer.close();
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         return array;
     }
@@ -1373,7 +1374,7 @@ public class AndroidUtilities {
             destination = new FileOutputStream(destFile);
             destination.getChannel().transferFrom(source.getChannel(), 0, source.getChannel().size());
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
             return false;
         } finally {
             if (source != null) {

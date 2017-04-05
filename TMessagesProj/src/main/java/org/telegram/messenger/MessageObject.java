@@ -996,7 +996,7 @@ public class MessageObject {
                 try {
                     Linkify.addLinks((Spannable) linkDescription, Linkify.WEB_URLS);
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
             linkDescription = Emoji.replaceEmoji(linkDescription, textPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
@@ -1013,7 +1013,7 @@ public class MessageObject {
                 try {
                     Linkify.addLinks((Spannable) caption, Linkify.WEB_URLS | Linkify.PHONE_NUMBERS);
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
                 addUsernamesAndHashtags(caption, true);
             }
@@ -1045,7 +1045,7 @@ public class MessageObject {
                 }
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
     }
 
@@ -1060,13 +1060,13 @@ public class MessageObject {
                 try {
                     Linkify.addLinks((Spannable) messageText, Linkify.WEB_URLS | Linkify.PHONE_NUMBERS);
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             } else {
                 try {
                     Linkify.addLinks((Spannable) messageText, Linkify.WEB_URLS);
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
             addUsernamesAndHashtags(messageText, botCommands);
@@ -1113,7 +1113,7 @@ public class MessageObject {
                 try {
                     Linkify.addLinks((Spannable) messageText, Linkify.PHONE_NUMBERS);
                 } catch (Throwable e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         }
@@ -1192,10 +1192,11 @@ public class MessageObject {
         } else {
             paint = textPaint;
         }
+
         try {
             textLayout = new StaticLayout(messageText, paint, maxWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
             return;
         }
 
@@ -1232,7 +1233,7 @@ public class MessageObject {
                     block.height = Math.max(block.height, block.textLayout.getLineBottom(block.textLayout.getLineCount() - 1));
                     prevOffset = block.textYOffset;
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                     continue;
                 }
                 if (a == blocksCount - 1) {
@@ -1240,7 +1241,7 @@ public class MessageObject {
                     try {
                         textHeight = Math.max(textHeight, (int) (block.textYOffset + block.textLayout.getHeight()));
                     } catch (Exception e) {
-                        FileLog.e("tmessages", e);
+                        FileLog.e(e);
                     }
                 }
             }
@@ -1281,7 +1282,7 @@ public class MessageObject {
                     try {
                         lineWidth = block.textLayout.getLineWidth(n);
                     } catch (Exception e) {
-                        FileLog.e("tmessages", e);
+                        FileLog.e(e);
                         lineWidth = 0;
                     }
 

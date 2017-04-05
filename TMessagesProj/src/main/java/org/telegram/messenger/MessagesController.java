@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2016.
+ * Copyright Nikolai Kudashov, 2013-2017.
  */
 
 package org.telegram.messenger;
@@ -275,7 +275,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     }
                 }
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
         }
     }
@@ -316,7 +316,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     }
                 } catch (Exception e) {
                     editor.remove("disabledFeatures");
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
                 editor.commit();
             }
@@ -648,7 +648,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
             try {
                 semaphore.acquire();
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
             if (result.size() == 2) {
                 chat = (TLRPC.EncryptedChat) result.get(0);
@@ -1320,7 +1320,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
     }
 
     protected void processNewChannelDifferenceParams(int pts, int pts_count, int channelId) {
-        FileLog.e("tmessages", "processNewChannelDifferenceParams pts = " + pts + " pts_count = " + pts_count + " channeldId = " + channelId);
+        FileLog.e("processNewChannelDifferenceParams pts = " + pts + " pts_count = " + pts_count + " channeldId = " + channelId);
         TLRPC.TL_dialog dialog = dialogs_dict.get((long) -channelId);
         if (!DialogObject.isChannel(dialog)) {
             return;
@@ -1334,7 +1334,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
             channelsPts.put(channelId, channelPts);
         }
         if (channelPts + pts_count == pts) {
-            FileLog.e("tmessages", "APPLY CHANNEL PTS");
+            FileLog.e("APPLY CHANNEL PTS");
             channelsPts.put(channelId, pts);
             MessagesStorage.getInstance().saveChannelPts(channelId, pts);
         } else if (channelPts != pts) {
@@ -1344,7 +1344,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 gettingDifferenceChannel = false;
             }
             if (gettingDifferenceChannel || updatesStartWaitTime == null || Math.abs(System.currentTimeMillis() - updatesStartWaitTime) <= 1500) {
-                FileLog.e("tmessages", "ADD CHANNEL UPDATE TO QUEUE pts = " + pts + " pts_count = " + pts_count);
+                FileLog.e("ADD CHANNEL UPDATE TO QUEUE pts = " + pts + " pts_count = " + pts_count);
                 if (updatesStartWaitTime == null) {
                     updatesStartWaitTimeChannels.put(channelId, System.currentTimeMillis());
                 }
@@ -1365,15 +1365,15 @@ public class MessagesController implements NotificationCenter.NotificationCenter
     }
 
     protected void processNewDifferenceParams(int seq, int pts, int date, int pts_count) {
-        FileLog.e("tmessages", "processNewDifferenceParams seq = " + seq + " pts = " + pts + " date = " + date + " pts_count = " + pts_count);
+        FileLog.e("processNewDifferenceParams seq = " + seq + " pts = " + pts + " date = " + date + " pts_count = " + pts_count);
         if (pts != -1) {
             if (MessagesStorage.lastPtsValue + pts_count == pts) {
-                FileLog.e("tmessages", "APPLY PTS");
+                FileLog.e("APPLY PTS");
                 MessagesStorage.lastPtsValue = pts;
                 MessagesStorage.getInstance().saveDiffParams(MessagesStorage.lastSeqValue, MessagesStorage.lastPtsValue, MessagesStorage.lastDateValue, MessagesStorage.lastQtsValue);
             } else if (MessagesStorage.lastPtsValue != pts) {
                 if (gettingDifference || updatesStartWaitTimePts == 0 || Math.abs(System.currentTimeMillis() - updatesStartWaitTimePts) <= 1500) {
-                    FileLog.e("tmessages", "ADD UPDATE TO QUEUE pts = " + pts + " pts_count = " + pts_count);
+                    FileLog.e("ADD UPDATE TO QUEUE pts = " + pts + " pts_count = " + pts_count);
                     if (updatesStartWaitTimePts == 0) {
                         updatesStartWaitTimePts = System.currentTimeMillis();
                     }
@@ -1388,7 +1388,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
         }
         if (seq != -1) {
             if (MessagesStorage.lastSeqValue + 1 == seq) {
-                FileLog.e("tmessages", "APPLY SEQ");
+                FileLog.e("APPLY SEQ");
                 MessagesStorage.lastSeqValue = seq;
                 if (date != -1) {
                     MessagesStorage.lastDateValue = date;
@@ -1396,7 +1396,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 MessagesStorage.getInstance().saveDiffParams(MessagesStorage.lastSeqValue, MessagesStorage.lastPtsValue, MessagesStorage.lastDateValue, MessagesStorage.lastQtsValue);
             } else if (MessagesStorage.lastSeqValue != seq) {
                 if (gettingDifference || updatesStartWaitTimeSeq == 0 || Math.abs(System.currentTimeMillis() - updatesStartWaitTimeSeq) <= 1500) {
-                    FileLog.e("tmessages", "ADD UPDATE TO QUEUE seq = " + seq);
+                    FileLog.e("ADD UPDATE TO QUEUE seq = " + seq);
                     if (updatesStartWaitTimeSeq == 0) {
                         updatesStartWaitTimeSeq = System.currentTimeMillis();
                     }
@@ -2113,7 +2113,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     int key = keys.get(a);
                     Long updatesStartWaitTime = updatesStartWaitTimeChannels.get(key);
                     if (updatesStartWaitTime != null && updatesStartWaitTime + 1500 < currentTime) {
-                        FileLog.e("tmessages", "QUEUE CHANNEL " + key + " UPDATES WAIT TIMEOUT - CHECK QUEUE");
+                        FileLog.e("QUEUE CHANNEL " + key + " UPDATES WAIT TIMEOUT - CHECK QUEUE");
                         processChannelsUpdatesQueue(key, 0);
                     }
                 }
@@ -2121,7 +2121,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
 
             for (int a = 0; a < 3; a++) {
                 if (getUpdatesStartTime(a) != 0 && getUpdatesStartTime(a) + 1500 < currentTime) {
-                    FileLog.e("tmessages", a + " QUEUE UPDATES WAIT TIMEOUT - CHECK QUEUE");
+                    FileLog.e(a + " QUEUE UPDATES WAIT TIMEOUT - CHECK QUEUE");
                     processUpdatesQueue(a, 0);
                 }
             }
@@ -2561,7 +2561,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
 
     public void processLoadedMessages(final TLRPC.messages_Messages messagesRes, final long dialog_id, final int count, final int max_id, final boolean isCache, final int classGuid,
                                       final int first_unread, final int last_message_id, final int unread_count, final int last_date, final int load_type, final boolean isChannel, final boolean isEnd, final int loadIndex, final boolean queryFromServer) {
-        FileLog.e("tmessages", "processLoadedMessages size " + messagesRes.messages.size() + " in chat " + dialog_id + " count " + count + " max_id " + max_id + " cache " + isCache + " guid " + classGuid + " load_type " + load_type + " last_message_id " + last_message_id + " isChannel " + isChannel + " index " + loadIndex + " firstUnread " + first_unread + " underad count " + unread_count + " last_date " + last_date + " queryFromServer " + queryFromServer);
+        FileLog.e("processLoadedMessages size " + messagesRes.messages.size() + " in chat " + dialog_id + " count " + count + " max_id " + max_id + " cache " + isCache + " guid " + classGuid + " load_type " + load_type + " last_message_id " + last_message_id + " isChannel " + isChannel + " index " + loadIndex + " firstUnread " + first_unread + " underad count " + unread_count + " last_date " + last_date + " queryFromServer " + queryFromServer);
         Utilities.stageQueue.postRunnable(new Runnable() {
             @Override
             public void run() {
@@ -2716,7 +2716,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
         }
         loadingDialogs = true;
         NotificationCenter.getInstance().postNotificationName(NotificationCenter.dialogsNeedReload);
-        FileLog.e("tmessages", "load cacheOffset = " + offset + " count = " + count + " cache = " + fromCache);
+        FileLog.e("load cacheOffset = " + offset + " count = " + count + " cache = " + fromCache);
         if (fromCache) {
             MessagesStorage.getInstance().getDialogs(offset == 0 ? 0 : nextDialogsCacheOffset, count);
         } else {
@@ -2904,7 +2904,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
 
                                 processLoadedDialogs(dialogsRes, null, offsetId, 0, 0, false, true);
                             } catch (Exception e) {
-                                FileLog.e("tmessages", e);
+                                FileLog.e(e);
                                 AndroidUtilities.runOnUIThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -3331,7 +3331,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 data.writeInt32(dialog.flags);
                 peer.serializeToStream(data);
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
             newTaskId = MessagesStorage.getInstance().createPendingTask(data);
         } else {
@@ -3903,7 +3903,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                                 try {
                                     progressDialog.dismiss();
                                 } catch (Exception e) {
-                                    FileLog.e("tmessages", e);
+                                    FileLog.e(e);
                                 }
                             }
                         }
@@ -3918,7 +3918,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                                 try {
                                     progressDialog.dismiss();
                                 } catch (Exception e) {
-                                    FileLog.e("tmessages", e);
+                                    FileLog.e(e);
                                 }
                                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                 builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
@@ -3938,7 +3938,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 try {
                     dialog.dismiss();
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });
@@ -4483,7 +4483,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
             @Override
             public void run(TLObject response, TLRPC.TL_error error) {
                 if (response instanceof TLRPC.TL_boolTrue) {
-                    FileLog.e("tmessages", "registered for push");
+                    FileLog.e("registered for push");
                     UserConfig.registeredForPush = true;
                     UserConfig.pushString = regid;
                     UserConfig.saveConfig(false);
@@ -4624,13 +4624,13 @@ public class MessagesController implements NotificationCenter.NotificationCenter
             } else if (updateState == 1) {
                 Long updatesStartWaitTime = updatesStartWaitTimeChannels.get(channelId);
                 if (updatesStartWaitTime != null && (anyProceed || Math.abs(System.currentTimeMillis() - updatesStartWaitTime) <= 1500)) {
-                    FileLog.e("tmessages", "HOLE IN CHANNEL " + channelId + " UPDATES QUEUE - will wait more time");
+                    FileLog.e("HOLE IN CHANNEL " + channelId + " UPDATES QUEUE - will wait more time");
                     if (anyProceed) {
                         updatesStartWaitTimeChannels.put(channelId, System.currentTimeMillis());
                     }
                     return;
                 } else {
-                    FileLog.e("tmessages", "HOLE IN CHANNEL " + channelId + " UPDATES QUEUE - getChannelDifference ");
+                    FileLog.e("HOLE IN CHANNEL " + channelId + " UPDATES QUEUE - getChannelDifference ");
                     updatesStartWaitTimeChannels.remove(channelId);
                     updatesQueueChannels.remove(channelId);
                     getChannelDifference(channelId);
@@ -4643,7 +4643,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
         }
         updatesQueueChannels.remove(channelId);
         updatesStartWaitTimeChannels.remove(channelId);
-        FileLog.e("tmessages", "UPDATES CHANNEL " + channelId + " QUEUE PROCEED - OK");
+        FileLog.e("UPDATES CHANNEL " + channelId + " QUEUE PROCEED - OK");
     }
 
     private void processUpdatesQueue(int type, int state) {
@@ -4695,13 +4695,13 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     a--;
                 } else if (updateState == 1) {
                     if (getUpdatesStartTime(type) != 0 && (anyProceed || Math.abs(System.currentTimeMillis() - getUpdatesStartTime(type)) <= 1500)) {
-                        FileLog.e("tmessages", "HOLE IN UPDATES QUEUE - will wait more time");
+                        FileLog.e("HOLE IN UPDATES QUEUE - will wait more time");
                         if (anyProceed) {
                             setUpdatesStartTime(type, System.currentTimeMillis());
                         }
                         return;
                     } else {
-                        FileLog.e("tmessages", "HOLE IN UPDATES QUEUE - getDifference");
+                        FileLog.e("HOLE IN UPDATES QUEUE - getDifference");
                         setUpdatesStartTime(type, 0);
                         updatesQueue.clear();
                         getDifference();
@@ -4713,7 +4713,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 }
             }
             updatesQueue.clear();
-            FileLog.e("tmessages", "UPDATES QUEUE PROCEED - OK");
+            FileLog.e("UPDATES QUEUE PROCEED - OK");
         }
         setUpdatesStartTime(type, 0);
     }
@@ -4735,9 +4735,8 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 data = new NativeByteBuffer(4 + channel.getObjectSize());
                 data.writeInt32(0);
                 channel.serializeToStream(data);
-
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
             newTaskId = MessagesStorage.getInstance().createPendingTask(data);
         } else {
@@ -4827,7 +4826,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 data.writeInt32(channelId);
                 data.writeInt32(newDialogType);
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
             newTaskId = MessagesStorage.getInstance().createPendingTask(data);
         } else {
@@ -5020,8 +5019,8 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                                     if (!res.isFinal) {
                                         getChannelDifference(channelId);
                                     }
-                                    FileLog.e("tmessages", "received channel difference with pts = " + res.pts + " channelId = " + channelId);
-                                    FileLog.e("tmessages", "new_messages = " + res.new_messages.size() + " messages = " + res.messages.size() + " users = " + res.users.size() + " chats = " + res.chats.size() + " other updates = " + res.other_updates.size());
+                                    FileLog.e("received channel difference with pts = " + res.pts + " channelId = " + channelId);
+                                    FileLog.e("new_messages = " + res.new_messages.size() + " messages = " + res.messages.size() + " users = " + res.users.size() + " chats = " + res.chats.size() + " other updates = " + res.other_updates.size());
 
                                     if (newTaskId != 0) {
                                         MessagesStorage.getInstance().removePendingTask(newTaskId);
@@ -5085,7 +5084,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
         if (req.date == 0) {
             req.date = ConnectionsManager.getInstance().getCurrentTime();
         }
-        FileLog.e("tmessages", "start getDifference with date = " + MessagesStorage.lastDateValue + " pts = " + MessagesStorage.lastPtsValue + " seq = " + MessagesStorage.lastSeqValue);
+        FileLog.e("start getDifference with date = " + MessagesStorage.lastDateValue + " pts = " + MessagesStorage.lastPtsValue + " seq = " + MessagesStorage.lastSeqValue);
         ConnectionsManager.getInstance().setIsUpdating(true);
         ConnectionsManager.getInstance().sendRequest(req, new RequestDelegate() {
             @Override
@@ -5288,7 +5287,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                                         }
                                     }
                                     MessagesStorage.getInstance().saveDiffParams(MessagesStorage.lastSeqValue, MessagesStorage.lastPtsValue, MessagesStorage.lastDateValue, MessagesStorage.lastQtsValue);
-                                    FileLog.e("tmessages", "received difference with date = " + MessagesStorage.lastDateValue + " pts = " + MessagesStorage.lastPtsValue + " seq = " + MessagesStorage.lastSeqValue + " messages = " + res.new_messages.size() + " users = " + res.users.size() + " chats = " + res.chats.size() + " other updates = " + res.other_updates.size());
+                                    FileLog.e("received difference with date = " + MessagesStorage.lastDateValue + " pts = " + MessagesStorage.lastPtsValue + " seq = " + MessagesStorage.lastSeqValue + " messages = " + res.new_messages.size() + " users = " + res.users.size() + " chats = " + res.chats.size() + " other updates = " + res.other_updates.size());
                                 }
                             });
                         }
@@ -5658,12 +5657,12 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     }
                     MessagesStorage.getInstance().putMessages(arr, false, true, false, 0);
                 } else if (MessagesStorage.lastPtsValue != updates.pts) {
-                    FileLog.e("tmessages", "need get diff short message, pts: " + MessagesStorage.lastPtsValue + " " + updates.pts + " count = " + updates.pts_count);
+                    FileLog.e("need get diff short message, pts: " + MessagesStorage.lastPtsValue + " " + updates.pts + " count = " + updates.pts_count);
                     if (gettingDifference || updatesStartWaitTimePts == 0 || Math.abs(System.currentTimeMillis() - updatesStartWaitTimePts) <= 1500) {
                         if (updatesStartWaitTimePts == 0) {
                             updatesStartWaitTimePts = System.currentTimeMillis();
                         }
-                        FileLog.e("tmessages", "add to queue");
+                        FileLog.e("add to queue");
                         updatesQueuePts.add(updates);
                     } else {
                         needGetDiff = true;
@@ -5699,7 +5698,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     if (update instanceof TLRPC.TL_updateNewChannelMessage) {
                         int channelId = ((TLRPC.TL_updateNewChannelMessage) update).message.to_id.channel_id;
                         if (minChannels.containsKey(channelId)) {
-                            FileLog.e("tmessages", "need get diff because of min channel " + channelId);
+                            FileLog.e("need get diff because of min channel " + channelId);
                             needGetDiff = true;
                             break;
                         }
@@ -5730,18 +5729,18 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                         }
                         if (MessagesStorage.lastPtsValue + updatesNew.pts_count == updatesNew.pts) {
                             if (!processUpdateArray(updatesNew.updates, updates.users, updates.chats, false)) {
-                                FileLog.e("tmessages", "need get diff inner TL_updates, seq: " + MessagesStorage.lastSeqValue + " " + updates.seq);
+                                FileLog.e("need get diff inner TL_updates, seq: " + MessagesStorage.lastSeqValue + " " + updates.seq);
                                 needGetDiff = true;
                             } else {
                                 MessagesStorage.lastPtsValue = updatesNew.pts;
                             }
                         } else if (MessagesStorage.lastPtsValue != updatesNew.pts) {
-                            FileLog.e("tmessages", update + " need get diff, pts: " + MessagesStorage.lastPtsValue + " " + updatesNew.pts + " count = " + updatesNew.pts_count);
+                            FileLog.e(update + " need get diff, pts: " + MessagesStorage.lastPtsValue + " " + updatesNew.pts + " count = " + updatesNew.pts_count);
                             if (gettingDifference || updatesStartWaitTimePts == 0 || updatesStartWaitTimePts != 0 && Math.abs(System.currentTimeMillis() - updatesStartWaitTimePts) <= 1500) {
                                 if (updatesStartWaitTimePts == 0) {
                                     updatesStartWaitTimePts = System.currentTimeMillis();
                                 }
-                                FileLog.e("tmessages", "add to queue");
+                                FileLog.e("add to queue");
                                 updatesQueuePts.add(updatesNew);
                             } else {
                                 needGetDiff = true;
@@ -5767,12 +5766,12 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                             MessagesStorage.lastQtsValue = updatesNew.pts;
                             needReceivedQueue = true;
                         } else if (MessagesStorage.lastPtsValue != updatesNew.pts) {
-                            FileLog.e("tmessages", update + " need get diff, qts: " + MessagesStorage.lastQtsValue + " " + updatesNew.pts);
+                            FileLog.e(update + " need get diff, qts: " + MessagesStorage.lastQtsValue + " " + updatesNew.pts);
                             if (gettingDifference || updatesStartWaitTimeQts == 0 || updatesStartWaitTimeQts != 0 && Math.abs(System.currentTimeMillis() - updatesStartWaitTimeQts) <= 1500) {
                                 if (updatesStartWaitTimeQts == 0) {
                                     updatesStartWaitTimeQts = System.currentTimeMillis();
                                 }
-                                FileLog.e("tmessages", "add to queue");
+                                FileLog.e("add to queue");
                                 updatesQueueQts.add(updatesNew);
                             } else {
                                 needGetDiff = true;
@@ -5816,7 +5815,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                         if (!skipUpdate) {
                             if (channelPts + updatesNew.pts_count == updatesNew.pts) {
                                 if (!processUpdateArray(updatesNew.updates, updates.users, updates.chats, false)) {
-                                    FileLog.e("tmessages", "need get channel diff inner TL_updates, channel_id = " + channelId);
+                                    FileLog.e("need get channel diff inner TL_updates, channel_id = " + channelId);
                                     if (needGetChannelsDiff == null) {
                                         needGetChannelsDiff = new ArrayList<>();
                                     } else if (!needGetChannelsDiff.contains(channelId)) {
@@ -5827,7 +5826,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                                     MessagesStorage.getInstance().saveChannelPts(channelId, updatesNew.pts);
                                 }
                             } else if (channelPts != updatesNew.pts) {
-                                FileLog.e("tmessages", update + " need get channel diff, pts: " + channelPts + " " + updatesNew.pts + " count = " + updatesNew.pts_count + " channelId = " + channelId);
+                                FileLog.e(update + " need get channel diff, pts: " + channelPts + " " + updatesNew.pts + " count = " + updatesNew.pts_count + " channelId = " + channelId);
                                 Long updatesStartWaitTime = updatesStartWaitTimeChannels.get(channelId);
                                 Boolean gettingDifferenceChannel = gettingDifferenceChannels.get(channelId);
                                 if (gettingDifferenceChannel == null) {
@@ -5837,7 +5836,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                                     if (updatesStartWaitTime == null) {
                                         updatesStartWaitTimeChannels.put(channelId, System.currentTimeMillis());
                                     }
-                                    FileLog.e("tmessages", "add to queue");
+                                    FileLog.e("add to queue");
                                     ArrayList<TLRPC.Updates> arrayList = updatesQueueChannels.get(channelId);
                                     if (arrayList == null) {
                                         arrayList = new ArrayList<>();
@@ -5853,7 +5852,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                                 }
                             }
                         } else {
-                            FileLog.e("tmessages", "need load unknown channel = " + channelId);
+                            FileLog.e("need load unknown channel = " + channelId);
                         }
                     } else {
                         break;
@@ -5878,16 +5877,16 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     }
                 } else {
                     if (updates instanceof TLRPC.TL_updatesCombined) {
-                        FileLog.e("tmessages", "need get diff TL_updatesCombined, seq: " + MessagesStorage.lastSeqValue + " " + updates.seq_start);
+                        FileLog.e("need get diff TL_updatesCombined, seq: " + MessagesStorage.lastSeqValue + " " + updates.seq_start);
                     } else {
-                        FileLog.e("tmessages", "need get diff TL_updates, seq: " + MessagesStorage.lastSeqValue + " " + updates.seq);
+                        FileLog.e("need get diff TL_updates, seq: " + MessagesStorage.lastSeqValue + " " + updates.seq);
                     }
 
                     if (gettingDifference || updatesStartWaitTimeSeq == 0 || Math.abs(System.currentTimeMillis() - updatesStartWaitTimeSeq) <= 1500) {
                         if (updatesStartWaitTimeSeq == 0) {
                             updatesStartWaitTimeSeq = System.currentTimeMillis();
                         }
-                        FileLog.e("tmessages", "add TL_updates/Combined to queue");
+                        FileLog.e("add TL_updates/Combined to queue");
                         updatesQueueSeq.add(updates);
                     } else {
                         needGetDiff = true;
@@ -5895,7 +5894,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 }
             }
         } else if (updates instanceof TLRPC.TL_updatesTooLong) {
-            FileLog.e("tmessages", "need get diff TL_updatesTooLong");
+            FileLog.e("need get diff TL_updatesTooLong");
             needGetDiff = true;
         } else if (updates instanceof UserActionUpdatesSeq) {
             MessagesStorage.lastSeqValue = updates.seq;
@@ -6020,7 +6019,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
 
         for (int c = 0; c < updates.size(); c++) {
             TLRPC.Update update = updates.get(c);
-            FileLog.d("tmessages", "process update " + update);
+            FileLog.d("process update " + update);
             if (update instanceof TLRPC.TL_updateNewMessage || update instanceof TLRPC.TL_updateNewChannelMessage) {
                 TLRPC.Message message;
                 if (update instanceof TLRPC.TL_updateNewMessage) {
@@ -6028,7 +6027,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 } else {
                     message = ((TLRPC.TL_updateNewChannelMessage) update).message;
                     if (BuildVars.DEBUG_VERSION) {
-                        FileLog.d("tmessages", update + " channelId = " + message.to_id.channel_id);
+                        FileLog.d(update + " channelId = " + message.to_id.channel_id);
                     }
                     if (!message.out && message.from_id == UserConfig.getClientUserId()) {
                         message.out = true;
@@ -6057,7 +6056,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 if (checkForUsers) {
                     if (chat_id != 0) {
                         if (chat == null) {
-                            FileLog.d("tmessages", "not found chat " + chat_id);
+                            FileLog.d("not found chat " + chat_id);
                             return false;
                         }
                     }
@@ -6091,7 +6090,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                                 putUser(user, true);
                             }
                             if (user == null) {
-                                FileLog.d("tmessages", "not found user " + user_id);
+                                FileLog.d("not found user " + user_id);
                                 return false;
                             }
                             if (a == 1 && user.status != null && user.status.expires <= 0) {
@@ -6459,7 +6458,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 webPages.put(update.webpage.id, update.webpage);
             } else if (update instanceof TLRPC.TL_updateChannelTooLong) {
                 if (BuildVars.DEBUG_VERSION) {
-                    FileLog.d("tmessages", update + " channelId = " + update.channel_id);
+                    FileLog.d(update + " channelId = " + update.channel_id);
                 }
                 Integer channelPts = channelsPts.get(update.channel_id);
                 if (channelPts == null) {
@@ -6510,7 +6509,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 read_max.put(dialog_id, Math.max(value, update.max_id));
             } else if (update instanceof TLRPC.TL_updateDeleteChannelMessages) {
                 if (BuildVars.DEBUG_VERSION) {
-                    FileLog.d("tmessages", update + " channelId = " + update.channel_id);
+                    FileLog.d(update + " channelId = " + update.channel_id);
                 }
                 ArrayList<Integer> arrayList = deletedMessages.get(update.channel_id);
                 if (arrayList == null) {
@@ -6520,12 +6519,12 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 arrayList.addAll(update.messages);
             } else if (update instanceof TLRPC.TL_updateChannel) {
                 if (BuildVars.DEBUG_VERSION) {
-                    FileLog.d("tmessages", update + " channelId = " + update.channel_id);
+                    FileLog.d(update + " channelId = " + update.channel_id);
                 }
                 updatesOnMainThread.add(update);
             } else if (update instanceof TLRPC.TL_updateChannelMessageViews) {
                 if (BuildVars.DEBUG_VERSION) {
-                    FileLog.d("tmessages", update + " channelId = " + update.channel_id);
+                    FileLog.d(update + " channelId = " + update.channel_id);
                 }
                 TLRPC.TL_updateChannelMessageViews updateChannelMessageViews = (TLRPC.TL_updateChannelMessageViews) update;
                 SparseIntArray array = channelViews.get(update.channel_id);
@@ -7395,7 +7394,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                             try {
                                 progressDialog.dismiss();
                             } catch (Exception e) {
-                                FileLog.e("tmessages", e);
+                                FileLog.e(e);
                             }
                             fragment.setVisibleDialog(null);
                             if (error == null) {
@@ -7413,7 +7412,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                                     try {
                                         Toast.makeText(fragment.getParentActivity(), LocaleController.getString("NoUsernameFound", R.string.NoUsernameFound), Toast.LENGTH_SHORT).show();
                                     } catch (Exception e) {
-                                        FileLog.e("tmessages", e);
+                                        FileLog.e(e);
                                     }
                                 }
                             }
@@ -7428,7 +7427,7 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     try {
                         dialog.dismiss();
                     } catch (Exception e) {
-                        FileLog.e("tmessages", e);
+                        FileLog.e(e);
                     }
                     if (fragment != null) {
                         fragment.setVisibleDialog(null);

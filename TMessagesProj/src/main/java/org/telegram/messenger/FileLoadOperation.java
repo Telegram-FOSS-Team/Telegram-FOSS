@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2016.
+ * Copyright Nikolai Kudashov, 2013-2017.
  */
 
 package org.telegram.messenger;
@@ -145,7 +145,7 @@ public class FileLoadOperation {
                 }
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
             onFail(true, 0);
         }
     }
@@ -226,7 +226,7 @@ public class FileLoadOperation {
             }
 
             if (BuildVars.DEBUG_VERSION) {
-                FileLog.d("tmessages", "start loading file to temp = " + cacheFileTemp + " final = " + cacheFileFinal);
+                FileLog.d("start loading file to temp = " + cacheFileTemp + " final = " + cacheFileFinal);
             }
 
             if (fileNameIv != null) {
@@ -240,7 +240,7 @@ public class FileLoadOperation {
                         downloadedBytes = 0;
                     }
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                     downloadedBytes = 0;
                 }
             }
@@ -250,7 +250,7 @@ public class FileLoadOperation {
                     fileOutputStream.seek(downloadedBytes);
                 }
             } catch (Exception e) {
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
             if (fileOutputStream == null) {
                 onFail(true, 0);
@@ -308,13 +308,13 @@ public class FileLoadOperation {
                 try {
                     fileOutputStream.getChannel().close();
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
                 fileOutputStream.close();
                 fileOutputStream = null;
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
 
         try {
@@ -323,7 +323,7 @@ public class FileLoadOperation {
                 fiv = null;
             }
         } catch (Exception e) {
-            FileLog.e("tmessages", e);
+            FileLog.e(e);
         }
         if (delayedRequestInfos != null) {
             for (int a = 0; a < delayedRequestInfos.size(); a++) {
@@ -351,7 +351,7 @@ public class FileLoadOperation {
             boolean renameResult = cacheFileTemp.renameTo(cacheFileFinal);
             if (!renameResult) {
                 if (BuildVars.DEBUG_VERSION) {
-                    FileLog.e("tmessages", "unable to rename temp = " + cacheFileTemp + " to final = " + cacheFileFinal + " retry = " + renameRetryCount);
+                    FileLog.e("unable to rename temp = " + cacheFileTemp + " to final = " + cacheFileFinal + " retry = " + renameRetryCount);
                 }
                 renameRetryCount++;
                 if (renameRetryCount < 3) {
@@ -372,7 +372,7 @@ public class FileLoadOperation {
             }
         }
         if (BuildVars.DEBUG_VERSION) {
-            FileLog.e("tmessages", "finished downloading file to " + cacheFileFinal);
+            FileLog.e("finished downloading file to " + cacheFileFinal);
         }
         delegate.didFinishLoadingFile(FileLoadOperation.this, cacheFileFinal);
     }
@@ -433,7 +433,7 @@ public class FileLoadOperation {
                 }
             } catch (Exception e) {
                 onFail(false, 0);
-                FileLog.e("tmessages", e);
+                FileLog.e(e);
             }
         } else {
             if (error.text.contains("FILE_MIGRATE_")) {
@@ -458,7 +458,7 @@ public class FileLoadOperation {
                     try {
                         onFinishLoadingFile();
                     } catch (Exception e) {
-                        FileLog.e("tmessages", e);
+                        FileLog.e(e);
                         onFail(false, 0);
                     }
                 } else {
@@ -468,7 +468,9 @@ public class FileLoadOperation {
                 onFail(false, 2);
             } else {
                 if (location != null) {
-                    FileLog.e("tmessages", "" + location + " id = " + location.id + " local_id = " + location.local_id + " access_hash = " + location.access_hash + " volume_id = " + location.volume_id + " secret = " + location.secret);
+                    FileLog.e("" + location + " id = " + location.id + " local_id = " + location.local_id + " access_hash = " + location.access_hash + " volume_id = " + location.volume_id + " secret = " + location.secret);
+                } else if (webLocation != null) {
+                    FileLog.e("" + webLocation + " id = " + webLocation.url + " access_hash = " + webLocation.access_hash);
                 }
                 onFail(false, 0);
             }
