@@ -115,7 +115,7 @@ public class SearchQuery {
                             }
                         });
                     } catch (Exception e) {
-                        FileLog.e("tmessages", e);
+                        FileLog.e(e);
                     }
                 }
             });
@@ -200,7 +200,7 @@ public class SearchQuery {
                                                 }
                                             });
                                         } catch (Exception e) {
-                                            FileLog.e("tmessages", e);
+                                            FileLog.e(e);
                                         }
                                     }
                                 });
@@ -328,7 +328,7 @@ public class SearchQuery {
                         cursor.dispose();
                     }
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
                 final double dtFinal = dt;
                 AndroidUtilities.runOnUIThread(new Runnable() {
@@ -389,7 +389,7 @@ public class SearchQuery {
                     state.step();
                     state.dispose();
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });
@@ -402,7 +402,7 @@ public class SearchQuery {
                 try {
                     MessagesStorage.getInstance().getDatabase().executeFast(String.format(Locale.US, "DELETE FROM chat_hints WHERE did = %d AND type = %d", did, type)).stepThis().dispose();
                 } catch (Exception e) {
-                    FileLog.e("tmessages", e);
+                    FileLog.e(e);
                 }
             }
         });
