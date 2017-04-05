@@ -52,6 +52,8 @@ public class StickersQuery {
     private static int loadHash[] = new int[2];
     private static int loadDate[] = new int[2];
 
+    private static int archivedStickersCount[] = new int[2];
+
     private static HashMap<Long, String> stickersByEmoji = new HashMap<>();
     private static HashMap<String, ArrayList<TLRPC.Document>> allStickers = new HashMap<>();
 
@@ -731,6 +733,21 @@ public class StickersQuery {
         }
     }
 
+    public static int getFeaturesStickersHashWithoutUnread() {
+        long acc = 0;
+        for (int a = 0; a < featuredStickerSets.size(); a++) {
+            TLRPC.StickerSet set = featuredStickerSets.get(a).set;
+            if (set.archived) {
+                continue;
+            }
+            int high_id = (int) (set.id >> 32);
+            int lower_id = (int) set.id;
+            acc = ((acc * 20261) + 0x80000000L + high_id) % 0x80000000L;
+            acc = ((acc * 20261) + 0x80000000L + lower_id) % 0x80000000L;
+        }
+        return (int) acc;
+    }
+
     public static void markFaturedStickersByIdAsRead(final long id) {
         if (!unreadStickerSets.contains(id) || readingStickerSets.contains(id)) { //TODO
             return;
@@ -756,10 +773,49 @@ public class StickersQuery {
         }, 1000);
     }
 
+    public static int getArchivedStickersCount(int type) {
+        return archivedStickersCount[type];
+    }
+
+    public static void loadArchivedStickersCount(final int type, boolean cache) {
+        if (cache) {
+            SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Activity.MODE_PRIVATE);
+            int count = preferences.getInt("archivedStickersCount" + type, -1);
+            if (count == -1) {
+                loadArchivedStickersCount(type, false);
+            } else {
+                archivedStickersCount[type] = count;
+                NotificationCenter.getInstance().postNotificationName(NotificationCenter.archivedStickersCountDidLoaded, type);
+            }
+        } else {
+            TLRPC.TL_messages_getArchivedStickers req = new TLRPC.TL_messages_getArchivedStickers();
+            req.limit = 0;
+            req.masks = type == TYPE_MASK;
+            int reqId = ConnectionsManager.getInstance().sendRequest(req, new RequestDelegate() {
+                @Override
+                public void run(final TLObject response, final TLRPC.TL_error error) {
+                    AndroidUtilities.runOnUIThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (error == null) {
+                                TLRPC.TL_messages_archivedStickers res = (TLRPC.TL_messages_archivedStickers) response;
+                                archivedStickersCount[type] = res.count;
+                                SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Activity.MODE_PRIVATE);
+                                preferences.edit().putInt("archivedStickersCount" + type, res.count).commit();
+                                NotificationCenter.getInstance().postNotificationName(NotificationCenter.archivedStickersCountDidLoaded, type);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    }
+
     public static void loadStickers(final int type, boolean cache, boolean force) {
         if (loadingStickers[type]) {
             return;
         }
+        loadArchivedStickersCount(type, cache);
         loadingStickers[type] = true;
         if (cache) {
             MessagesStorage.getInstance().getStorageQueue().postRunnable(new Runnable() {
@@ -917,7 +973,15 @@ public class StickersQuery {
 
     public static String getStickerSetName(long setId) {
         TLRPC.TL_messages_stickerSet stickerSet = stickerSetsById.get(setId);
-        return stickerSet != null ? stickerSet.set.short_name : null;
+        if (stickerSet != null) {
+            return stickerSet.set.short_name;
+
+        }
+        TLRPC.StickerSetCovered stickerSetCovered = featuredStickerSetsById.get(setId);
+        if (stickerSetCovered != null) {
+            return stickerSetCovered.set.short_name;
+        }
+        return null;
     }
 
     public static long getStickerSetId(TLRPC.Document document) {
