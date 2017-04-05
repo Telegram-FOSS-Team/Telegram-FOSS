@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -25,19 +24,14 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
-import org.telegram.messenger.Utilities;
 import org.telegram.messenger.VideoEditedInfo;
 import org.telegram.messenger.ApplicationLoader;
-import org.telegram.messenger.FileLog;
 import org.telegram.messenger.R;
 import org.telegram.messenger.support.widget.GridLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView;
@@ -46,7 +40,6 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.messenger.MessageObject;
-import org.telegram.messenger.UserConfig;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -61,18 +54,8 @@ import org.telegram.ui.Components.PickerBottomLayout;
 import org.telegram.ui.Components.RadialProgressView;
 import org.telegram.ui.Components.RecyclerListView;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 public class PhotoPickerActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, PhotoViewer.PhotoViewerProvider {
 
@@ -91,10 +74,8 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
 
     private ArrayList<MediaController.SearchImage> searchResult = new ArrayList<>();
     private HashMap<String, MediaController.SearchImage> searchResultKeys = new HashMap<>();
-    private HashMap<String, MediaController.SearchImage> searchResultUrls = new HashMap<>();
 
     private boolean searching;
-    private boolean bingSearchEndReached = true;
     private boolean giphySearchEndReached = true;
     private String lastSearchString;
     private boolean loadingRecent;
@@ -102,7 +83,6 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
     private int giphyReqId;
     private int lastSearchToken;
     private boolean allowCaption = true;
-    private AsyncTask<Void, Void, JSONObject> currentBingTask;
 
     private MediaController.AlbumEntry selectedAlbum;
 
@@ -151,10 +131,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
     public void onFragmentDestroy() {
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.closeChats);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recentImagesDidLoaded);
-        if (currentBingTask != null) {
-            currentBingTask.cancel(true);
-            currentBingTask = null;
-        }
+
         if (giphyReqId != 0) {
             ConnectionsManager.getInstance().cancelRequest(giphyReqId, true);
             giphyReqId = 0;
@@ -171,8 +148,6 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         if (selectedAlbum != null) {
             actionBar.setTitle(selectedAlbum.bucketName);
-        } else if (type == 0) {
-            actionBar.setTitle(LocaleController.getString("SearchImagesTitle", R.string.SearchImagesTitle));
         } else if (type == 1) {
             actionBar.setTitle(LocaleController.getString("SearchGifsTitle", R.string.SearchGifsTitle));
         }
@@ -205,13 +180,8 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                         searchResult.clear();
                         searchResultKeys.clear();
                         lastSearchString = null;
-                        bingSearchEndReached = true;
                         giphySearchEndReached = true;
                         searching = false;
-                        if (currentBingTask != null) {
-                            currentBingTask.cancel(true);
-                            currentBingTask = null;
-                        }
                         if (giphyReqId != 0) {
                             ConnectionsManager.getInstance().cancelRequest(giphyReqId, true);
                             giphyReqId = 0;
@@ -227,16 +197,34 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
 
                 @Override
                 public void onSearchPressed(EditText editText) {
-                    // Telegram-FOSS doesn't support searching with external engines (privacy issues)
-                    return;
+                    if (editText.getText().toString().length() == 0) {
+                        return;
+                    }
+                    searchResult.clear();
+                    searchResultKeys.clear();
+                    giphySearchEndReached = true;
+                    if (type == 1) {
+                        nextGiphySearchOffset = 0;
+                        searchGiphyImages(editText.getText().toString(), 0);
+                    }
+                    lastSearchString = editText.getText().toString();
+                    if (lastSearchString.length() == 0) {
+                        lastSearchString = null;
+                        if (type == 0) {
+                            emptyView.setText(LocaleController.getString("NoRecentPhotos", R.string.NoRecentPhotos));
+                        } else if (type == 1) {
+                            emptyView.setText(LocaleController.getString("NoRecentGIFs", R.string.NoRecentGIFs));
+                        }
+                    } else {
+                        emptyView.setText(LocaleController.getString("NoResult", R.string.NoResult));
+                    }
+                    updateSearchInterface();
                 }
             });
         }
 
         if (selectedAlbum == null) {
-            if (type == 0) {
-                searchItem.getSearchField().setHint(LocaleController.getString("SearchImagesTitle", R.string.SearchImagesTitle));
-            } else if (type == 1) {
+            if (type == 1) {
                 searchItem.getSearchField().setHint(LocaleController.getString("SearchGifsTitle", R.string.SearchGifsTitle));
             }
         }
@@ -344,7 +332,24 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
             listView.setOnItemLongClickListener(new RecyclerListView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemClick(View view, int position) {
-					// Telegram-FOSS doesn't support searching with external engines (privacy issues)
+                    if (searchResult.isEmpty() && lastSearchString == null) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                        builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
+                        builder.setMessage(LocaleController.getString("ClearSearch", R.string.ClearSearch));
+                        builder.setPositiveButton(LocaleController.getString("ClearButton", R.string.ClearButton).toUpperCase(), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                recentImages.clear();
+                                if (listAdapter != null) {
+                                    listAdapter.notifyDataSetChanged();
+                                }
+                                MessagesStorage.getInstance().clearWebRecent(type);
+                            }
+                        });
+                        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+                        showDialog(builder.create());
+                        return true;
+                    }
                     return false;
                 }
             });
@@ -357,9 +362,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         if (selectedAlbum != null) {
             emptyView.setText(LocaleController.getString("NoPhotos", R.string.NoPhotos));
         } else {
-            if (type == 0) {
-                emptyView.setText(LocaleController.getString("NoRecentPhotos", R.string.NoRecentPhotos));
-            } else if (type == 1) {
+            if (type == 1) {
                 emptyView.setText(LocaleController.getString("NoRecentGIFs", R.string.NoRecentGIFs));
             }
         }
@@ -376,7 +379,16 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
 
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-				// Telegram-FOSS doesn't support searching with external engines (privacy issues)
+                    int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+                    int visibleItemCount = firstVisibleItem == RecyclerView.NO_POSITION ? 0 : Math.abs(layoutManager.findLastVisibleItemPosition() - firstVisibleItem) + 1;
+                    if (visibleItemCount > 0) {
+                        int totalItemCount = layoutManager.getItemCount();
+                        if (visibleItemCount != 0 && firstVisibleItem + visibleItemCount > totalItemCount - 2 && !searching) {
+                            if (type == 1 && !giphySearchEndReached) {
+                                searchGiphyImages(searchItem.getSearchField().getText().toString(), nextGiphySearchOffset);
+                            }
+                        }
+                    }
                 }
             });
 
@@ -713,6 +725,91 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         }
     }
 
+    private void searchGiphyImages(final String query, int offset) {
+        if (searching) {
+            searching = false;
+            if (giphyReqId != 0) {
+                ConnectionsManager.getInstance().cancelRequest(giphyReqId, true);
+                giphyReqId = 0;
+            }
+        }
+        searching = true;
+        TLRPC.TL_messages_searchGifs req = new TLRPC.TL_messages_searchGifs();
+        req.q = query;
+        req.offset = offset;
+        final int token = ++lastSearchToken;
+        giphyReqId = ConnectionsManager.getInstance().sendRequest(req, new RequestDelegate() {
+            @Override
+            public void run(final TLObject response, TLRPC.TL_error error) {
+                AndroidUtilities.runOnUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (token != lastSearchToken) {
+                            return;
+                        }
+                        int addedCount = 0;
+                        if (response != null) {
+                            boolean added = false;
+                            TLRPC.TL_messages_foundGifs res = (TLRPC.TL_messages_foundGifs) response;
+                            nextGiphySearchOffset = res.next_offset;
+                            for (int a = 0; a < res.results.size(); a++) {
+                                TLRPC.FoundGif gif = res.results.get(a);
+                                if (searchResultKeys.containsKey(gif.url)) {
+                                    continue;
+                                }
+                                added = true;
+                                MediaController.SearchImage bingImage = new MediaController.SearchImage();
+                                bingImage.id = gif.url;
+                                if (gif.document != null) {
+                                    for (int b = 0; b < gif.document.attributes.size(); b++) {
+                                        TLRPC.DocumentAttribute attribute = gif.document.attributes.get(b);
+                                        if (attribute instanceof TLRPC.TL_documentAttributeImageSize || attribute instanceof TLRPC.TL_documentAttributeVideo) {
+                                            bingImage.width = attribute.w;
+                                            bingImage.height = attribute.h;
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    bingImage.width = gif.w;
+                                    bingImage.height = gif.h;
+                                }
+                                bingImage.size = 0;
+                                bingImage.imageUrl = gif.content_url;
+                                bingImage.thumbUrl = gif.thumb_url;
+                                bingImage.localUrl = gif.url + "|" + query;
+                                bingImage.document = gif.document;
+                                if (gif.photo != null && gif.document != null) {
+                                    TLRPC.PhotoSize size = FileLoader.getClosestPhotoSizeWithSize(gif.photo.sizes, itemWidth, true);
+                                    if (size != null) {
+                                        gif.document.thumb = size;
+                                    }
+                                }
+                                bingImage.type = 1;
+                                searchResult.add(bingImage);
+                                addedCount++;
+                                searchResultKeys.put(bingImage.id, bingImage);
+                            }
+                            giphySearchEndReached = !added;
+                        }
+                        searching = false;
+                        if (addedCount != 0) {
+                            listAdapter.notifyItemRangeInserted(searchResult.size(), addedCount);
+                        } else if (giphySearchEndReached) {
+                            listAdapter.notifyItemRemoved(searchResult.size() - 1);
+                        }
+                        if (searching && searchResult.isEmpty() || loadingRecent && lastSearchString == null) {
+                            emptyView.showProgress();
+                        } else {
+                            emptyView.showTextView();
+                        }
+                    }
+                });
+            }
+        });
+        ConnectionsManager.getInstance().bindRequestToGuid(giphyReqId, classGuid);
+    }
+
+
     public void setDelegate(PhotoPickerActivityDelegate delegate) {
         this.delegate = delegate;
     }
@@ -801,8 +898,6 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
             if (selectedAlbum == null) {
                 if (searchResult.isEmpty() && lastSearchString == null) {
                     return recentImages.size();
-                } else if (type == 0) {
-                    return searchResult.size() + (bingSearchEndReached ? 0 : 1);
                 } else if (type == 1) {
                     return searchResult.size() + (giphySearchEndReached ? 0 : 1);
                 }
