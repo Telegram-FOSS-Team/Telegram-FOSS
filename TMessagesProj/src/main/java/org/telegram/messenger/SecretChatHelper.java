@@ -9,8 +9,6 @@
 package org.telegram.messenger;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
@@ -22,6 +20,7 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLClassStore;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.ActionBar.AlertDialog;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -157,15 +156,7 @@ public class SecretChatHelper {
         if (!(encryptedChat instanceof TLRPC.TL_encryptedChat)) {
             return;
         }
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
-
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
         TLRPC.Message message;
 
         if (resendMessage != null) {
@@ -184,7 +175,7 @@ public class SecretChatHelper {
     protected void processUpdateEncryption(TLRPC.TL_updateEncryption update, ConcurrentHashMap<Integer, TLRPC.User> usersDict) {
         final TLRPC.EncryptedChat newChat = update.chat;
         long dialog_id = ((long) newChat.id) << 32;
-        TLRPC.EncryptedChat existingChat = MessagesController.getInstance().getEncryptedChatDB(newChat.id);
+        TLRPC.EncryptedChat existingChat = MessagesController.getInstance().getEncryptedChatDB(newChat.id, false);
 
         if (newChat instanceof TLRPC.TL_encryptedChatRequested && existingChat == null) {
             int user_id = newChat.participant_id;
@@ -233,6 +224,7 @@ public class SecretChatHelper {
                 newChat.ttl = exist.ttl;
                 newChat.seq_in = exist.seq_in;
                 newChat.seq_out = exist.seq_out;
+                newChat.admin_id = exist.admin_id;
             }
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
@@ -251,15 +243,7 @@ public class SecretChatHelper {
         if (!(encryptedChat instanceof TLRPC.TL_encryptedChat)) {
             return;
         }
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
-
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
         TLRPC.Message message;
 
         if (resendMessage != null) {
@@ -279,15 +263,7 @@ public class SecretChatHelper {
         if (!(encryptedChat instanceof TLRPC.TL_encryptedChat)) {
             return;
         }
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
-
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
         TLRPC.Message message;
 
         if (resendMessage != null) {
@@ -310,15 +286,7 @@ public class SecretChatHelper {
             return;
         }
         sendingNotifyLayer.add(encryptedChat.id);
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
-
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
         TLRPC.Message message;
 
         if (resendMessage != null) {
@@ -339,15 +307,7 @@ public class SecretChatHelper {
             return;
         }
 
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
-
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
         TLRPC.Message message;
 
         if (resendMessage != null) {
@@ -370,15 +330,7 @@ public class SecretChatHelper {
             return;
         }
 
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
-
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
         TLRPC.Message message;
 
         if (resendMessage != null) {
@@ -402,15 +354,7 @@ public class SecretChatHelper {
             return;
         }
 
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
-
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
         TLRPC.Message message;
 
         if (resendMessage != null) {
@@ -433,15 +377,7 @@ public class SecretChatHelper {
             return;
         }
 
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
-
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
         TLRPC.Message message;
 
         if (resendMessage != null) {
@@ -463,15 +399,7 @@ public class SecretChatHelper {
             return;
         }
 
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
-
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
         TLRPC.Message message;
 
         if (resendMessage != null) {
@@ -491,15 +419,7 @@ public class SecretChatHelper {
             return;
         }
 
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
-
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
         TLRPC.Message message;
 
         if (resendMessage != null) {
@@ -527,14 +447,7 @@ public class SecretChatHelper {
             return;
         }
 
-        TLRPC.TL_decryptedMessageService reqSend;
-        if (AndroidUtilities.getPeerLayerVersion(encryptedChat.layer) >= 17) {
-            reqSend = new TLRPC.TL_decryptedMessageService();
-        } else {
-            reqSend = new TLRPC.TL_decryptedMessageService_layer8();
-            reqSend.random_bytes = new byte[15];
-            Utilities.random.nextBytes(reqSend.random_bytes);
-        }
+        TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();
 
         TLRPC.Message message;
 
@@ -644,51 +557,47 @@ public class SecretChatHelper {
             public void run() {
                 try {
                     TLObject toEncryptObject;
-                    if (AndroidUtilities.getPeerLayerVersion(chat.layer) >= 17) {
-                        TLRPC.TL_decryptedMessageLayer layer = new TLRPC.TL_decryptedMessageLayer();
-                        int myLayer = Math.max(17, AndroidUtilities.getMyLayerVersion(chat.layer));
-                        layer.layer = Math.min(myLayer, AndroidUtilities.getPeerLayerVersion(chat.layer));
-                        layer.message = req;
-                        layer.random_bytes = new byte[15];
-                        Utilities.random.nextBytes(layer.random_bytes);
-                        toEncryptObject = layer;
 
-                        if (chat.seq_in == 0 && chat.seq_out == 0) {
-                            if (chat.admin_id == UserConfig.getClientUserId()) {
-                                chat.seq_out = 1;
-                            } else {
-                                chat.seq_in = 1;
-                            }
-                        }
+                    TLRPC.TL_decryptedMessageLayer layer = new TLRPC.TL_decryptedMessageLayer();
+                    int myLayer = Math.max(46, AndroidUtilities.getMyLayerVersion(chat.layer));
+                    layer.layer = Math.min(myLayer, Math.max(46, AndroidUtilities.getPeerLayerVersion(chat.layer)));
+                    layer.message = req;
+                    layer.random_bytes = new byte[15];
+                    Utilities.random.nextBytes(layer.random_bytes);
+                    toEncryptObject = layer;
 
-                        if (newMsgObj.seq_in == 0 && newMsgObj.seq_out == 0) {
-                            layer.in_seq_no = chat.seq_in;
-                            layer.out_seq_no = chat.seq_out;
-                            chat.seq_out += 2;
-                            if (AndroidUtilities.getPeerLayerVersion(chat.layer) >= 20) {
-                                if (chat.key_create_date == 0) {
-                                    chat.key_create_date = ConnectionsManager.getInstance().getCurrentTime();
-                                }
-                                chat.key_use_count_out++;
-                                if ((chat.key_use_count_out >= 100 || chat.key_create_date < ConnectionsManager.getInstance().getCurrentTime() - 60 * 60 * 24 * 7) && chat.exchange_id == 0 && chat.future_key_fingerprint == 0) {
-                                    requestNewSecretChatKey(chat);
-                                }
-                            }
-                            MessagesStorage.getInstance().updateEncryptedChatSeq(chat);
-                            if (newMsgObj != null) {
-                                newMsgObj.seq_in = layer.in_seq_no;
-                                newMsgObj.seq_out = layer.out_seq_no;
-                                MessagesStorage.getInstance().setMessageSeq(newMsgObj.id, newMsgObj.seq_in, newMsgObj.seq_out);
-                            }
+                    if (chat.seq_in == 0 && chat.seq_out == 0) {
+                        if (chat.admin_id == UserConfig.getClientUserId()) {
+                            chat.seq_out = 1;
                         } else {
-                            layer.in_seq_no = newMsgObj.seq_in;
-                            layer.out_seq_no = newMsgObj.seq_out;
+                            chat.seq_in = 1;
                         }
-                        FileLog.e("tmessages", req + " send message with in_seq = " + layer.in_seq_no + " out_seq = " + layer.out_seq_no);
-                    } else {
-                        toEncryptObject = req;
                     }
 
+                    if (newMsgObj.seq_in == 0 && newMsgObj.seq_out == 0) {
+                        layer.in_seq_no = chat.seq_in;
+                        layer.out_seq_no = chat.seq_out;
+                        chat.seq_out += 2;
+                        if (AndroidUtilities.getPeerLayerVersion(chat.layer) >= 20) {
+                            if (chat.key_create_date == 0) {
+                                chat.key_create_date = ConnectionsManager.getInstance().getCurrentTime();
+                            }
+                            chat.key_use_count_out++;
+                            if ((chat.key_use_count_out >= 100 || chat.key_create_date < ConnectionsManager.getInstance().getCurrentTime() - 60 * 60 * 24 * 7) && chat.exchange_id == 0 && chat.future_key_fingerprint == 0) {
+                                requestNewSecretChatKey(chat);
+                            }
+                        }
+                        MessagesStorage.getInstance().updateEncryptedChatSeq(chat);
+                        if (newMsgObj != null) {
+                            newMsgObj.seq_in = layer.in_seq_no;
+                            newMsgObj.seq_out = layer.out_seq_no;
+                            MessagesStorage.getInstance().setMessageSeq(newMsgObj.id, newMsgObj.seq_in, newMsgObj.seq_out);
+                        }
+                    } else {
+                        layer.in_seq_no = newMsgObj.seq_in;
+                        layer.out_seq_no = newMsgObj.seq_out;
+                    }
+                    FileLog.e(req + " send message with in_seq = " + layer.in_seq_no + " out_seq = " + layer.out_seq_no);
 
                     int len = toEncryptObject.getObjectSize();
                     NativeByteBuffer toEncrypt = new NativeByteBuffer(4 + len);
@@ -1502,7 +1411,7 @@ public class SecretChatHelper {
     }
 
     protected ArrayList<TLRPC.Message> decryptMessage(TLRPC.EncryptedMessage message) {
-        final TLRPC.EncryptedChat chat = MessagesController.getInstance().getEncryptedChatDB(message.chat_id);
+        final TLRPC.EncryptedChat chat = MessagesController.getInstance().getEncryptedChatDB(message.chat_id, true);
         if (chat == null || chat instanceof TLRPC.TL_encryptedChatDiscarded) {
             return null;
         }
@@ -1604,6 +1513,8 @@ public class SecretChatHelper {
                     chat.in_seq_no = layer.in_seq_no;
                     MessagesStorage.getInstance().updateEncryptedChatSeq(chat);
                     object = layer.message;
+                } else if (!(object instanceof TLRPC.TL_decryptedMessageService && ((TLRPC.TL_decryptedMessageService) object).action instanceof TLRPC.TL_decryptedMessageActionNotifyLayer)) {
+                    return null;
                 }
                 ArrayList<TLRPC.Message> messages = new ArrayList<>();
                 TLRPC.Message decryptedMessage = processDecryptedObject(chat, message.file, message.date, message.random_id, object, new_key_used);
@@ -1700,6 +1611,7 @@ public class SecretChatHelper {
             newChat.key_use_count_out = encryptedChat.key_use_count_out;
             newChat.seq_in = encryptedChat.seq_in;
             newChat.seq_out = encryptedChat.seq_out;
+            newChat.admin_id = encryptedChat.admin_id;
             MessagesStorage.getInstance().updateEncryptedChat(newChat);
             AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
@@ -1837,7 +1749,7 @@ public class SecretChatHelper {
             return;
         }
         startingSecretChat = true;
-        final ProgressDialog progressDialog = new ProgressDialog(context);
+        final AlertDialog progressDialog = new AlertDialog(context, 1);
         progressDialog.setMessage(LocaleController.getString("Loading", R.string.Loading));
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setCancelable(false);
