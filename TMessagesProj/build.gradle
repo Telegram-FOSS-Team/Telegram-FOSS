@@ -4,24 +4,6 @@ repositories {
     mavenCentral()
 }
 
-task nativeLibsToJar(
-    type: Zip,
-    description: 'create a jar archive of the native libs') {
-    destinationDir file("$buildDir/native-libs")
-    baseName 'native-libs'
-    extension 'jar'
-    from fileTree(dir: 'libs', include: '**/*.so')
-    into 'lib/'
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
-
-tasks.withType(JavaCompile) {
-    compileTask -> compileTask.dependsOn(nativeLibsToJar)
-}
-
 configurations {
     compile.exclude module: 'support-v4'
 }
@@ -33,7 +15,6 @@ dependencies {
     compile 'com.android.support:support-v13:25.3.1'
     compile 'com.android.support:palette-v7:25.3.1'
     compile 'com.googlecode.mp4parser:isoparser:1.0.6'
-    compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
 android {
