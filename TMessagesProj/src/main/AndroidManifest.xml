@@ -279,7 +279,6 @@
         </receiver>
 
         <receiver android:name=".WearReplyReceiver" android:enabled="true"/>
-        <receiver android:name=".NetworkAlarm" android:enabled="true"/>
 
         <receiver android:name=".PopupReplyReceiver" android:enabled="true"/>
 
