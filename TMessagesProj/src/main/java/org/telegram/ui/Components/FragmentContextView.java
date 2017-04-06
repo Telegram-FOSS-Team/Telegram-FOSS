@@ -3,16 +3,21 @@
  * It is licensed under GNU GPL v. 2 or later.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Nikolai Kudashov, 2013-2016.
+ * Copyright Nikolai Kudashov, 2013-2017.
  */
 
 package org.telegram.ui.Components;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -25,16 +30,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.AnimatorListenerAdapterProxy;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.messenger.voip.VoIPService;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.AudioPlayerActivity;
+import org.telegram.ui.VoIPActivity;
 
-public class PlayerView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
+public class FragmentContextView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
     private ImageView playButton;
     private TextView titleTextView;
@@ -44,8 +51,11 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
     private BaseFragment fragment;
     private float topPadding;
     private boolean visible;
+    private FrameLayout frameLayout;
+    private ImageView closeButton;
+    private int currentStyle = -1;
 
-    public PlayerView(Context context, BaseFragment parentFragment) {
+    public FragmentContextView(Context context, BaseFragment parentFragment) {
         super(context);
 
         fragment = parentFragment;
@@ -53,8 +63,7 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
         ((ViewGroup) fragment.getFragmentView()).setClipToPadding(false);
 
         setTag(1);
-        FrameLayout frameLayout = new FrameLayout(context);
-        frameLayout.setBackgroundColor(Theme.INAPP_PLAYER_BACKGROUND_COLOR);
+        frameLayout = new FrameLayout(context);
         addView(frameLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36, Gravity.TOP | Gravity.LEFT, 0, 0, 0, 0));
 
         View shadow = new View(context);
@@ -63,6 +72,7 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
 
         playButton = new ImageView(context);
         playButton.setScaleType(ImageView.ScaleType.CENTER);
+        playButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_inappPlayerPlayPause), PorterDuff.Mode.MULTIPLY));
         addView(playButton, LayoutHelper.createFrame(36, 36, Gravity.TOP | Gravity.LEFT, 0, 0, 0, 0));
         playButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -76,7 +86,6 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
         });
 
         titleTextView = new TextView(context);
-        titleTextView.setTextColor(Theme.INAPP_PLAYER_TITLE_TEXT_COLOR);
         titleTextView.setMaxLines(1);
         titleTextView.setLines(1);
         titleTextView.setSingleLine(true);
@@ -85,8 +94,9 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
         titleTextView.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
         addView(titleTextView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36, Gravity.LEFT | Gravity.TOP, 35, 0, 36, 0));
 
-        ImageView closeButton = new ImageView(context);
+        closeButton = new ImageView(context);
         closeButton.setImageResource(R.drawable.miniplayer_close);
+        closeButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_inappPlayerClose), PorterDuff.Mode.MULTIPLY));
         closeButton.setScaleType(ImageView.ScaleType.CENTER);
         addView(closeButton, LayoutHelper.createFrame(36, 36, Gravity.RIGHT | Gravity.TOP));
         closeButton.setOnClickListener(new OnClickListener() {
@@ -99,9 +109,15 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
         setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MessageObject messageObject = MediaController.getInstance().getPlayingMessageObject();
-                if (messageObject != null && messageObject.isMusic() && fragment != null) {
-                    fragment.presentFragment(new AudioPlayerActivity());
+                if (currentStyle == 0) {
+                    MessageObject messageObject = MediaController.getInstance().getPlayingMessageObject();
+                    if (messageObject != null && messageObject.isMusic() && fragment != null) {
+                        fragment.presentFragment(new AudioPlayerActivity());
+                    }
+                } else if (currentStyle == 1) {
+                    Intent intent = new Intent(getContext(), VoIPActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    getContext().startActivity(intent);
                 }
             }
         });
@@ -121,6 +137,31 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
         }
     }
 
+    private void updateStyle(int style) {
+        if (currentStyle == style) {
+            return;
+        }
+        currentStyle = style;
+        if (style == 0) {
+            frameLayout.setBackgroundColor(Theme.getColor(Theme.key_inappPlayerBackground));
+            titleTextView.setTextColor(Theme.getColor(Theme.key_inappPlayerTitle));
+            closeButton.setVisibility(VISIBLE);
+            playButton.setVisibility(VISIBLE);
+            titleTextView.setTypeface(Typeface.DEFAULT);
+            titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+            titleTextView.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36, Gravity.LEFT | Gravity.TOP, 35, 0, 36, 0));
+        } else if (style == 1) {
+            titleTextView.setText(LocaleController.getString("ReturnToCall", R.string.ReturnToCall));
+            frameLayout.setBackgroundColor(Theme.getColor(Theme.key_returnToCallBackground));
+            titleTextView.setTextColor(Theme.getColor(Theme.key_returnToCallText));
+            closeButton.setVisibility(GONE);
+            playButton.setVisibility(GONE);
+            titleTextView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+            titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+            titleTextView.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER, 0, 0, 0, 2));
+        }
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -128,6 +169,8 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioDidReset);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioPlayStateChanged);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.audioDidStarted);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.didStartedCall);
+        NotificationCenter.getInstance().removeObserver(this, NotificationCenter.didEndedCall);
     }
 
     @Override
@@ -136,17 +179,28 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioDidReset);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioPlayStateChanged);
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.audioDidStarted);
-        checkPlayer(true);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.didStartedCall);
+        NotificationCenter.getInstance().addObserver(this, NotificationCenter.didEndedCall);
+        boolean callAvailable = VoIPService.getSharedInstance() != null && VoIPService.getSharedInstance().getCallState() != VoIPService.STATE_WAITING_INCOMING;
+        if (callAvailable) {
+            checkCall(true);
+        } else {
+            checkPlayer(true);
+        }
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, AndroidUtilities.dp(39));
+        super.onMeasure(widthMeasureSpec, AndroidUtilities.dp2(39));
     }
 
     @Override
     public void didReceivedNotification(int id, Object... args) {
-        if (id == NotificationCenter.audioDidStarted || id == NotificationCenter.audioPlayStateChanged || id == NotificationCenter.audioDidReset) {
+        if (id == NotificationCenter.audioDidStarted || id == NotificationCenter.audioPlayStateChanged || id == NotificationCenter.audioDidReset || id == NotificationCenter.didEndedCall) {
+            checkPlayer(false);
+        } else if (id == NotificationCenter.didStartedCall) {
+            checkCall(false);
+        } else {
             checkPlayer(false);
         }
     }
@@ -174,10 +228,10 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
                         animatorSet = null;
                     }
                     animatorSet = new AnimatorSet();
-                    animatorSet.playTogether(ObjectAnimator.ofFloat(this, "translationY", -AndroidUtilities.dp(36)),
+                    animatorSet.playTogether(ObjectAnimator.ofFloat(this, "translationY", -AndroidUtilities.dp2(36)),
                             ObjectAnimator.ofFloat(this, "topPadding", 0));
                     animatorSet.setDuration(200);
-                    animatorSet.addListener(new AnimatorListenerAdapterProxy() {
+                    animatorSet.addListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
                             if (animatorSet != null && animatorSet.equals(animation)) {
@@ -190,8 +244,10 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
                 }
             }
         } else {
+            int prevStyle = currentStyle;
+            updateStyle(0);
             if (create && topPadding == 0) {
-                setTopPadding(AndroidUtilities.dp(36));
+                setTopPadding(AndroidUtilities.dp2(36));
                 setTranslationY(0);
                 yPosition = 0;
             }
@@ -202,10 +258,10 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
                         animatorSet = null;
                     }
                     animatorSet = new AnimatorSet();
-                    animatorSet.playTogether(ObjectAnimator.ofFloat(this, "translationY", -AndroidUtilities.dp(36), 0),
-                            ObjectAnimator.ofFloat(this, "topPadding", AndroidUtilities.dp(36)));
+                    animatorSet.playTogether(ObjectAnimator.ofFloat(this, "translationY", -AndroidUtilities.dp2(36), 0),
+                            ObjectAnimator.ofFloat(this, "topPadding", AndroidUtilities.dp2(36)));
                     animatorSet.setDuration(200);
-                    animatorSet.addListener(new AnimatorListenerAdapterProxy() {
+                    animatorSet.addListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
                             if (animatorSet != null && animatorSet.equals(animation)) {
@@ -223,7 +279,7 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
             } else {
                 playButton.setImageResource(R.drawable.miniplayer_pause);
             }
-            if (lastMessageObject != messageObject) {
+            if (lastMessageObject != messageObject || prevStyle != 0) {
                 lastMessageObject = messageObject;
                 SpannableStringBuilder stringBuilder;
                 if (lastMessageObject.isVoice()) {
@@ -233,9 +289,79 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
                     stringBuilder = new SpannableStringBuilder(String.format("%s - %s", messageObject.getMusicAuthor(), messageObject.getMusicTitle()));
                     titleTextView.setEllipsize(TextUtils.TruncateAt.END);
                 }
-                TypefaceSpan span = new TypefaceSpan(AndroidUtilities.getTypeface("fonts/rmedium.ttf"), 0, Theme.INAPP_PLAYER_PERFORMER_TEXT_COLOR);
+                TypefaceSpan span = new TypefaceSpan(AndroidUtilities.getTypeface("fonts/rmedium.ttf"), 0, Theme.getColor(Theme.key_inappPlayerPerformer));
                 stringBuilder.setSpan(span, 0, messageObject.getMusicAuthor().length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                 titleTextView.setText(stringBuilder);
+            }
+        }
+    }
+
+    private void checkCall(boolean create) {
+        View fragmentView = fragment.getFragmentView();
+        if (!create && fragmentView != null) {
+            if (fragmentView.getParent() == null || ((View) fragmentView.getParent()).getVisibility() != VISIBLE) {
+                create = true;
+            }
+        }
+        boolean callAvailable = VoIPService.getSharedInstance() != null && VoIPService.getSharedInstance().getCallState() != VoIPService.STATE_WAITING_INCOMING;
+        if (!callAvailable) {
+            if (visible) {
+                visible = false;
+                if (create) {
+                    if (getVisibility() != GONE) {
+                        setVisibility(GONE);
+                    }
+                    setTopPadding(0);
+                } else {
+                    if (animatorSet != null) {
+                        animatorSet.cancel();
+                        animatorSet = null;
+                    }
+                    animatorSet = new AnimatorSet();
+                    animatorSet.playTogether(ObjectAnimator.ofFloat(this, "translationY", -AndroidUtilities.dp2(36)),
+                            ObjectAnimator.ofFloat(this, "topPadding", 0));
+                    animatorSet.setDuration(200);
+                    animatorSet.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            if (animatorSet != null && animatorSet.equals(animation)) {
+                                setVisibility(GONE);
+                                animatorSet = null;
+                            }
+                        }
+                    });
+                    animatorSet.start();
+                }
+            }
+        } else {
+            updateStyle(1);
+            if (create && topPadding == 0) {
+                setTopPadding(AndroidUtilities.dp2(36));
+                setTranslationY(0);
+                yPosition = 0;
+            }
+            if (!visible) {
+                if (!create) {
+                    if (animatorSet != null) {
+                        animatorSet.cancel();
+                        animatorSet = null;
+                    }
+                    animatorSet = new AnimatorSet();
+                    animatorSet.playTogether(ObjectAnimator.ofFloat(this, "translationY", -AndroidUtilities.dp2(36), 0),
+                            ObjectAnimator.ofFloat(this, "topPadding", AndroidUtilities.dp2(36)));
+                    animatorSet.setDuration(200);
+                    animatorSet.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            if (animatorSet != null && animatorSet.equals(animation)) {
+                                animatorSet = null;
+                            }
+                        }
+                    });
+                    animatorSet.start();
+                }
+                visible = true;
+                setVisibility(VISIBLE);
             }
         }
     }
@@ -251,7 +377,7 @@ public class PlayerView extends FrameLayout implements NotificationCenter.Notifi
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
         int restoreToCount = canvas.save();
         if (yPosition < 0) {
-            canvas.clipRect(0, (int) -yPosition, child.getMeasuredWidth(), AndroidUtilities.dp(39));
+            canvas.clipRect(0, (int) -yPosition, child.getMeasuredWidth(), AndroidUtilities.dp2(39));
         }
         final boolean result = super.drawChild(canvas, child, drawingTime);
         canvas.restoreToCount(restoreToCount);
