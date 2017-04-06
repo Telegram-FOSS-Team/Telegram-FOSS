@@ -4,6 +4,7 @@
 - Choose between 5 grades of video compression and preview the quality of your video before you send it.
 - **Telegram FOSS:**
   - Update to openssl 1.0.2k
+  - Restore SMS receiving functionality: reviewed, harmless
 
 #### v3.17.1 (not released as FOSS version)
 
