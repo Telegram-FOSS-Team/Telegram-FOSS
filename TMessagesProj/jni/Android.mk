@@ -922,7 +922,7 @@ endif
 
 MY_DIR := libtgvoip
 
-LOCAL_C_INCLUDES := jni/opus/include jni/boringssl/include/
+LOCAL_C_INCLUDES := jni/opus/include jni/openssl/include/
 
 LOCAL_SRC_FILES := \
 ./libtgvoip/logging.cpp \
