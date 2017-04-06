@@ -5,6 +5,7 @@
 - **Telegram FOSS:**
   - Update to openssl 1.0.2k
   - Restore SMS receiving functionality: reviewed, harmless
+  - Restore Giphy search
 
 #### v3.17.1 (not released as FOSS version)
 
