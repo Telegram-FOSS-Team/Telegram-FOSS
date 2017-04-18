@@ -6,6 +6,7 @@
   - Update to openssl 1.0.2k
   - Restore SMS receiving functionality: reviewed, harmless
   - Restore Giphy search
+  - Add [osmdroid](https://github.com/osmdroid/osmdroid) for location messages support
 
 #### v3.17.0 (not released as FOSS version)
 
