@@ -2523,14 +2523,12 @@ int32_t ConnectionsManager::getMtProtoVersion() {
 #ifdef ANDROID
 void ConnectionsManager::useJavaVM(JavaVM *vm, bool useJavaByteBuffers) {
     javaVm = vm;
-
-    JNIEnv *env = 0;
-    if (javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
-        DEBUG_E("can't get jnienv");
-        exit(1);
-    }
-
     if (useJavaByteBuffers) {
+        JNIEnv *env = 0;
+        if (javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
+            DEBUG_E("can't get jnienv");
+            exit(1);
+        }
         jclass_ByteBuffer = (jclass) env->NewGlobalRef(env->FindClass("java/nio/ByteBuffer"));
         if (jclass_ByteBuffer == 0) {
             DEBUG_E("can't find java ByteBuffer class");

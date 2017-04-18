@@ -2,25 +2,6 @@ apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
-    jcenter()
-}
-
-task nativeLibsToJar(
-    type: Zip,
-    description: 'create a jar archive of the native libs') {
-    destinationDir file("$buildDir/native-libs")
-    baseName 'native-libs'
-    extension 'jar'
-    from fileTree(dir: 'libs', include: '**/*.so')
-    into 'lib/'
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
-
-tasks.withType(JavaCompile) {
-    compileTask -> compileTask.dependsOn(nativeLibsToJar)
 }
 
 configurations {
@@ -28,13 +9,12 @@ configurations {
 }
 
 dependencies {
-    compile 'com.android.support:support-core-ui:25.3.0'
-    compile 'com.android.support:support-compat:25.3.0'
-    compile 'com.android.support:support-core-utils:25.3.0'
-    compile 'com.android.support:support-v13:25.3.0'
-    compile 'com.android.support:palette-v7:25.3.0'
+    compile 'com.android.support:support-core-ui:25.3.1'
+    compile 'com.android.support:support-compat:25.3.1'
+    compile 'com.android.support:support-core-utils:25.3.1'
+    compile 'com.android.support:support-v13:25.3.1'
+    compile 'com.android.support:palette-v7:25.3.1'
     compile 'com.googlecode.mp4parser:isoparser:1.0.6'
-    compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
 android {
@@ -54,6 +34,8 @@ android {
 
     dexOptions {
         jumboMode = true
+        // Telegram-FOSS uncomment if it doesn't compile
+        //javaMaxHeapSize "2g"
     }
 
     compileOptions {

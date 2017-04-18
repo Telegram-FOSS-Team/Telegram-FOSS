@@ -42,7 +42,6 @@ import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AlertsCreator;
-import org.telegram.ui.PaymentFormActivity;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -1089,11 +1088,9 @@ public class SendMessagesHelper implements NotificationCenter.NotificationCenter
                         } else if (response != null) {
                             if (button instanceof TLRPC.TL_keyboardButtonBuy) {
                                 if (response instanceof TLRPC.TL_payments_paymentForm) {
-                                    final TLRPC.TL_payments_paymentForm form = (TLRPC.TL_payments_paymentForm) response;
-                                    MessagesController.getInstance().putUsers(form.users, false);
-                                    parentFragment.presentFragment(new PaymentFormActivity(form, messageObject));
+                                    // Telegram-FOSS: kill payments for now
                                 } else if (response instanceof TLRPC.TL_payments_paymentReceipt) {
-                                    parentFragment.presentFragment(new PaymentFormActivity(messageObject, (TLRPC.TL_payments_paymentReceipt) response));
+                                    // Telegram-FOSS: kill payments for now
                                 }
                             } else {
                                 TLRPC.TL_messages_botCallbackAnswer res = (TLRPC.TL_messages_botCallbackAnswer) response;

@@ -9,7 +9,6 @@
 package org.telegram.messenger;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
@@ -170,10 +169,7 @@ public class ApplicationLoader extends Application {
         if (systemVersion.trim().length() == 0) {
             systemVersion = "SDK Unknown";
         }
-
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Activity.MODE_PRIVATE);
         // Telegram-FOSS: Unconditionally enable push connection
-        //boolean enablePushConnection = preferences.getBoolean("pushConnection", true);
         boolean enablePushConnection = true;
 
         MessagesController.getInstance();
@@ -226,22 +222,16 @@ public class ApplicationLoader extends Application {
     }*/
 
     public static void startPushService() {
-        SharedPreferences preferences = applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
 
         // Telegram-FOSS: unconditionally enable push service
         //if (preferences.getBoolean("pushService", true)) {
-        if (true) {
-            AlarmManager am = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
-            Intent i = new Intent(applicationContext, ApplicationLoader.class);
-            pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, i, 0);
+        AlarmManager am = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent(applicationContext, ApplicationLoader.class);
+        pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, i, 0);
 
-            am.cancel(pendingIntent);
-            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
-
-            applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
-        } else {
-            stopPushService();
-        }
+        am.cancel(pendingIntent);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
+        applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
     }
 
     public static void stopPushService() {
@@ -263,150 +253,4 @@ public class ApplicationLoader extends Application {
             e.printStackTrace();
         }
     }
-<<<<<<< HEAD
-||||||| parent of 5a281fb... [REVIEW] java/messenger
-
-    private void initPlayServices() {
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkPlayServices()) {
-                    if (UserConfig.pushString != null && UserConfig.pushString.length() != 0) {
-                        FileLog.d("tmessages", "GCM regId = " + UserConfig.pushString);
-                    } else {
-                        FileLog.d("tmessages", "GCM Registration not found.");
-                    }
-
-                    //if (UserConfig.pushString == null || UserConfig.pushString.length() == 0) {
-                    Intent intent = new Intent(applicationContext, GcmRegistrationIntentService.class);
-                    startService(intent);
-                    //} else {
-                    //    FileLog.d("tmessages", "GCM regId = " + UserConfig.pushString);
-                    //}
-                } else {
-                    FileLog.d("tmessages", "No valid Google Play Services APK found.");
-                }
-            }
-        }, 1000);
-    }
-
-    /*private void initPlayServices() {
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkPlayServices()) {
-                    if (UserConfig.pushString != null && UserConfig.pushString.length() != 0) {
-                        FileLog.d("tmessages", "GCM regId = " + UserConfig.pushString);
-                    } else {
-                        FileLog.d("tmessages", "GCM Registration not found.");
-                    }
-                    try {
-                        if (!FirebaseApp.getApps(ApplicationLoader.applicationContext).isEmpty()) {
-                            String token = FirebaseInstanceId.getInstance().getToken();
-                            if (token != null) {
-                                sendRegIdToBackend(token);
-                            }
-                        }
-                    } catch (Throwable e) {
-                        FileLog.e("tmessages", e);
-                    }
-                } else {
-                    FileLog.d("tmessages", "No valid Google Play Services APK found.");
-                }
-            }
-        }, 2000);
-    }*/
-
-    private boolean checkPlayServices() {
-        try {
-            int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-            return resultCode == ConnectionResult.SUCCESS;
-        } catch (Exception e) {
-            FileLog.e("tmessages", e);
-        }
-        return true;
-
-        /*if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i("tmessages", "This device is not supported.");
-            }
-            return false;
-        }
-        return true;*/
-    }
-=======
-
-    private void initPlayServices() {
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkPlayServices()) {
-                    if (UserConfig.pushString != null && UserConfig.pushString.length() != 0) {
-                        FileLog.d("GCM regId = " + UserConfig.pushString);
-                    } else {
-                        FileLog.d("GCM Registration not found.");
-                    }
-
-                    //if (UserConfig.pushString == null || UserConfig.pushString.length() == 0) {
-                    Intent intent = new Intent(applicationContext, GcmRegistrationIntentService.class);
-                    startService(intent);
-                    //} else {
-                    //    FileLog.d("GCM regId = " + UserConfig.pushString);
-                    //}
-                } else {
-                    FileLog.d("No valid Google Play Services APK found.");
-                }
-            }
-        }, 1000);
-    }
-
-    /*private void initPlayServices() {
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkPlayServices()) {
-                    if (UserConfig.pushString != null && UserConfig.pushString.length() != 0) {
-                        FileLog.d("GCM regId = " + UserConfig.pushString);
-                    } else {
-                        FileLog.d("GCM Registration not found.");
-                    }
-                    try {
-                        if (!FirebaseApp.getApps(ApplicationLoader.applicationContext).isEmpty()) {
-                            String token = FirebaseInstanceId.getInstance().getToken();
-                            if (token != null) {
-                                sendRegIdToBackend(token);
-                            }
-                        }
-                    } catch (Throwable e) {
-                        FileLog.e(e);
-                    }
-                } else {
-                    FileLog.d("No valid Google Play Services APK found.");
-                }
-            }
-        }, 2000);
-    }*/
-
-    private boolean checkPlayServices() {
-        try {
-            int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-            return resultCode == ConnectionResult.SUCCESS;
-        } catch (Exception e) {
-            FileLog.e(e);
-        }
-        return true;
-
-        /*if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i("tmessages", "This device is not supported.");
-            }
-            return false;
-        }
-        return true;*/
-    }
->>>>>>> 5a281fb... [REVIEW] java/messenger
 }
