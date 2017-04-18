@@ -771,6 +771,16 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                 }
                             }
                             String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+                            /*
+                            if (text != null && text.length() != 0) {
+                                if ((text.startsWith("http://") || text.startsWith("https://")) && subject != null && subject.length() != 0) {
+                                    text = subject + "\n" + text;
+                                }
+                                sendingText = text;
+                            } else if (subject != null && subject.length() > 0) {
+                                sendingText = subject;
+                            }
+                             */
                             if (text != null && text.length() != 0) {
                                 if (text.startsWith("geo:")) {
                                     Pattern r = Pattern.compile("geo: ?(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)(,|\\?z=)(-?\\d+)");
@@ -2072,7 +2082,26 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             builder.setNegativeButton(LocaleController.getString("ShareYouLocationUnableManually", R.string.ShareYouLocationUnableManually), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    /*Telegram FOSS: manual Location selection not available */
+                    /*
+                    if (mainFragmentsStack.isEmpty()) {
+                        return;
+                    }
+                    BaseFragment lastFragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
+                    if (!AndroidUtilities.isGoogleMapsInstalled(lastFragment)) {
+                        return;
+                    }
+                    LocationActivity fragment = new LocationActivity();
+                    fragment.setDelegate(new LocationActivity.LocationActivityDelegate() {
+                        @Override
+                        public void didSelectLocation(TLRPC.MessageMedia location) {
+                            for (HashMap.Entry<String, MessageObject> entry : waitingForLocation.entrySet()) {
+                                MessageObject messageObject = entry.getValue();
+                                SendMessagesHelper.getInstance().sendMessage(location, messageObject.getDialogId(), messageObject, null, null);
+                            }
+                        }
+                    });
+                    presentFragment(fragment);*/
+
                     Toast.makeText(getApplicationContext(),"Telegram-FOSS: Disabled for now.", Toast.LENGTH_LONG).show();
                 }
             });
