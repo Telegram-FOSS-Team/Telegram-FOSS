@@ -1,4 +1,4 @@
-### v3.18.0 (Work In Progress)
+### v3.18.0
 
 - Telegram Calls are here: secure, crystal-clear, constantly improved by artificial intelligence. We are rolling them out in Europe today, the rest of the world will get calls within a few days.
 - Choose between 5 grades of video compression and preview the quality of your video before you send it.
