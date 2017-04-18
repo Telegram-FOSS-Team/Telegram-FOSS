@@ -2,25 +2,6 @@ apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
-    jcenter()
-}
-
-task nativeLibsToJar(
-    type: Zip,
-    description: 'create a jar archive of the native libs') {
-    destinationDir file("$buildDir/native-libs")
-    baseName 'native-libs'
-    extension 'jar'
-    from fileTree(dir: 'libs', include: '**/*.so')
-    into 'lib/'
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
-
-tasks.withType(JavaCompile) {
-    compileTask -> compileTask.dependsOn(nativeLibsToJar)
 }
 
 configurations {
@@ -28,16 +9,17 @@ configurations {
 }
 
 dependencies {
-    compile 'com.android.support:support-core-ui:24.2.1'
-    compile 'com.android.support:support-compat:24.2.1'
-    compile 'com.android.support:support-core-utils:24.2.1'
+    compile 'com.android.support:support-core-ui:25.3.1'
+    compile 'com.android.support:support-compat:25.3.1'
+    compile 'com.android.support:support-core-utils:25.3.1'
+    compile 'com.android.support:support-v13:25.3.1'
+    compile 'com.android.support:palette-v7:25.3.1'
     compile 'com.googlecode.mp4parser:isoparser:1.0.6'
-    compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
 }
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '24.0.2'
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
 
     useLibrary 'org.apache.http.legacy'
     defaultConfig.applicationId = "org.telegram.messenger"
@@ -48,6 +30,12 @@ android {
         ndkBuild {
             path "jni/Android.mk"
         }
+    }
+
+    dexOptions {
+        jumboMode = true
+        // Telegram-FOSS uncomment if it doesn't compile
+        //javaMaxHeapSize "2g"
     }
 
     compileOptions {
@@ -86,6 +74,7 @@ android {
             jniDebuggable false
             signingConfig signingConfigs.release
             minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
@@ -96,7 +85,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 851
+    defaultConfig.versionCode = 957
 
     sourceSets.debug {
         manifest.srcFile 'config/debug/AndroidManifest.xml'
@@ -123,20 +112,52 @@ android {
             }
             versionCode = 1
         }
-        fat {
+        x86_SDK23 {
+            ndk {
+                abiFilter "x86"
+            }
+            sourceSets.debug {
+                manifest.srcFile 'config/debug/AndroidManifest_SDK23.xml'
+            }
+            sourceSets.release {
+                manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
+            }
+            minSdkVersion 23
+            versionCode = 4
+        }
+        armv7_SDK23 {
+            ndk {
+                abiFilter "armeabi-v7a"
+            }
+            sourceSets.debug {
+                manifest.srcFile 'config/debug/AndroidManifest_SDK23.xml'
+            }
+            sourceSets.release {
+                manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
+            }
+            minSdkVersion 23
             versionCode = 3
+        }
+        fat {
+            sourceSets.debug {
+                manifest.srcFile 'config/debug/AndroidManifest_SDK23.xml'
+            }
+            sourceSets.release {
+                manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
+            }
+            versionCode = 5
         }
     }
 
     applicationVariants.all { variant ->
         def abiVersion = variant.productFlavors.get(0).versionCode
-        variant.mergedFlavor.versionCode = defaultConfig.versionCode * 10 + abiVersion;
+        variant.mergedFlavor.versionCode = defaultConfig.versionCode * 10 + abiVersion
     }
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 24
-        versionName "3.13.1"
+        targetSdkVersion 25
+        versionName "3.18.0"
 
         externalNativeBuild {
             ndkBuild {
