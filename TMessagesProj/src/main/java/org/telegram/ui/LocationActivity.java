@@ -40,9 +40,12 @@ import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.ApplicationLoader;
@@ -116,6 +119,8 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
     private final static int map_list_menu_map = 2;
     private final static int map_list_menu_satellite = 3;
     private final static int map_list_menu_hybrid = 4;
+
+    private MyLocationNewOverlay myLocationOverlay;
 
     public interface LocationActivityDelegate {
         void didSelectLocation(TLRPC.MessageMedia location);
@@ -654,6 +659,22 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 positionMarker(location);
             }
         });*/
+        Activity parentActivity = getParentActivity();
+        GpsMyLocationProvider imlp = new GpsMyLocationProvider(parentActivity);
+        imlp.setLocationUpdateMinDistance(1000);
+        imlp.setLocationUpdateMinTime(60000);
+        myLocationOverlay = new MyLocationNewOverlay(imlp, mapView);
+        myLocationOverlay.enableMyLocation();
+        mapView.getOverlays().add(myLocationOverlay);
+        myLocationOverlay.setDrawAccuracyEnabled(true);
+
+        myLocationOverlay.runOnFirstFix(new Runnable() {
+            public void run() {
+
+                MapController mapController = (MapController) mapView.getController();
+                mapController.animateTo(myLocationOverlay.getMyLocation());
+            }
+        });
 
         //mapView.setBuiltInZoomControls(true);
         positionMarker(myLocation = getLastLocation());
@@ -783,6 +804,10 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
     private Location getLastLocation() {
         LocationManager lm = (LocationManager) ApplicationLoader.applicationContext.getSystemService(Context.LOCATION_SERVICE);
+
+        if (getParentActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            getParentActivity().requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+        }
         List<String> providers = lm.getProviders(true);
         Location l = null;
         for (int i = providers.size() - 1; i >= 0; i--) {
@@ -903,6 +928,8 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         public void onPause() {
             super.onPause();
             if (mapView != null && mapsInitialized) {
+
+                myLocationOverlay.disableMyLocation();
                 /*
                 try {
                     mapView.onPause();
@@ -919,6 +946,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             super.onResume();
             AndroidUtilities.removeAdjustResize(getParentActivity(), classGuid);
             if (mapView != null && mapsInitialized) {
+                myLocationOverlay.enableMyLocation();
                 /*
                 try {
                     mapView.onResume();

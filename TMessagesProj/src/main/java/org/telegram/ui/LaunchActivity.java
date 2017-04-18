@@ -2082,14 +2082,16 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             builder.setNegativeButton(LocaleController.getString("ShareYouLocationUnableManually", R.string.ShareYouLocationUnableManually), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    /*
+
                     if (mainFragmentsStack.isEmpty()) {
                         return;
                     }
                     BaseFragment lastFragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
+                    /* OSMDroid!
                     if (!AndroidUtilities.isGoogleMapsInstalled(lastFragment)) {
                         return;
                     }
+                    */
                     LocationActivity fragment = new LocationActivity();
                     fragment.setDelegate(new LocationActivity.LocationActivityDelegate() {
                         @Override
@@ -2100,9 +2102,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                             }
                         }
                     });
-                    presentFragment(fragment);*/
-
-                    Toast.makeText(getApplicationContext(),"Telegram-FOSS: Disabled for now.", Toast.LENGTH_LONG).show();
+                    presentFragment(fragment);
                 }
             });
             builder.setMessage(LocaleController.getString("ShareYouLocationUnable", R.string.ShareYouLocationUnable));
