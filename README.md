@@ -29,10 +29,15 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
 
 ## Building
 
-The project can be build with Android Studio or from the command line with gradle.
-
 **Important:**
-You also need the [Android-NDK](https://developer.android.com/ndk/downloads/index.html) and run `ndk-build` in the TMessagesProj directory before building the apk.
+1. You need the [Android-NDK](https://developer.android.com/ndk/downloads/index.html) to build the apk.
 
-If you want to publish a modified version of Telegram you should get **your own API key** form here: https://core.telegram.org/api/obtaining_api_id.
-Then update the file **src/main/java/org/telegram/messenger/BuildVars.java** accordingly.
+2. If you want to publish a modified version of Telegram:
+      - You should get **your own API key** here: https://core.telegram.org/api/obtaining_api_id and update the file `src/main/java/org/telegram/messenger/BuildVars.java` accordingly
+      - Do not use the name Telegram and the standard logo (white paper plane in a blue circle) for your app — or make sure your users understand that it is unofficial
+      - Take good care of your users' data and privacy
+      - **Please remember to publish your code too in order to comply with the licenses**
+
+The project can be built with Android Studio or from the command line with gradle:
+
+`./gradlew assembleFatRelease`
