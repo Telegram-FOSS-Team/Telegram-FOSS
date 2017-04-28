@@ -663,6 +663,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         GpsMyLocationProvider imlp = new GpsMyLocationProvider(parentActivity);
         imlp.setLocationUpdateMinDistance(1000);
         imlp.setLocationUpdateMinTime(60000);
+        imlp.addLocationSource(LocationManager.NETWORK_PROVIDER);
         myLocationOverlay = new MyLocationNewOverlay(imlp, mapView);
         myLocationOverlay.enableMyLocation();
         mapView.getOverlays().add(myLocationOverlay);
@@ -804,9 +805,10 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
     private Location getLastLocation() {
         LocationManager lm = (LocationManager) ApplicationLoader.applicationContext.getSystemService(Context.LOCATION_SERVICE);
-
-        if (getParentActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            getParentActivity().requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (getParentActivity().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                getParentActivity().requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+            }
         }
         List<String> providers = lm.getProviders(true);
         Location l = null;
