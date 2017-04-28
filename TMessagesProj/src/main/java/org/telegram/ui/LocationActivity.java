@@ -637,7 +637,11 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             marker.setPosition(latLng);
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
             //marker.setTitle(station.getName());
-            marker.setIcon(getParentActivity().getDrawable(R.drawable.map_pin));
+            if (Build.VERSION.SDK_INT >= 21) {
+                marker.setIcon(getParentActivity().getDrawable(R.drawable.map_pin));
+            } else {
+                marker.setIcon(getParentActivity().getResources().getDrawable(R.drawable.map_pin));
+            }
             mapView.getOverlays().add(marker);
 
         } else {
