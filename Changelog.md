@@ -1,3 +1,6 @@
+### v3.18.0a
+- **Telegram FOSS:**
+  - Fix location sharing on SDK < 23
 ### v3.18.0
 
 - Telegram Calls are here: secure, crystal-clear, constantly improved by artificial intelligence. We are rolling them out in Europe today, the rest of the world will get calls within a few days.
