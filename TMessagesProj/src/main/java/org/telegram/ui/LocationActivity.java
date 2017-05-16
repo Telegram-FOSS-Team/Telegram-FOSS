@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -27,7 +28,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
+import android.text.Html;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -93,6 +96,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
     private FrameLayout bottomView;
     private LinearLayoutManager layoutManager;
     private AvatarDrawable avatarDrawable;
+    private TextView attributionOverlay;
 
     private AnimatorSet animatorSet;
 
@@ -306,6 +310,13 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 }
             });
 
+            attributionOverlay = new TextView(context);
+            attributionOverlay.setText(Html.fromHtml("© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"));
+            attributionOverlay.setShadowLayer(1,-1,-1, Color.WHITE);
+            attributionOverlay.setLinksClickable(true);
+            attributionOverlay.setMovementMethod(LinkMovementMethod.getInstance());
+            frameLayout.addView(attributionOverlay, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) | Gravity.BOTTOM, LocaleController.isRTL ? 0 : 4, 0, LocaleController.isRTL ? 4 : 0, 60));
+
             routeButton = new ImageView(context);
             drawable = Theme.createSimpleSelectorCircleDrawable(AndroidUtilities.dp(56), Theme.getColor(Theme.key_chats_actionBackground), Theme.getColor(Theme.key_chats_actionPressedBackground));
             if (Build.VERSION.SDK_INT < 21) {
@@ -496,6 +507,13 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             markerXImageView.setImageResource(R.drawable.place_x);
             mapViewClip.addView(markerXImageView, LayoutHelper.createFrame(14, 14, Gravity.TOP | Gravity.CENTER_HORIZONTAL));
 
+            attributionOverlay = new TextView(context);
+            attributionOverlay.setText(Html.fromHtml("© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"));
+            attributionOverlay.setShadowLayer(1,-1,-1, Color.WHITE);
+            attributionOverlay.setLinksClickable(true);
+            attributionOverlay.setMovementMethod(LinkMovementMethod.getInstance());
+            mapViewClip.addView(attributionOverlay, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) | Gravity.BOTTOM, LocaleController.isRTL ? 0 : 4, 0, LocaleController.isRTL ? 4 : 0, 4));
+
             mapViewClip.addView(locationButton, LayoutHelper.createFrame(Build.VERSION.SDK_INT >= 21 ? 56 : 60, Build.VERSION.SDK_INT >= 21 ? 56 : 60, (LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT) | Gravity.BOTTOM, LocaleController.isRTL ? 14 : 0, 0, LocaleController.isRTL ? 0 : 14, 14));
             locationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -591,6 +609,8 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
         });
         mapView.getOverlays().add(myLocationOverlay);
         positionMarker(myLocation = getLastLocation());
+
+        attributionOverlay.bringToFront();
     }
 
     private void showPermissionAlert(boolean byButton) {
