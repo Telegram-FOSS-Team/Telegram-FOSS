@@ -87,8 +87,6 @@
   <string name="PaymentPrecheckoutFailed">К сожалению, платёж отклонён ботом.</string>
   <string name="PaymentFailed">К сожалению, ваш платёж был отклонён.</string>
   <string name="PaymentConnectionFailed">Не удалось связаться с платёжным сервером. Пожалуйста, проверьте соединение с интернетом и повторите попытку.</string>
-  <string name="PaymentWarning">Внимание</string>
-  <string name="PaymentWarningText">Все платежи будут отправлены напрямую разработчику %1$s. Telegram не предоставляет никаких гарантий: продолжайте на свой страх и риск. В случае возникновения проблем, пожалуйста, обратитесь к разработчику %2$s или в свой банк.</string>
   <!--chats view-->
   <string name="NewConversationShortcut">Новый диалог</string>
   <string name="Settings">Настройки</string>
@@ -168,7 +166,6 @@
   <string name="ActionPinnedFile">un1 прикрепил(а) файл</string>
   <string name="ActionPinnedSticker">un1 прикрепил(а) стикер</string>
   <string name="ActionPinnedVoice">un1 прикрепил(а) голосовое сообщение</string>
-  <string name="ActionPinnedRound">un1 прикрепил(а) видеосообщение</string>
   <string name="ActionPinnedContact">un1 прикрепил(а) контактные данные</string>
   <string name="ActionPinnedGame">un1 прикрепил(а) %1$s</string>
   <string name="ActionPinnedGeo">un1 прикрепил(а) карту</string>
@@ -272,7 +269,6 @@
   <string name="ChannelMessageGroupDocument">%1$s отправил(а) файл на канал %2$s</string>
   <string name="ChannelMessageGroupGif">%1$s отправил(а) GIF на канал %2$s</string>
   <string name="ChannelMessageGroupAudio">%1$s опубликовал(а) аудиозапись на канале «%2$s»</string>
-  <string name="ChannelMessageGroupRound">%1$s опубликовал(а) видеосообщение на канале «%2$s»</string>
   <string name="ChannelMessageGroupMusic">%1$s опубликовал(а) аудиозапись на канале %2$s</string>
   <string name="ChannelMessageGroupSticker">%1$s отправил(а) стикер на канал %2$s</string>
   <string name="ChannelMessageGroupStickerEmoji">%1$s опубликовала(а) стикер %3$s на канале %2$s</string>
@@ -284,7 +280,6 @@
   <string name="ChannelMessageDocument">%1$s опубликовал(а) файл</string>
   <string name="ChannelMessageGIF">%1$s опубликовал(а) GIF</string>
   <string name="ChannelMessageAudio">%1$s опубликовал(а) аудиозапись</string>
-  <string name="ChannelMessageRound">%1$s опубликовал(а) видеосообщение</string>
   <string name="ChannelMessageMusic">%1$s опубликовал(а) аудиозапись</string>
   <string name="ChannelMessageSticker">%1$s опубликовал(а) стикер</string>
   <string name="ChannelMessageStickerEmoji">%1$s опубликовал(а) стикер %2$s</string>
@@ -327,7 +322,6 @@
   <string name="IsTyping">печатает…</string>
   <string name="AreTyping">печатают…</string>
   <string name="IsRecordingAudio">%1$s что-то говорит в телефон...</string>
-  <string name="IsRecordingRound">%1$s записывает видеосообщение...</string>
   <string name="IsSendingAudio">%1$s отправляет аудио...</string>
   <string name="IsSendingPhoto">%1$s отправляет фото...</string>
   <string name="InstantView">ЧИТАТЬ ДАЛЬШЕ</string>
@@ -335,7 +329,6 @@
   <string name="IsSendingVideo">%1$s отправляет видео...</string>
   <string name="IsSendingFile">%1$s отправляет файл...</string>
   <string name="RecordingAudio">запись голоса...</string>
-  <string name="RecordingRound">запись видеосообщения...</string>
   <string name="SendingAudio">отправляет аудио...</string>
   <string name="SendingPhoto">отправка фото...</string>
   <string name="SendingGame">сейчас играет...</string>
@@ -432,8 +425,6 @@
   <string name="DeleteForUser">Удалить у %1$s</string>
   <string name="DeleteForAll">Удалить у всех</string>
   <string name="TextCopied">Текст скопирован в буфер обмена</string>
-  <string name="DiscardVoiceMessageTitle">Удалить голосовое сообщение</string>
-  <string name="DiscardVoiceMessageAction">Удалить</string>
   <!--notification-->
   <string name="MessageLifetimeChanged">%1$s поставил(а) таймер самоуничтожения на %2$s</string>
   <string name="MessageLifetimeChangedOutgoing">Вы поставили таймер самоуничтожения на %1$s</string>
@@ -467,6 +458,8 @@
   <string name="NotificationMessageGroupSticker">%1$s отправил(а) стикер в группу %2$s</string>
   <string name="NotificationMessageGroupStickerEmoji">%1$s отправил(а) стикер %3$s в группу %2$s</string>
   <string name="NotificationInvitedToGroup">%1$s пригласил(а) вас в группу %2$s</string>
+  <string name="NotificationEditedGroupName">%1$s изменил название группы %2$s</string>
+  <string name="NotificationEditedGroupPhoto">%1$s изменил фото группы %2$s</string>
   <string name="NotificationGroupAddMember">%1$s пригласил(а) пользователя %3$s в группу %2$s</string>
   <string name="NotificationGroupAddSelf">%1$s вернулся(-лась) в группу %2$s</string>
   <string name="NotificationGroupAddSelfMega">%1$s присоединился к группе %2$s</string>
@@ -802,6 +795,7 @@
   <string name="CalculatingSize">Вычисление...</string>
   <string name="LocalDocumentCache">Документы</string>
   <string name="LocalPhotoCache">Фото</string>
+  <string name="LocalAudioCache">Голосовые сообщения</string>
   <string name="LocalVideoCache">Видео</string>
   <string name="LocalMusicCache">Музыка</string>
   <string name="LocalGifCache">Анимации</string>
