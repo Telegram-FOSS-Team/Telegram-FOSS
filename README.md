@@ -4,7 +4,22 @@
 
 This is an unofficial, FOSS-friendly fork of the original [Telegram App for Android](https://github.com/DrKLO/Telegram).
 
-**Changes:**
+This version of Telegram is available on FDroid: 
+
+[<img src="https://f-droid.org/badge/get-it-on.png"
+      alt="Get it on F-Droid"
+      height="80">](https://f-droid.org/app/org.telegram.messenger)
+
+## Maintainers
+
+- [thermatk](https://github.com/thermatk)
+- you? :)
+
+## Discussion
+
+Join the [Telegram-FOSS Offtopics group](https://t.me/joinchat/AAAAAEFaw9LIC-VgKVCevg) 
+
+## Changes:
 
 *Replacement of non-FOSS, untrustworthy or suspicious binaries or source code:*
 - Do location sharing with OpenStreetMap instead of Google Maps (thermatk)
@@ -19,12 +34,6 @@ This is an unofficial, FOSS-friendly fork of the original [Telegram App for Andr
 - Bing image search (requires API key)
 - Foursquare map search (requires API key)
 - HockeyApp crash reporting and self-updates
-
-This version of Telegram is available on FDroid: 
-
-[<img src="https://f-droid.org/badge/get-it-on.png"
-      alt="Get it on F-Droid"
-      height="80">](https://f-droid.org/app/org.telegram.messenger)
 
 ## Versioning
 
