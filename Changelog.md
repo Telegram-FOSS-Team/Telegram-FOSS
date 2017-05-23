@@ -1,3 +1,13 @@
+
+### v4.0 (no source code released yet)
+- Video messages. Tap the mic icon to switch to camera mode, then tap and hold to record stylish video messages. Swipe up while recording for hands free mode (works with voice notes).
+- Meet Telesco.pe, where anyone can view video messages from public channels — no Telegram account required.
+- Bots can now accept payments from users.
+- The Instant View Platform is now public and will soon support thousands of websites, including your favorite ones.
+
+#### v3.18.1 (not released as FOSS version)
+- Voice calls are now available in Europe, Africa, North and South Americas.
+
 ### v3.18.0b
 - **Telegram FOSS:**
   - Add OpenStreetMap attribution (#151)
@@ -8,7 +18,6 @@
   - Fix location sharing on SDK < 23
 
 ### v3.18.0
-
 - Telegram Calls are here: secure, crystal-clear, constantly improved by artificial intelligence. We are rolling them out in Europe today, the rest of the world will get calls within a few days.
 - Choose between 5 grades of video compression and preview the quality of your video before you send it.
 - **Telegram FOSS:**
@@ -18,13 +27,11 @@
   - Add [osmdroid](https://github.com/osmdroid/osmdroid) for location messages support
 
 #### v3.17.0 (not released as FOSS version)
-
 - Use custom themes to change the appearance of the app.
 - Check out the new dark theme in Settings > Themes. See the @themes channel for more ideas.
 - Create your own themes using the new built-in editor.
 
 #### v3.16.0 (not released as FOSS version)
-
 - Delete recently sent messages for everyone.
 - Network Usage in 'Data and Storage' Settings.
 - App remembers scroll position when switching to another chat and back.
@@ -36,14 +43,12 @@
 - Android 7.1: Added fast action menu to home screen.
 
 #### v3.15.0 (not released as FOSS version)
-
 - Pin important chats to the top of the list so that you never miss a new message.
 - Link your Telegram account with hundreds of services like Twitter, Instagram, Spotify, Gmail, and others. Control apps via Telegram, or get messages when something happens. Talk to @IFTTT to set up.
 - Rotate photos by any number of degrees in the photo editor.
 - View YouTube and Vimeo in Picture-in-Picture mode.
 
 #### v3.14.0 (not released as FOSS version)
-
 - Instant View for Medium articles and some other sites. No more waiting for the pages to load!
 - ‘Groups in common’ in user profiles.
 - ‘Jump to date’ in message search.
@@ -54,7 +59,6 @@
 - Also introducing telegra.ph, a new publishing platform. You can now use telegra.ph to publish articles – it’s clean, simple and efficient.
 
 #### v3.13.2 (not released as FOSS version)
-
 - Major update to Telegram's Bot Platform: Bots can now offer you rich HTML5 experiences, like games.
 - Check out @gamebot for examples of what's coming.
 - You can use these bots in inline mode in any of your chats to share a game and compete with friends.
