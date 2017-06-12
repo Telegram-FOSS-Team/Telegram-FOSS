@@ -1112,7 +1112,7 @@
     <string name="ActionAddUserSelf">un1 se vrátil(a) do skupiny</string>
     <string name="ActionAddUserSelfMega">un1 se připojil(a) ke skupině</string>
     <string name="ActionAddUserSelfYou">Vrátil(a) jsi se do skupiny</string>
-    <string name="UnsupportedMedia">Tato zpráva není podporována tvojí verzi Telegramu. Pro zobrazení aktualizuj aplikaci na: https://telegram.org/update</string>
+    <string name="UnsupportedMedia">Tato zpráva není podporována tvojí verzi Telegramu. Pro zobrazení aktualizuj aplikaci na: https://github.com/Telegram-FOSS-Team/Telegram-FOSS/blob/master/Update.md</string>
     <string name="AttachPhoto">Obrázek</string>
     <string name="AttachVideo">Video</string>
     <string name="AttachGif">GIF</string>

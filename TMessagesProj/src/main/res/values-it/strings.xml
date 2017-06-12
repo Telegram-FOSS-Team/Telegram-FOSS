@@ -1112,7 +1112,7 @@
     <string name="ActionAddUserSelf">un1 è tornato nel gruppo</string>
     <string name="ActionAddUserSelfMega">un1 si è unito al gruppo</string>
     <string name="ActionAddUserSelfYou">Sei tornato nel gruppo</string>
-    <string name="UnsupportedMedia">Questo messaggio non è supportato dalla tua versione di Telegram. Aggiorna l\'app per visualizzarlo: https://telegram.org/update</string>
+    <string name="UnsupportedMedia">Questo messaggio non è supportato dalla tua versione di Telegram. Aggiorna l\'app per visualizzarlo: https://github.com/Telegram-FOSS-Team/Telegram-FOSS/blob/master/Update.md</string>
     <string name="AttachPhoto">Foto</string>
     <string name="AttachVideo">Video</string>
     <string name="AttachGif">GIF</string>

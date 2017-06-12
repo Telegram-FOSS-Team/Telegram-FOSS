@@ -1110,7 +1110,7 @@
   <string name="ActionAddUserSelf">un1 вернулся(-лась) в группу</string>
   <string name="ActionAddUserSelfMega">un1 вступил(а) в группу</string>
   <string name="ActionAddUserSelfYou">Вы вернулись в группу</string>
-  <string name="UnsupportedMedia">Это сообщение не поддерживается в вашей версии Telegram. Обновите приложение для просмотра: https://telegram.org/update</string>
+  <string name="UnsupportedMedia">Это сообщение не поддерживается в вашей версии Telegram. Обновите приложение для просмотра: https://github.com/Telegram-FOSS-Team/Telegram-FOSS/blob/master/Update.md</string>
   <string name="AttachPhoto">Фото</string>
   <string name="AttachVideo">Видео</string>
   <string name="AttachGif">GIF</string>
