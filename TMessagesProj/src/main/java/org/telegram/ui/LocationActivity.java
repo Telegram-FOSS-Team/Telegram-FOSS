@@ -560,7 +560,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             GeoPoint latLng = new GeoPoint(userLocation.getLatitude(), userLocation.getLongitude());
             Marker marker = new Marker(mapView);
             marker.setPosition(latLng);
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             if (Build.VERSION.SDK_INT >= 21) {
                 marker.setIcon(getParentActivity().getDrawable(R.drawable.map_pin));
             } else {
