@@ -8,6 +8,11 @@
 #### v3.18.1 (not released as FOSS version)
 - Voice calls are now available in Europe, Africa, North and South Americas.
 
+### v3.18.0c
+- **Telegram FOSS:**
+  - Telegram-FOSS won't suggest to update from Google Play
+  - The location pin is now accurate (#155)
+  
 ### v3.18.0b
 - **Telegram FOSS:**
   - Add OpenStreetMap attribution (#151)
