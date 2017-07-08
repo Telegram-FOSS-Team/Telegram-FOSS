@@ -893,8 +893,8 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := voip
-LOCAL_CPPFLAGS := -Wall -std=c++11 -DANDROID -finline-functions -ffast-math -Os -fno-strict-aliasing -O3
-LOCAL_CFLAGS := -O3 -DUSE_KISS_FFT -fexceptions -DWEBRTC_APM_DEBUG_DUMP=0 -DWEBRTC_POSIX
+LOCAL_CPPFLAGS := -Wall -std=c++11 -DANDROID -finline-functions -ffast-math -Os -fno-strict-aliasing -O3 -frtti -D__STDC_LIMIT_MACROS
+LOCAL_CFLAGS := -O3 -DUSE_KISS_FFT -fexceptions -DWEBRTC_APM_DEBUG_DUMP=0 -DWEBRTC_POSIX -D__STDC_LIMIT_MACROS
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
 #    LOCAL_CPPFLAGS += -mfloat-abi=softfp -mfpu=neon
@@ -937,7 +937,9 @@ LOCAL_SRC_FILES := \
 ./libtgvoip/EchoCanceller.cpp \
 ./libtgvoip/CongestionControl.cpp \
 ./libtgvoip/VoIPServerConfig.cpp \
-./libtgvoip/audio/Resampler.cpp
+./libtgvoip/audio/Resampler.cpp \
+./libtgvoip/NetworkSocket.cpp \
+./libtgvoip/os/posix/NetworkSocketPosix.cpp
 
 # WebRTC signal processing
 
@@ -1175,12 +1177,12 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_PRELINK_MODULE := false
 
-LOCAL_MODULE 	:= tmessages.26
+LOCAL_MODULE 	:= tmessages.27
 LOCAL_CFLAGS 	:= -w -std=c11 -Os -DNULL=0 -DSOCKLEN_T=socklen_t -DLOCALE_NOT_USED -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
 LOCAL_CFLAGS 	+= -Drestrict='' -D__EMX__ -DOPUS_BUILD -DFIXED_POINT -DUSE_ALLOCA -DHAVE_LRINT -DHAVE_LRINTF -fno-math-errno
 LOCAL_CFLAGS 	+= -DANDROID_NDK -DDISABLE_IMPORTGL -fno-strict-aliasing -fprefetch-loop-arrays -DAVOID_TABLES -DANDROID_TILE_BASED_DECODE -DANDROID_ARMV6_IDCT -ffast-math -D__STDC_CONSTANT_MACROS
 LOCAL_CPPFLAGS 	:= -DBSD=1 -ffast-math -Os -funroll-loops -std=c++11
-LOCAL_LDLIBS 	:= -ljnigraphics -llog -lz -latomic -lOpenSLES
+LOCAL_LDLIBS 	:= -ljnigraphics -llog -lz -latomic -lOpenSLES -lEGL -lGLESv2
 LOCAL_STATIC_LIBRARIES := webp sqlite tgnet breakpad avformat avcodec avutil voip
 
 LOCAL_SRC_FILES     := \
