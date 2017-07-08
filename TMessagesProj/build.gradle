@@ -15,6 +15,7 @@ dependencies {
     compile 'com.android.support:support-v13:25.3.1'
     compile 'com.android.support:palette-v7:25.3.1'
     compile 'com.googlecode.mp4parser:isoparser:1.0.6'
+    compile 'com.stripe:stripe-android:2.0.2'
     compile 'org.osmdroid:osmdroid-android:5.6.4'
 }
 
@@ -65,7 +66,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 960
+    defaultConfig.versionCode = 1030
 
     sourceSets.debug {
         manifest.srcFile 'config/debug/AndroidManifest.xml'
@@ -137,7 +138,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionName "3.18.0c"
+        versionName "4.1.1"
 
         externalNativeBuild {
             ndkBuild {
