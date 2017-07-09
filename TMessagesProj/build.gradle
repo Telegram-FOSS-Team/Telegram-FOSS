@@ -37,7 +37,7 @@ android {
     dexOptions {
         jumboMode = true
         // Telegram-FOSS uncomment if it doesn't compile
-        javaMaxHeapSize "2g"
+        //javaMaxHeapSize "2g"
     }
 
     compileOptions {
