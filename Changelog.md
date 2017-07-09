@@ -1,5 +1,18 @@
+### v4.1.1
+- Improved voice calls, bug fixes.
+- **Telegram FOSS:**
+  - Revert Russian and Czech translations(closer to upstream, xmls are always outdated)
+  - Payments code restored, cleaned from binaries and might be working(not tested, please report)
+  - Removed jni/breakpad/common/android/include/link.h, now requires ndk r15+
+  
+#### v4.1.0 (not released as FOSS version)
+- Up to 10.000 members in each supergroup.
+- Granular rights for supergroup admins.
+- Granular restrictions and temporary bans for members.
+- Event log: all service actions taken by members and admins in the last 48 hours – with search and filters.
+- Admins can now search for specific users among group and channel members.
 
-### v4.0 (no source code released yet)
+#### v4.0 (not released as FOSS version)
 - Video messages. Tap the mic icon to switch to camera mode, then tap and hold to record stylish video messages. Swipe up while recording for hands free mode (works with voice notes).
 - Meet Telesco.pe, where anyone can view video messages from public channels — no Telegram account required.
 - Bots can now accept payments from users.
