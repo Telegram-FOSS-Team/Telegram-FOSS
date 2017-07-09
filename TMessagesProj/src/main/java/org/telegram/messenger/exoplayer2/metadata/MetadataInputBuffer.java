@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.telegram.messenger.exoplayer2.util;
+package org.telegram.messenger.exoplayer2.metadata;
 
-import android.os.HandlerThread;
-import android.os.Process;
+import org.telegram.messenger.exoplayer2.Format;
+import org.telegram.messenger.exoplayer2.decoder.DecoderInputBuffer;
 
 /**
- * A {@link HandlerThread} with a specified process priority.
+ * A {@link DecoderInputBuffer} for a {@link MetadataDecoder}.
  */
-public final class PriorityHandlerThread extends HandlerThread {
-
-  private final int priority;
+public final class MetadataInputBuffer extends DecoderInputBuffer {
 
   /**
-   * @param name The name of the thread.
-   * @param priority The priority level. See {@link Process#setThreadPriority(int)} for details.
+   * An offset that must be added to the metadata's timestamps after it's been decoded, or
+   * {@link Format#OFFSET_SAMPLE_RELATIVE} if {@link #timeUs} should be added.
    */
-  public PriorityHandlerThread(String name, int priority) {
-    super(name);
-    this.priority = priority;
-  }
+  public long subsampleOffsetUs;
 
-  @Override
-  public void run() {
-    Process.setThreadPriority(priority);
-    super.run();
+  public MetadataInputBuffer() {
+    super(DecoderInputBuffer.BUFFER_REPLACEMENT_MODE_NORMAL);
   }
 
 }
