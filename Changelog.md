@@ -3,7 +3,6 @@
 - **Telegram FOSS:**
   - Revert Russian and Czech translations(closer to upstream, xmls are always outdated)
   - Payments code restored, cleaned from binaries and might be working(not tested, please report)
-  - Removed jni/breakpad/common/android/include/link.h, now requires ndk r15+
   
 #### v4.1.0 (not released as FOSS version)
 - Up to 10.000 members in each supergroup.
