@@ -21,7 +21,7 @@ dependencies {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '25.0.3'
 
     useLibrary 'org.apache.http.legacy'
     defaultConfig.applicationId = "org.telegram.messenger"
@@ -37,7 +37,7 @@ android {
     dexOptions {
         jumboMode = true
         // Telegram-FOSS uncomment if it doesn't compile
-        //javaMaxHeapSize "2g"
+        javaMaxHeapSize "2g"
     }
 
     compileOptions {
