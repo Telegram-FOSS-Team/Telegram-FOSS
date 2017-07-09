@@ -2144,9 +2144,10 @@ public class ChannelAdminLogActivity extends BaseFragment implements PhotoViewer
                                 alertUserOpenError(message);
                             }
                         } else if (message.type == 4) {
+                            /* OSMDroid!
                             if (!AndroidUtilities.isGoogleMapsInstalled(ChannelAdminLogActivity.this)) {
                                 return;
-                            }
+                            }*/
                             LocationActivity fragment = new LocationActivity();
                             fragment.setMessageObject(message);
                             presentFragment(fragment);
