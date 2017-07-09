@@ -420,15 +420,12 @@ public class IntroActivity extends Activity implements NotificationCenter.Notifi
             }
             justCreated = false;
         }
-        AndroidUtilities.checkForCrashes(this);
-        AndroidUtilities.checkForUpdates(this);
         ConnectionsManager.getInstance().setAppPaused(false, false);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        AndroidUtilities.unregisterUpdates();
         ConnectionsManager.getInstance().setAppPaused(true, false);
     }
 
