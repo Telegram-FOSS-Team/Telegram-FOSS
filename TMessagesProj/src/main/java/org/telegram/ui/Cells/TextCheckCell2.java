@@ -20,17 +20,17 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
-import org.telegram.ui.Components.Switch;
+import org.telegram.ui.Components.Switch2;
 
-public class TextCheckCell extends FrameLayout {
+public class TextCheckCell2 extends FrameLayout {
 
     private TextView textView;
     private TextView valueTextView;
-    private Switch checkBox;
+    private Switch2 checkBox;
     private boolean needDivider;
     private boolean isMultiline;
 
-    public TextCheckCell(Context context) {
+    public TextCheckCell2(Context context) {
         super(context);
 
         textView = new TextView(context);
@@ -54,12 +54,8 @@ public class TextCheckCell extends FrameLayout {
         valueTextView.setEllipsize(TextUtils.TruncateAt.END);
         addView(valueTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) | Gravity.TOP, LocaleController.isRTL ? 64 : 17, 35, LocaleController.isRTL ? 17 : 64, 0));
 
-        checkBox = new Switch(context);
-        checkBox.setDuplicateParentStateEnabled(false);
-        checkBox.setFocusable(false);
-        checkBox.setFocusableInTouchMode(false);
-        checkBox.setClickable(false);
-        addView(checkBox, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, (LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT) | Gravity.CENTER_VERTICAL, 14, 0, 14, 0));
+        checkBox = new Switch2(context);
+        addView(checkBox, LayoutHelper.createFrame(44, 40, (LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT) | Gravity.CENTER_VERTICAL, 14, 0, 14, 0));
     }
 
     @Override
@@ -74,7 +70,7 @@ public class TextCheckCell extends FrameLayout {
     public void setTextAndCheck(String text, boolean checked, boolean divider) {
         textView.setText(text);
         isMultiline = false;
-        checkBox.setChecked(checked);
+        checkBox.setChecked(checked, false);
         needDivider = divider;
         valueTextView.setVisibility(GONE);
         LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
@@ -87,7 +83,7 @@ public class TextCheckCell extends FrameLayout {
     public void setTextAndValueAndCheck(String text, String value, boolean checked, boolean multiline, boolean divider) {
         textView.setText(text);
         valueTextView.setText(value);
-        checkBox.setChecked(checked);
+        checkBox.setChecked(checked, false);
         needDivider = divider;
         valueTextView.setVisibility(VISIBLE);
         isMultiline = multiline;
@@ -117,14 +113,16 @@ public class TextCheckCell extends FrameLayout {
         if (value) {
             textView.setAlpha(1.0f);
             valueTextView.setAlpha(1.0f);
+            checkBox.setAlpha(1.0f);
         } else {
+            checkBox.setAlpha(0.5f);
             textView.setAlpha(0.5f);
             valueTextView.setAlpha(0.5f);
         }
     }
 
     public void setChecked(boolean checked) {
-        checkBox.setChecked(checked);
+        checkBox.setChecked(checked, true);
     }
 
     public boolean isChecked() {
