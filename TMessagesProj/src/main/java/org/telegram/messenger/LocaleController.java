@@ -268,24 +268,6 @@ public class LocaleController {
         languages.add(localeInfo);
         languagesDict.put(localeInfo.shortName, localeInfo);
 
-        localeInfo = new LocaleInfo();
-        localeInfo.name = "Čeština";
-        localeInfo.nameEnglish = "Czech";
-        localeInfo.shortName = "cs";
-        localeInfo.pathToFile = null;
-        localeInfo.builtIn = true;
-        languages.add(localeInfo);
-        languagesDict.put(localeInfo.shortName, localeInfo);
-
-        localeInfo = new LocaleInfo();
-        localeInfo.name = "Русский";
-        localeInfo.nameEnglish = "Russian";
-        localeInfo.shortName = "ru";
-        localeInfo.pathToFile = null;
-        localeInfo.builtIn = true;
-        languages.add(localeInfo);
-        languagesDict.put(localeInfo.shortName, localeInfo);
-
         loadOtherLanguages();
         if (remoteLanguages.isEmpty()) {
             loadRemoteLanguages();
