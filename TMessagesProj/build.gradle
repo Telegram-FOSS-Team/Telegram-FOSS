@@ -23,6 +23,18 @@ dependencies {
     compile 'com.stripe:stripe-android:2.0.2'
 }
 
+//return an api key from a properties file.
+def getAppId(){
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("./API_KEYS"))
+    return properties.get("APP_ID")
+}
+def getAppHash(){
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("./API_KEYS"))
+    return "\"" + properties.get("APP_HASH") + "\""
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion '25.0.2'
@@ -162,6 +174,10 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionName "4.2.1"
+
+        //obtain your own keys at https://core.telegram.org/api/obtaining_api_id
+        buildConfigField 'int', 'APP_ID', getAppId()
+        buildConfigField 'String', 'APP_HASH', getAppHash()
 
         externalNativeBuild {
             ndkBuild {
