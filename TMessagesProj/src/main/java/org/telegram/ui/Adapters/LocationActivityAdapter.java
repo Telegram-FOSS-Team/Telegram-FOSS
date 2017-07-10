@@ -18,10 +18,6 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.support.widget.RecyclerView;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Cells.EmptyCell;
-import org.telegram.ui.Cells.GraySectionCell;
-import org.telegram.ui.Cells.LocationCell;
-import org.telegram.ui.Cells.LocationLoadingCell;
-import org.telegram.ui.Cells.LocationPoweredCell;
 import org.telegram.ui.Cells.SendLocationCell;
 import org.telegram.ui.Components.RecyclerListView;
 
@@ -70,10 +66,7 @@ public class LocationActivityAdapter extends BaseLocationAdapter {
 
     @Override
     public int getItemCount() {
-        if (searching || !searching && places.isEmpty()) {
-            return 4;
-        }
-        return 3 + places.size() + (places.isEmpty() ? 0 : 1);
+            return 2;
     }
 
     @Override
@@ -86,18 +79,8 @@ public class LocationActivityAdapter extends BaseLocationAdapter {
             case 1:
                 view = new SendLocationCell(mContext);
                 break;
-            case 2:
-                view = new GraySectionCell(mContext);
-                break;
-            case 3:
-                view = new LocationCell(mContext);
-                break;
-            case 4:
-                view = new LocationLoadingCell(mContext);
-                break;
-            case 5:
             default:
-                view = new LocationPoweredCell(mContext);
+                view = new EmptyCell(mContext);
                 break;
         }
         return new RecyclerListView.Holder(view);
@@ -113,15 +96,6 @@ public class LocationActivityAdapter extends BaseLocationAdapter {
                 sendLocationCell = (SendLocationCell) holder.itemView;
                 updateCell();
                 break;
-            case 2:
-                ((GraySectionCell) holder.itemView).setText(LocaleController.getString("NearbyPlaces", R.string.NearbyPlaces));
-                break;
-            case 3:
-                ((LocationCell) holder.itemView).setLocation(places.get(position - 3), iconUrls.get(position - 3), true);
-                break;
-            case 4:
-                ((LocationLoadingCell) holder.itemView).setLoading(searching);
-                break;
         }
     }
 
@@ -134,23 +108,12 @@ public class LocationActivityAdapter extends BaseLocationAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
-            return 0;
-        } else if (position == 1) {
-            return 1;
-        } else if (position == 2) {
-            return 2;
-        } else if (searching || !searching && places.isEmpty()) {
-            return 4;
-        } else if (position == places.size() + 3) {
-            return 5;
-        }
-        return 3;
+        return position;
     }
 
     @Override
     public boolean isEnabled(RecyclerView.ViewHolder holder) {
         int position = holder.getAdapterPosition();
-        return !(position == 2 || position == 0 || position == 3 && (searching || !searching && places.isEmpty()) || position == places.size() + 3);
+        return !(position == 2 || position == 0);
     }
 }
