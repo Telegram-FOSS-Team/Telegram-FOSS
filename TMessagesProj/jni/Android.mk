@@ -1,56 +1,316 @@
-LOCAL_PATH := $(call my-dir)
+LOCAL_PATH:= $(call my-dir)
+FFMPEG_PATH:= ./ffmpeg
 
-LOCAL_MODULE    := avutil 
+local_src_files := \
+	$(FFMPEG_PATH)/libavformat/cutils.c \
+	$(FFMPEG_PATH)/libavformat/allformats.c \
+	$(FFMPEG_PATH)/libavformat/file.c \
+	$(FFMPEG_PATH)/libavformat/id3v1.c \
+	$(FFMPEG_PATH)/libavformat/gifdec.c \
+	$(FFMPEG_PATH)/libavformat/format.c \
+	$(FFMPEG_PATH)/libavformat/metadata.c \
+	$(FFMPEG_PATH)/libavformat/isom.c \
+	$(FFMPEG_PATH)/libavformat/avio.c \
+	$(FFMPEG_PATH)/libavformat/mov_chan.c \
+	$(FFMPEG_PATH)/libavformat/options.c \
+	$(FFMPEG_PATH)/libavformat/os_support.c \
+	$(FFMPEG_PATH)/libavformat/dump.c \
+	$(FFMPEG_PATH)/libavformat/qtpalette.c \
+	$(FFMPEG_PATH)/libavformat/riff.c \
+	$(FFMPEG_PATH)/libavformat/replaygain.c \
+	$(FFMPEG_PATH)/libavformat/sdp.c \
+	$(FFMPEG_PATH)/libavformat/url.c \
+	$(FFMPEG_PATH)/libavformat/id3v2.c \
+	$(FFMPEG_PATH)/libavformat/riffdec.c \
+	$(FFMPEG_PATH)/libavformat/aviobuf.c \
+	$(FFMPEG_PATH)/libavformat/mux.c \
+	$(FFMPEG_PATH)/libavformat/mov.c \
+	$(FFMPEG_PATH)/libavformat/utils.c
 
+local_c_includes := \
+        $(LOCAL_PATH)/$(FFMPEG_PATH) \
+	$(LOCAL_PATH)/$(FFMPEG_PATH)/config/$(TARGET_ARCH_ABI)
+
+LOCAL_SRC_FILES += $(local_src_files)
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libavutil.a
+    LOCAL_SRC_FILES += $(local_armv7_files)
 else
     ifeq ($(TARGET_ARCH_ABI),armeabi)
-	LOCAL_SRC_FILES := ./ffmpeg/armv5te/libavutil.a
+       LOCAL_SRC_FILES += $(local_arm_files)
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
-	    LOCAL_SRC_FILES := ./ffmpeg/i686/libavutil.a
+           LOCAL_SRC_FILES += $(local_x86_files)
         endif
     endif
 endif
 
-include $(PREBUILT_STATIC_LIBRARY)
-
+LOCAL_CFLAGS += $(local_c_flags) -DPURIFY -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Dstrtod=avpriv_strtod -DPIC -DHAVE_AV_CONFIG_H -Os -DANDROID -fPIE -pie --static -std=c99
+LOCAL_C_INCLUDES += $(local_c_includes)
+LOCAL_ARM_MODE:= arm
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE:= libavformat
+include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := avformat
 
+local_src_files := \
+	$(FFMPEG_PATH)/libavutil/adler32.c \
+	$(FFMPEG_PATH)/libavutil/aes.c \
+	$(FFMPEG_PATH)/libavutil/aes_ctr.c \
+	$(FFMPEG_PATH)/libavutil/audio_fifo.c \
+	$(FFMPEG_PATH)/libavutil/avstring.c \
+	$(FFMPEG_PATH)/libavutil/base64.c \
+	$(FFMPEG_PATH)/libavutil/blowfish.c \
+	$(FFMPEG_PATH)/libavutil/bprint.c \
+	$(FFMPEG_PATH)/libavutil/buffer.c \
+	$(FFMPEG_PATH)/libavutil/camellia.c \
+	$(FFMPEG_PATH)/libavutil/cast5.c \
+	$(FFMPEG_PATH)/libavutil/channel_layout.c \
+	$(FFMPEG_PATH)/libavutil/color_utils.c \
+	$(FFMPEG_PATH)/libavutil/cpu.c \
+	$(FFMPEG_PATH)/libavutil/crc.c \
+	$(FFMPEG_PATH)/libavutil/des.c \
+	$(FFMPEG_PATH)/libavutil/dict.c \
+	$(FFMPEG_PATH)/libavutil/display.c \
+	$(FFMPEG_PATH)/libavutil/downmix_info.c \
+	$(FFMPEG_PATH)/libavutil/error.c \
+	$(FFMPEG_PATH)/libavutil/eval.c \
+	$(FFMPEG_PATH)/libavutil/fifo.c \
+	$(FFMPEG_PATH)/libavutil/file.c \
+	$(FFMPEG_PATH)/libavutil/file_open.c \
+	$(FFMPEG_PATH)/libavutil/fixed_dsp.c \
+	$(FFMPEG_PATH)/libavutil/float_dsp.c \
+	$(FFMPEG_PATH)/libavutil/frame.c \
+	$(FFMPEG_PATH)/libavutil/hash.c \
+	$(FFMPEG_PATH)/libavutil/hmac.c \
+	$(FFMPEG_PATH)/libavutil/imgutils.c \
+	$(FFMPEG_PATH)/libavutil/integer.c \
+	$(FFMPEG_PATH)/libavutil/intmath.c \
+	$(FFMPEG_PATH)/libavutil/lfg.c \
+	$(FFMPEG_PATH)/libavutil/lls.c \
+	$(FFMPEG_PATH)/libavutil/log.c \
+	$(FFMPEG_PATH)/libavutil/log2_tab.c \
+	$(FFMPEG_PATH)/libavutil/mastering_display_metadata.c \
+	$(FFMPEG_PATH)/libavutil/mathematics.c \
+	$(FFMPEG_PATH)/libavutil/md5.c \
+	$(FFMPEG_PATH)/libavutil/mem.c \
+	$(FFMPEG_PATH)/libavutil/murmur3.c \
+	$(FFMPEG_PATH)/libavutil/opt.c \
+	$(FFMPEG_PATH)/libavutil/parseutils.c \
+	$(FFMPEG_PATH)/libavutil/pixdesc.c \
+	$(FFMPEG_PATH)/libavutil/pixelutils.c \
+	$(FFMPEG_PATH)/libavutil/random_seed.c \
+	$(FFMPEG_PATH)/libavutil/rational.c \
+	$(FFMPEG_PATH)/libavutil/rc4.c \
+	$(FFMPEG_PATH)/libavutil/reverse.c \
+	$(FFMPEG_PATH)/libavutil/ripemd.c \
+	$(FFMPEG_PATH)/libavutil/samplefmt.c \
+	$(FFMPEG_PATH)/libavutil/sha.c \
+	$(FFMPEG_PATH)/libavutil/sha512.c \
+	$(FFMPEG_PATH)/libavutil/stereo3d.c \
+	$(FFMPEG_PATH)/libavutil/tea.c \
+	$(FFMPEG_PATH)/libavutil/threadmessage.c \
+	$(FFMPEG_PATH)/libavutil/time.c \
+	$(FFMPEG_PATH)/libavutil/timecode.c \
+	$(FFMPEG_PATH)/libavutil/tree.c \
+	$(FFMPEG_PATH)/libavutil/twofish.c \
+	$(FFMPEG_PATH)/libavutil/utils.c \
+	$(FFMPEG_PATH)/libavutil/xga_font_data.c \
+	$(FFMPEG_PATH)/libavutil/xtea.c \
+	$(FFMPEG_PATH)/compat/strtod.c
+
+local_arm_files := \
+	$(FFMPEG_PATH)/libavutil/arm/cpu.c \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_init_arm.c
+
+local_armv7_files := \
+	$(FFMPEG_PATH)/libavutil/arm/cpu.c \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_init_arm.c \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_init_neon.c \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_init_vfp.c \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_neon.S \
+	$(FFMPEG_PATH)/libavutil/arm/float_dsp_vfp.S
+
+local_x86_files := \
+	$(FFMPEG_PATH)/libavutil/x86/cpu.c \
+	$(FFMPEG_PATH)/libavutil/x86/fixed_dsp_init.c \
+	$(FFMPEG_PATH)/libavutil/x86/float_dsp_init.c \
+	$(FFMPEG_PATH)/libavutil/x86/lls_init.c
+
+local_c_includes := \
+        $(LOCAL_PATH)/$(FFMPEG_PATH) \
+	$(LOCAL_PATH)/$(FFMPEG_PATH)/config/$(TARGET_ARCH_ABI)
+
+LOCAL_SRC_FILES += $(local_src_files)
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libavformat.a
+    LOCAL_SRC_FILES += $(local_armv7_files)
 else
     ifeq ($(TARGET_ARCH_ABI),armeabi)
-	LOCAL_SRC_FILES := ./ffmpeg/armv5te/libavformat.a
+       LOCAL_SRC_FILES += $(local_arm_files)
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
-	    LOCAL_SRC_FILES := ./ffmpeg/i686/libavformat.a
+           LOCAL_SRC_FILES += $(local_x86_files)
         endif
     endif
 endif
 
-include $(PREBUILT_STATIC_LIBRARY)
-
+LOCAL_CFLAGS += $(local_c_flags) -DPURIFY -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Dstrtod=avpriv_strtod -DPIC -DHAVE_AV_CONFIG_H -Os -DANDROID -fPIE -pie --static -std=c99
+LOCAL_ARM_MODE:= arm
+LOCAL_C_INCLUDES += $(local_c_includes)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE:= libavutil
+include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := avcodec 
 
+local_src_files := \
+	$(FFMPEG_PATH)/libavcodec/ac3tab.c \
+	$(FFMPEG_PATH)/libavcodec/allcodecs.c \
+	$(FFMPEG_PATH)/libavcodec/avdct.c \
+	$(FFMPEG_PATH)/libavcodec/avpicture.c \
+	$(FFMPEG_PATH)/libavcodec/audioconvert.c \
+	$(FFMPEG_PATH)/libavcodec/bitstream_filter.c \
+	$(FFMPEG_PATH)/libavcodec/d3d11va.c \
+	$(FFMPEG_PATH)/libavcodec/cabac.c \
+	$(FFMPEG_PATH)/libavcodec/codec_desc.c \
+	$(FFMPEG_PATH)/libavcodec/dv_profile.c \
+	$(FFMPEG_PATH)/libavcodec/dirac.c \
+	$(FFMPEG_PATH)/libavcodec/bitstream.c \
+	$(FFMPEG_PATH)/libavcodec/fdctdsp.c \
+	$(FFMPEG_PATH)/libavcodec/avpacket.c \
+	$(FFMPEG_PATH)/libavcodec/golomb.c \
+	$(FFMPEG_PATH)/libavcodec/faandct.c \
+	$(FFMPEG_PATH)/libavcodec/faanidct.c \
+	$(FFMPEG_PATH)/libavcodec/gifdec.c \
+	$(FFMPEG_PATH)/libavcodec/h264_direct.c \
+	$(FFMPEG_PATH)/libavcodec/error_resilience.c \
+	$(FFMPEG_PATH)/libavcodec/h264_picture.c \
+	$(FFMPEG_PATH)/libavcodec/h264.c \
+	$(FFMPEG_PATH)/libavcodec/h264_ps.c \
+	$(FFMPEG_PATH)/libavcodec/h264_sei.c \
+	$(FFMPEG_PATH)/libavcodec/h264_refs.c \
+	$(FFMPEG_PATH)/libavcodec/h264_cavlc.c \
+	$(FFMPEG_PATH)/libavcodec/h264_loopfilter.c \
+	$(FFMPEG_PATH)/libavcodec/h264_cabac.c \
+	$(FFMPEG_PATH)/libavcodec/h264chroma.c \
+	$(FFMPEG_PATH)/libavcodec/h264_mb.c \
+	$(FFMPEG_PATH)/libavcodec/h264_slice.c \
+	$(FFMPEG_PATH)/libavcodec/h264dsp.c \
+	$(FFMPEG_PATH)/libavcodec/h264idct.c \
+	$(FFMPEG_PATH)/libavcodec/h264pred.c \
+	$(FFMPEG_PATH)/libavcodec/h264qpel.c \
+	$(FFMPEG_PATH)/libavcodec/idctdsp.c \
+	$(FFMPEG_PATH)/libavcodec/imgconvert.c \
+	$(FFMPEG_PATH)/libavcodec/jfdctfst.c \
+	$(FFMPEG_PATH)/libavcodec/jfdctint.c \
+	$(FFMPEG_PATH)/libavcodec/jrevdct.c \
+	$(FFMPEG_PATH)/libavcodec/lzw.c \
+	$(FFMPEG_PATH)/libavcodec/mathtables.c \
+	$(FFMPEG_PATH)/libavcodec/me_cmp.c \
+	$(FFMPEG_PATH)/libavcodec/mpeg4audio.c \
+	$(FFMPEG_PATH)/libavcodec/mpegaudiodata.c \
+	$(FFMPEG_PATH)/libavcodec/options.c \
+	$(FFMPEG_PATH)/libavcodec/parser.c \
+	$(FFMPEG_PATH)/libavcodec/pixblockdsp.c \
+	$(FFMPEG_PATH)/libavcodec/profiles.c \
+	$(FFMPEG_PATH)/libavcodec/pthread.c \
+	$(FFMPEG_PATH)/libavcodec/pthread_frame.c \
+	$(FFMPEG_PATH)/libavcodec/pthread_slice.c \
+	$(FFMPEG_PATH)/libavcodec/qsv_api.c \
+	$(FFMPEG_PATH)/libavcodec/raw.c \
+	$(FFMPEG_PATH)/libavcodec/resample.c \
+	$(FFMPEG_PATH)/libavcodec/resample2.c \
+	$(FFMPEG_PATH)/libavcodec/simple_idct.c \
+	$(FFMPEG_PATH)/libavcodec/startcode.c \
+	$(FFMPEG_PATH)/libavcodec/utils.c \
+	$(FFMPEG_PATH)/libavcodec/videodsp.c \
+	$(FFMPEG_PATH)/libavcodec/vorbis_parser.c \
+	$(FFMPEG_PATH)/libavcodec/xiph.c
+
+local_arm_files := \
+	$(FFMPEG_PATH)/libavcodec/arm/h264chroma_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/h264dsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_arm.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264qpel_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/jrevdct_arm.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264pred_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/simple_idct_arm.S \
+	$(FFMPEG_PATH)/libavcodec/arm/simple_idct_armv5te.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_init_armv5te.c \
+	$(FFMPEG_PATH)/libavcodec/arm/me_cmp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/videodsp_armv5te.S \
+	$(FFMPEG_PATH)/libavcodec/arm/pixblockdsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/videodsp_init_armv5te.c \
+	$(FFMPEG_PATH)/libavcodec/arm/videodsp_init_arm.c
+
+local_armv7_files := \
+	$(FFMPEG_PATH)/libavcodec/arm/h264cmc_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264chroma_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/h264dsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/h264dsp_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264idct_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264qpel_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264pred_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/hpeldsp_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_arm.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_armv6.S \
+	$(FFMPEG_PATH)/libavcodec/arm/h264pred_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/h264qpel_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_init_armv5te.c \
+	$(FFMPEG_PATH)/libavcodec/arm/jrevdct_arm.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_init_armv6.c \
+	$(FFMPEG_PATH)/libavcodec/arm/me_cmp_armv6.S \
+	$(FFMPEG_PATH)/libavcodec/arm/idctdsp_init_neon.c \
+	$(FFMPEG_PATH)/libavcodec/arm/pixblockdsp_armv6.S \
+	$(FFMPEG_PATH)/libavcodec/arm/simple_idct_arm.S \
+	$(FFMPEG_PATH)/libavcodec/arm/simple_idct_armv5te.S \
+	$(FFMPEG_PATH)/libavcodec/arm/simple_idct_armv6.S \
+	$(FFMPEG_PATH)/libavcodec/arm/simple_idct_neon.S \
+	$(FFMPEG_PATH)/libavcodec/arm/startcode_armv6.S \
+	$(FFMPEG_PATH)/libavcodec/arm/pixblockdsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/me_cmp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/videodsp_armv5te.S \
+	$(FFMPEG_PATH)/libavcodec/arm/videodsp_init_arm.c \
+	$(FFMPEG_PATH)/libavcodec/arm/videodsp_init_armv5te.c
+
+local_x86_files := \
+	$(FFMPEG_PATH)/libavcodec/x86/constants.c \
+	$(FFMPEG_PATH)/libavcodec/x86/fdctdsp_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/h264_intrapred_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/h264chroma_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/h264_qpel.c \
+	$(FFMPEG_PATH)/libavcodec/x86/h264dsp_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/idctdsp_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/me_cmp_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/pixblockdsp_init.c \
+	$(FFMPEG_PATH)/libavcodec/x86/videodsp_init.c
+
+local_c_includes := \
+        $(LOCAL_PATH)/$(FFMPEG_PATH) \
+	$(LOCAL_PATH)/$(FFMPEG_PATH)/config/$(TARGET_ARCH_ABI)
+
+LOCAL_SRC_FILES += $(local_src_files)
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libavcodec.a
+    LOCAL_SRC_FILES += $(local_armv7_files)
 else
     ifeq ($(TARGET_ARCH_ABI),armeabi)
-	LOCAL_SRC_FILES := ./ffmpeg/armv5te/libavcodec.a
+       LOCAL_SRC_FILES += $(local_arm_files)
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
-	    LOCAL_SRC_FILES := ./ffmpeg/i686/libavcodec.a
+           LOCAL_SRC_FILES += $(local_x86_files)
         endif
     endif
 endif
 
-include $(PREBUILT_STATIC_LIBRARY)
+LOCAL_CFLAGS += $(local_c_flags) -DPURIFY -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Dstrtod=avpriv_strtod -DPIC -DHAVE_AV_CONFIG_H -Os -DANDROID -fPIE -pie --static -std=c99
+LOCAL_ARM_MODE:= arm
+LOCAL_C_INCLUDES += $(local_c_includes)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE:= libavcodec
+include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
@@ -602,7 +862,7 @@ LOCAL_C_INCLUDES    := \
 ./jni/boringssl/include \
 ./jni/breakpad/common/android/include \
 ./jni/breakpad \
-./jni/ffmpeg/include
+./jni/ffmpeg
 
 LOCAL_SRC_FILES     += \
 ./libyuv/source/compare_common.cc \
