@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+﻿apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
@@ -138,7 +138,7 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 25
-        versionName “4.2.1”
+        versionName "4.2.1"
 
         externalNativeBuild {
             ndkBuild {
