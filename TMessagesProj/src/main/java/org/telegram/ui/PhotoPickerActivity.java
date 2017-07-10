@@ -13,8 +13,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Surface;
 import android.view.View;
@@ -24,19 +24,14 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
-import org.telegram.messenger.Utilities;
 import org.telegram.messenger.VideoEditedInfo;
 import org.telegram.messenger.ApplicationLoader;
-import org.telegram.messenger.FileLog;
 import org.telegram.messenger.R;
 import org.telegram.messenger.support.widget.GridLayoutManager;
 import org.telegram.messenger.support.widget.RecyclerView;
@@ -45,7 +40,6 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.messenger.MessageObject;
-import org.telegram.messenger.UserConfig;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -60,18 +54,8 @@ import org.telegram.ui.Components.PickerBottomLayout;
 import org.telegram.ui.Components.RadialProgressView;
 import org.telegram.ui.Components.RecyclerListView;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 public class PhotoPickerActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, PhotoViewer.PhotoViewerProvider {
 
@@ -87,10 +71,8 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
 
     private ArrayList<MediaController.SearchImage> searchResult = new ArrayList<>();
     private HashMap<String, MediaController.SearchImage> searchResultKeys = new HashMap<>();
-    private HashMap<String, MediaController.SearchImage> searchResultUrls = new HashMap<>();
 
     private boolean searching;
-    private boolean bingSearchEndReached = true;
     private boolean giphySearchEndReached = true;
     private String lastSearchString;
     private boolean loadingRecent;
@@ -98,7 +80,6 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
     private int giphyReqId;
     private int lastSearchToken;
     private boolean allowCaption = true;
-    private AsyncTask<Void, Void, JSONObject> currentBingTask;
 
     private MediaController.AlbumEntry selectedAlbum;
 
@@ -144,10 +125,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
     public void onFragmentDestroy() {
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.closeChats);
         NotificationCenter.getInstance().removeObserver(this, NotificationCenter.recentImagesDidLoaded);
-        if (currentBingTask != null) {
-            currentBingTask.cancel(true);
-            currentBingTask = null;
-        }
+
         if (giphyReqId != 0) {
             ConnectionsManager.getInstance().cancelRequest(giphyReqId, true);
             giphyReqId = 0;
@@ -164,8 +142,6 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         if (selectedAlbum != null) {
             actionBar.setTitle(selectedAlbum.bucketName);
-        } else if (type == 0) {
-            actionBar.setTitle(LocaleController.getString("SearchImagesTitle", R.string.SearchImagesTitle));
         } else if (type == 1) {
             actionBar.setTitle(LocaleController.getString("SearchGifsTitle", R.string.SearchGifsTitle));
         }
@@ -198,13 +174,8 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                         searchResult.clear();
                         searchResultKeys.clear();
                         lastSearchString = null;
-                        bingSearchEndReached = true;
                         giphySearchEndReached = true;
                         searching = false;
-                        if (currentBingTask != null) {
-                            currentBingTask.cancel(true);
-                            currentBingTask = null;
-                        }
                         if (giphyReqId != 0) {
                             ConnectionsManager.getInstance().cancelRequest(giphyReqId, true);
                             giphyReqId = 0;
@@ -225,11 +196,8 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                     }
                     searchResult.clear();
                     searchResultKeys.clear();
-                    bingSearchEndReached = true;
                     giphySearchEndReached = true;
-                    if (type == 0) {
-                        searchBingImages(editText.getText().toString(), 0, 53);
-                    } else if (type == 1) {
+                    if (type == 1) {
                         nextGiphySearchOffset = 0;
                         searchGiphyImages(editText.getText().toString(), 0);
                     }
@@ -250,9 +218,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         }
 
         if (selectedAlbum == null) {
-            if (type == 0) {
-                searchItem.getSearchField().setHint(LocaleController.getString("SearchImagesTitle", R.string.SearchImagesTitle));
-            } else if (type == 1) {
+            if (type == 1) {
                 searchItem.getSearchField().setHint(LocaleController.getString("SearchGifsTitle", R.string.SearchGifsTitle));
             }
         }
@@ -350,9 +316,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         if (selectedAlbum != null) {
             emptyView.setText(LocaleController.getString("NoPhotos", R.string.NoPhotos));
         } else {
-            if (type == 0) {
-                emptyView.setText(LocaleController.getString("NoRecentPhotos", R.string.NoRecentPhotos));
-            } else if (type == 1) {
+            if (type == 1) {
                 emptyView.setText(LocaleController.getString("NoRecentGIFs", R.string.NoRecentGIFs));
             }
         }
@@ -374,9 +338,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                     if (visibleItemCount > 0) {
                         int totalItemCount = layoutManager.getItemCount();
                         if (visibleItemCount != 0 && firstVisibleItem + visibleItemCount > totalItemCount - 2 && !searching) {
-                            if (type == 0 && !bingSearchEndReached) {
-                                searchBingImages(lastSearchString, searchResult.size(), 54);
-                            } else if (type == 1 && !giphySearchEndReached) {
+                            if (type == 1 && !giphySearchEndReached) {
                                 searchGiphyImages(searchItem.getSearchField().getText().toString(), nextGiphySearchOffset);
                             }
                         }
@@ -725,10 +687,6 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                 ConnectionsManager.getInstance().cancelRequest(giphyReqId, true);
                 giphyReqId = 0;
             }
-            if (currentBingTask != null) {
-                currentBingTask.cancel(true);
-                currentBingTask = null;
-            }
         }
         searching = true;
         TLRPC.TL_messages_searchGifs req = new TLRPC.TL_messages_searchGifs();
@@ -806,211 +764,6 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
         ConnectionsManager.getInstance().bindRequestToGuid(giphyReqId, classGuid);
     }
 
-    private void searchBingImages(String query, int offset, int count) {
-        if (searching) {
-            searching = false;
-            if (giphyReqId != 0) {
-                ConnectionsManager.getInstance().cancelRequest(giphyReqId, true);
-                giphyReqId = 0;
-            }
-            if (currentBingTask != null) {
-                currentBingTask.cancel(true);
-                currentBingTask = null;
-            }
-        }
-        try {
-            searching = true;
-
-            boolean adult;
-            String phone = UserConfig.getCurrentUser().phone;
-            adult = phone.startsWith("44") || phone.startsWith("49") || phone.startsWith("43") || phone.startsWith("31") || phone.startsWith("1");
-            final String url = String.format(Locale.US, "https://api.cognitive.microsoft.com/bing/v5.0/images/search?q='%s'&offset=%d&count=%d&$format=json&safeSearch=%s", URLEncoder.encode(query, "UTF-8"), offset, count, adult ? "Strict" : "Off");
-
-            currentBingTask = new AsyncTask<Void, Void, JSONObject>() {
-
-                private boolean canRetry = true;
-
-                private String downloadUrlContent(String url) {
-                    boolean canRetry = true;
-                    InputStream httpConnectionStream = null;
-                    boolean done = false;
-                    StringBuilder result = null;
-                    URLConnection httpConnection = null;
-                    try {
-                        URL downloadUrl = new URL(url);
-                        httpConnection = downloadUrl.openConnection();
-                        httpConnection.addRequestProperty("Ocp-Apim-Subscription-Key", BuildVars.BING_SEARCH_KEY);
-                        httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20150101 Firefox/47.0 (Chrome)");
-                        httpConnection.addRequestProperty("Accept-Language", "en-us,en;q=0.5");
-                        httpConnection.addRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-                        httpConnection.addRequestProperty("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
-                        httpConnection.setConnectTimeout(5000);
-                        httpConnection.setReadTimeout(5000);
-                        if (httpConnection instanceof HttpURLConnection) {
-                            HttpURLConnection httpURLConnection = (HttpURLConnection) httpConnection;
-                            httpURLConnection.setInstanceFollowRedirects(true);
-                            int status = httpURLConnection.getResponseCode();
-                            if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM || status == HttpURLConnection.HTTP_SEE_OTHER) {
-                                String newUrl = httpURLConnection.getHeaderField("Location");
-                                String cookies = httpURLConnection.getHeaderField("Set-Cookie");
-                                downloadUrl = new URL(newUrl);
-                                httpConnection = downloadUrl.openConnection();
-                                httpConnection.setRequestProperty("Cookie", cookies);
-                                httpConnection.addRequestProperty("Ocp-Apim-Subscription-Key", BuildVars.BING_SEARCH_KEY);
-                                httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20150101 Firefox/47.0 (Chrome)");
-                                httpConnection.addRequestProperty("Accept-Language", "en-us,en;q=0.5");
-                                httpConnection.addRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-                                httpConnection.addRequestProperty("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
-                            }
-                        }
-                        httpConnection.connect();
-                        httpConnectionStream = httpConnection.getInputStream();
-                    } catch (Throwable e) {
-                        if (e instanceof SocketTimeoutException) {
-                            if (ConnectionsManager.isNetworkOnline()) {
-                                canRetry = false;
-                            }
-                        } else if (e instanceof UnknownHostException) {
-                            canRetry = false;
-                        } else if (e instanceof SocketException) {
-                            if (e.getMessage() != null && e.getMessage().contains("ECONNRESET")) {
-                                canRetry = false;
-                            }
-                        } else if (e instanceof FileNotFoundException) {
-                            canRetry = false;
-                        }
-                        FileLog.e(e);
-                    }
-
-                    if (canRetry) {
-                        try {
-                            if (httpConnection != null && httpConnection instanceof HttpURLConnection) {
-                                int code = ((HttpURLConnection) httpConnection).getResponseCode();
-                                if (code != HttpURLConnection.HTTP_OK && code != HttpURLConnection.HTTP_ACCEPTED && code != HttpURLConnection.HTTP_NOT_MODIFIED) {
-                                    //canRetry = false;
-                                }
-                            }
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-
-                        if (httpConnectionStream != null) {
-                            try {
-                                byte[] data = new byte[1024 * 32];
-                                while (true) {
-                                    if (isCancelled()) {
-                                        break;
-                                    }
-                                    try {
-                                        int read = httpConnectionStream.read(data);
-                                        if (read > 0) {
-                                            if (result == null) {
-                                                result = new StringBuilder();
-                                            }
-                                            result.append(new String(data, 0, read, "UTF-8"));
-                                        } else if (read == -1) {
-                                            done = true;
-                                            break;
-                                        } else {
-                                            break;
-                                        }
-                                    } catch (Exception e) {
-                                        FileLog.e(e);
-                                        break;
-                                    }
-                                }
-                            } catch (Throwable e) {
-                                FileLog.e(e);
-                            }
-                        }
-
-                        try {
-                            if (httpConnectionStream != null) {
-                                httpConnectionStream.close();
-                            }
-                        } catch (Throwable e) {
-                            FileLog.e(e);
-                        }
-                    }
-                    return done ? result.toString() : null;
-                }
-
-                protected JSONObject doInBackground(Void... voids) {
-                    String code = downloadUrlContent(url);
-                    if (isCancelled()) {
-                        return null;
-                    }
-                    try {
-                        return new JSONObject(code);
-                    } catch (Exception e) {
-                        FileLog.e(e);
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(JSONObject response) {
-                    int addedCount = 0;
-                    if (response != null) {
-                        try {
-                            JSONArray result = response.getJSONArray("value");
-                            boolean added = false;
-                            for (int a = 0; a < result.length(); a++) {
-                                try {
-                                    JSONObject object = result.getJSONObject(a);
-                                    String id = Utilities.MD5(object.getString("contentUrl"));
-                                    if (searchResultKeys.containsKey(id)) {
-                                        continue;
-                                    }
-                                    MediaController.SearchImage bingImage = new MediaController.SearchImage();
-                                    bingImage.id = id;
-                                    bingImage.width = object.getInt("width");
-                                    bingImage.height = object.getInt("height");
-                                    bingImage.size = Utilities.parseInt(object.getString("contentSize"));
-                                    bingImage.imageUrl = object.getString("contentUrl");
-                                    bingImage.thumbUrl = object.getString("thumbnailUrl");
-                                    searchResult.add(bingImage);
-                                    searchResultKeys.put(id, bingImage);
-                                    addedCount++;
-                                    added = true;
-                                } catch (Exception e) {
-                                    FileLog.e(e);
-                                }
-                            }
-                            bingSearchEndReached = !added;
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-                        searching = false;
-                    } else {
-                        bingSearchEndReached = true;
-                        searching = false;
-                    }
-                    if (addedCount != 0) {
-                        listAdapter.notifyItemRangeInserted(searchResult.size(), addedCount);
-                    } else if (giphySearchEndReached) {
-                        listAdapter.notifyItemRemoved(searchResult.size() - 1);
-                    }
-                    if (searching && searchResult.isEmpty() || loadingRecent && lastSearchString == null) {
-                        emptyView.showProgress();
-                    } else {
-                        emptyView.showTextView();
-                    }
-                }
-            };
-            currentBingTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null, null, null);
-        } catch (Exception e) {
-            FileLog.e(e);
-            bingSearchEndReached = true;
-            searching = false;
-            listAdapter.notifyItemRemoved(searchResult.size() - 1);
-            if (searching && searchResult.isEmpty() || loadingRecent && lastSearchString == null) {
-                emptyView.showProgress();
-            } else {
-                emptyView.showTextView();
-            }
-        }
-    }
 
     public void setDelegate(PhotoPickerActivityDelegate delegate) {
         this.delegate = delegate;
@@ -1100,8 +853,6 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
             if (selectedAlbum == null) {
                 if (searchResult.isEmpty() && lastSearchString == null) {
                     return recentImages.size();
-                } else if (type == 0) {
-                    return searchResult.size() + (bingSearchEndReached ? 0 : 1);
                 } else if (type == 1) {
                     return searchResult.size() + (giphySearchEndReached ? 0 : 1);
                 }
