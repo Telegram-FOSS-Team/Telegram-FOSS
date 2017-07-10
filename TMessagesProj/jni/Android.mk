@@ -314,21 +314,545 @@ include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := crypto 
+CRYPTO_PATH:= ./openssl/crypto
+
+arm_cflags := -DOPENSSL_BN_ASM_MONT -DAES_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM
+
+local_src_files := \
+	$(CRYPTO_PATH)/cryptlib.c \
+	$(CRYPTO_PATH)/mem.c \
+	$(CRYPTO_PATH)/mem_clr.c \
+	$(CRYPTO_PATH)/mem_dbg.c \
+	$(CRYPTO_PATH)/cversion.c \
+	$(CRYPTO_PATH)/ex_data.c \
+	$(CRYPTO_PATH)/cpt_err.c \
+	$(CRYPTO_PATH)/ebcdic.c \
+	$(CRYPTO_PATH)/uid.c \
+	$(CRYPTO_PATH)/o_time.c \
+	$(CRYPTO_PATH)/o_str.c \
+	$(CRYPTO_PATH)/o_dir.c \
+	$(CRYPTO_PATH)/o_init.c \
+	$(CRYPTO_PATH)/aes/aes_cbc.c \
+	$(CRYPTO_PATH)/aes/aes_core.c \
+	$(CRYPTO_PATH)/aes/aes_cfb.c \
+	$(CRYPTO_PATH)/aes/aes_ctr.c \
+	$(CRYPTO_PATH)/aes/aes_ecb.c \
+	$(CRYPTO_PATH)/aes/aes_ige.c \
+	$(CRYPTO_PATH)/aes/aes_misc.c \
+	$(CRYPTO_PATH)/aes/aes_ofb.c \
+	$(CRYPTO_PATH)/aes/aes_wrap.c \
+	$(CRYPTO_PATH)/asn1/a_bitstr.c \
+	$(CRYPTO_PATH)/asn1/a_bool.c \
+	$(CRYPTO_PATH)/asn1/a_bytes.c \
+	$(CRYPTO_PATH)/asn1/a_d2i_fp.c \
+	$(CRYPTO_PATH)/asn1/a_digest.c \
+	$(CRYPTO_PATH)/asn1/a_dup.c \
+	$(CRYPTO_PATH)/asn1/a_enum.c \
+	$(CRYPTO_PATH)/asn1/a_gentm.c \
+	$(CRYPTO_PATH)/asn1/a_i2d_fp.c \
+	$(CRYPTO_PATH)/asn1/a_int.c \
+	$(CRYPTO_PATH)/asn1/a_mbstr.c \
+	$(CRYPTO_PATH)/asn1/a_object.c \
+	$(CRYPTO_PATH)/asn1/a_octet.c \
+	$(CRYPTO_PATH)/asn1/a_print.c \
+	$(CRYPTO_PATH)/asn1/a_set.c \
+	$(CRYPTO_PATH)/asn1/a_sign.c \
+	$(CRYPTO_PATH)/asn1/a_strex.c \
+	$(CRYPTO_PATH)/asn1/a_strnid.c \
+	$(CRYPTO_PATH)/asn1/a_time.c \
+	$(CRYPTO_PATH)/asn1/a_type.c \
+	$(CRYPTO_PATH)/asn1/a_utctm.c \
+	$(CRYPTO_PATH)/asn1/a_utf8.c \
+	$(CRYPTO_PATH)/asn1/a_verify.c \
+	$(CRYPTO_PATH)/asn1/ameth_lib.c \
+	$(CRYPTO_PATH)/asn1/asn1_err.c \
+	$(CRYPTO_PATH)/asn1/asn1_gen.c \
+	$(CRYPTO_PATH)/asn1/asn1_lib.c \
+	$(CRYPTO_PATH)/asn1/asn1_par.c \
+	$(CRYPTO_PATH)/asn1/asn_mime.c \
+	$(CRYPTO_PATH)/asn1/asn_moid.c \
+	$(CRYPTO_PATH)/asn1/asn_pack.c \
+	$(CRYPTO_PATH)/asn1/bio_asn1.c \
+	$(CRYPTO_PATH)/asn1/bio_ndef.c \
+	$(CRYPTO_PATH)/asn1/d2i_pr.c \
+	$(CRYPTO_PATH)/asn1/d2i_pu.c \
+	$(CRYPTO_PATH)/asn1/evp_asn1.c \
+	$(CRYPTO_PATH)/asn1/f_enum.c \
+	$(CRYPTO_PATH)/asn1/f_int.c \
+	$(CRYPTO_PATH)/asn1/f_string.c \
+	$(CRYPTO_PATH)/asn1/i2d_pr.c \
+	$(CRYPTO_PATH)/asn1/i2d_pu.c \
+	$(CRYPTO_PATH)/asn1/n_pkey.c \
+	$(CRYPTO_PATH)/asn1/nsseq.c \
+	$(CRYPTO_PATH)/asn1/p5_pbe.c \
+	$(CRYPTO_PATH)/asn1/p5_pbev2.c \
+	$(CRYPTO_PATH)/asn1/p8_pkey.c \
+	$(CRYPTO_PATH)/asn1/t_bitst.c \
+	$(CRYPTO_PATH)/asn1/t_crl.c \
+	$(CRYPTO_PATH)/asn1/t_pkey.c \
+	$(CRYPTO_PATH)/asn1/t_req.c \
+	$(CRYPTO_PATH)/asn1/t_spki.c \
+	$(CRYPTO_PATH)/asn1/t_x509.c \
+	$(CRYPTO_PATH)/asn1/t_x509a.c \
+	$(CRYPTO_PATH)/asn1/tasn_dec.c \
+	$(CRYPTO_PATH)/asn1/tasn_enc.c \
+	$(CRYPTO_PATH)/asn1/tasn_fre.c \
+	$(CRYPTO_PATH)/asn1/tasn_new.c \
+	$(CRYPTO_PATH)/asn1/tasn_prn.c \
+	$(CRYPTO_PATH)/asn1/tasn_typ.c \
+	$(CRYPTO_PATH)/asn1/tasn_utl.c \
+	$(CRYPTO_PATH)/asn1/x_algor.c \
+	$(CRYPTO_PATH)/asn1/x_attrib.c \
+	$(CRYPTO_PATH)/asn1/x_bignum.c \
+	$(CRYPTO_PATH)/asn1/x_crl.c \
+	$(CRYPTO_PATH)/asn1/x_exten.c \
+	$(CRYPTO_PATH)/asn1/x_info.c \
+	$(CRYPTO_PATH)/asn1/x_long.c \
+	$(CRYPTO_PATH)/asn1/x_name.c \
+	$(CRYPTO_PATH)/asn1/x_nx509.c \
+	$(CRYPTO_PATH)/asn1/x_pkey.c \
+	$(CRYPTO_PATH)/asn1/x_pubkey.c \
+	$(CRYPTO_PATH)/asn1/x_req.c \
+	$(CRYPTO_PATH)/asn1/x_sig.c \
+	$(CRYPTO_PATH)/asn1/x_spki.c \
+	$(CRYPTO_PATH)/asn1/x_val.c \
+	$(CRYPTO_PATH)/asn1/x_x509.c \
+	$(CRYPTO_PATH)/asn1/x_x509a.c \
+	$(CRYPTO_PATH)/bf/bf_cfb64.c \
+	$(CRYPTO_PATH)/bf/bf_ecb.c \
+	$(CRYPTO_PATH)/bf/bf_enc.c \
+	$(CRYPTO_PATH)/bf/bf_ofb64.c \
+	$(CRYPTO_PATH)/bf/bf_skey.c \
+	$(CRYPTO_PATH)/bio/b_dump.c \
+	$(CRYPTO_PATH)/bio/b_print.c \
+	$(CRYPTO_PATH)/bio/b_sock.c \
+	$(CRYPTO_PATH)/bio/bf_buff.c \
+	$(CRYPTO_PATH)/bio/bf_nbio.c \
+	$(CRYPTO_PATH)/bio/bf_null.c \
+	$(CRYPTO_PATH)/bio/bio_cb.c \
+	$(CRYPTO_PATH)/bio/bio_err.c \
+	$(CRYPTO_PATH)/bio/bio_lib.c \
+	$(CRYPTO_PATH)/bio/bss_acpt.c \
+	$(CRYPTO_PATH)/bio/bss_bio.c \
+	$(CRYPTO_PATH)/bio/bss_conn.c \
+	$(CRYPTO_PATH)/bio/bss_dgram.c \
+	$(CRYPTO_PATH)/bio/bss_fd.c \
+	$(CRYPTO_PATH)/bio/bss_file.c \
+	$(CRYPTO_PATH)/bio/bss_log.c \
+	$(CRYPTO_PATH)/bio/bss_mem.c \
+	$(CRYPTO_PATH)/bio/bss_null.c \
+	$(CRYPTO_PATH)/bio/bss_sock.c \
+	$(CRYPTO_PATH)/bn/bn_add.c \
+	$(CRYPTO_PATH)/bn/bn_asm.c \
+	$(CRYPTO_PATH)/bn/bn_blind.c \
+	$(CRYPTO_PATH)/bn/bn_ctx.c \
+	$(CRYPTO_PATH)/bn/bn_div.c \
+	$(CRYPTO_PATH)/bn/bn_err.c \
+	$(CRYPTO_PATH)/bn/bn_exp.c \
+	$(CRYPTO_PATH)/bn/bn_exp2.c \
+	$(CRYPTO_PATH)/bn/bn_gcd.c \
+	$(CRYPTO_PATH)/bn/bn_gf2m.c \
+	$(CRYPTO_PATH)/bn/bn_kron.c \
+	$(CRYPTO_PATH)/bn/bn_lib.c \
+	$(CRYPTO_PATH)/bn/bn_mod.c \
+	$(CRYPTO_PATH)/bn/bn_mont.c \
+	$(CRYPTO_PATH)/bn/bn_mpi.c \
+	$(CRYPTO_PATH)/bn/bn_mul.c \
+	$(CRYPTO_PATH)/bn/bn_nist.c \
+	$(CRYPTO_PATH)/bn/bn_prime.c \
+	$(CRYPTO_PATH)/bn/bn_print.c \
+	$(CRYPTO_PATH)/bn/bn_rand.c \
+	$(CRYPTO_PATH)/bn/bn_recp.c \
+	$(CRYPTO_PATH)/bn/bn_shift.c \
+	$(CRYPTO_PATH)/bn/bn_sqr.c \
+	$(CRYPTO_PATH)/bn/bn_sqrt.c \
+	$(CRYPTO_PATH)/bn/bn_word.c \
+	$(CRYPTO_PATH)/buffer/buf_err.c \
+	$(CRYPTO_PATH)/buffer/buf_str.c \
+	$(CRYPTO_PATH)/buffer/buffer.c \
+	$(CRYPTO_PATH)/cmac/cm_ameth.c \
+	$(CRYPTO_PATH)/cmac/cm_pmeth.c \
+	$(CRYPTO_PATH)/cmac/cmac.c \
+    ${CRYPTO_PATH}/cms/cms_asn1.c \
+    ${CRYPTO_PATH}/cms/cms_att.c \
+    ${CRYPTO_PATH}/cms/cms_cd.c \
+    ${CRYPTO_PATH}/cms/cms_dd.c \
+    ${CRYPTO_PATH}/cms/cms_enc.c \
+    ${CRYPTO_PATH}/cms/cms_env.c \
+    ${CRYPTO_PATH}/cms/cms_err.c \
+    ${CRYPTO_PATH}/cms/cms_ess.c \
+    ${CRYPTO_PATH}/cms/cms_io.c \
+    ${CRYPTO_PATH}/cms/cms_kari.c \
+    ${CRYPTO_PATH}/cms/cms_lib.c \
+    ${CRYPTO_PATH}/cms/cms_pwri.c \
+    ${CRYPTO_PATH}/cms/cms_sd.c \
+    ${CRYPTO_PATH}/cms/cms_smime.c \
+	$(CRYPTO_PATH)/comp/c_rle.c \
+	$(CRYPTO_PATH)/comp/c_zlib.c \
+	$(CRYPTO_PATH)/comp/comp_err.c \
+	$(CRYPTO_PATH)/comp/comp_lib.c \
+	$(CRYPTO_PATH)/conf/conf_api.c \
+	$(CRYPTO_PATH)/conf/conf_def.c \
+	$(CRYPTO_PATH)/conf/conf_err.c \
+	$(CRYPTO_PATH)/conf/conf_lib.c \
+	$(CRYPTO_PATH)/conf/conf_mall.c \
+	$(CRYPTO_PATH)/conf/conf_mod.c \
+	$(CRYPTO_PATH)/conf/conf_sap.c \
+	$(CRYPTO_PATH)/des/cbc_cksm.c \
+	$(CRYPTO_PATH)/des/cbc_enc.c \
+	$(CRYPTO_PATH)/des/cfb64ede.c \
+	$(CRYPTO_PATH)/des/cfb64enc.c \
+	$(CRYPTO_PATH)/des/cfb_enc.c \
+	$(CRYPTO_PATH)/des/des_enc.c \
+	$(CRYPTO_PATH)/des/des_old.c \
+	$(CRYPTO_PATH)/des/des_old2.c \
+	$(CRYPTO_PATH)/des/ecb3_enc.c \
+	$(CRYPTO_PATH)/des/ecb_enc.c \
+	$(CRYPTO_PATH)/des/ede_cbcm_enc.c \
+	$(CRYPTO_PATH)/des/enc_read.c \
+	$(CRYPTO_PATH)/des/enc_writ.c \
+	$(CRYPTO_PATH)/des/fcrypt.c \
+	$(CRYPTO_PATH)/des/fcrypt_b.c \
+	$(CRYPTO_PATH)/des/ofb64ede.c \
+	$(CRYPTO_PATH)/des/ofb64enc.c \
+	$(CRYPTO_PATH)/des/ofb_enc.c \
+	$(CRYPTO_PATH)/des/pcbc_enc.c \
+	$(CRYPTO_PATH)/des/qud_cksm.c \
+	$(CRYPTO_PATH)/des/rand_key.c \
+	$(CRYPTO_PATH)/des/read2pwd.c \
+	$(CRYPTO_PATH)/des/rpc_enc.c \
+	$(CRYPTO_PATH)/des/set_key.c \
+	$(CRYPTO_PATH)/des/str2key.c \
+	$(CRYPTO_PATH)/des/xcbc_enc.c \
+	$(CRYPTO_PATH)/dh/dh_ameth.c \
+	$(CRYPTO_PATH)/dh/dh_asn1.c \
+	$(CRYPTO_PATH)/dh/dh_check.c \
+	$(CRYPTO_PATH)/dh/dh_depr.c \
+	$(CRYPTO_PATH)/dh/dh_err.c \
+	$(CRYPTO_PATH)/dh/dh_gen.c \
+	$(CRYPTO_PATH)/dh/dh_key.c \
+	$(CRYPTO_PATH)/dh/dh_lib.c \
+	$(CRYPTO_PATH)/dh/dh_pmeth.c \
+	$(CRYPTO_PATH)/dh/dh_rfc5114.c \
+	$(CRYPTO_PATH)/dh/dh_kdf.c \
+	$(CRYPTO_PATH)/dsa/dsa_ameth.c \
+	$(CRYPTO_PATH)/dsa/dsa_asn1.c \
+	$(CRYPTO_PATH)/dsa/dsa_depr.c \
+	$(CRYPTO_PATH)/dsa/dsa_err.c \
+	$(CRYPTO_PATH)/dsa/dsa_gen.c \
+	$(CRYPTO_PATH)/dsa/dsa_key.c \
+	$(CRYPTO_PATH)/dsa/dsa_lib.c \
+	$(CRYPTO_PATH)/dsa/dsa_ossl.c \
+	$(CRYPTO_PATH)/dsa/dsa_pmeth.c \
+	$(CRYPTO_PATH)/dsa/dsa_prn.c \
+	$(CRYPTO_PATH)/dsa/dsa_sign.c \
+	$(CRYPTO_PATH)/dsa/dsa_vrf.c \
+	$(CRYPTO_PATH)/dso/dso_dl.c \
+	$(CRYPTO_PATH)/dso/dso_dlfcn.c \
+	$(CRYPTO_PATH)/dso/dso_err.c \
+	$(CRYPTO_PATH)/dso/dso_lib.c \
+	$(CRYPTO_PATH)/dso/dso_null.c \
+	$(CRYPTO_PATH)/dso/dso_openssl.c \
+	$(CRYPTO_PATH)/dso/dso_vms.c \
+	$(CRYPTO_PATH)/dso/dso_win32.c \
+	$(CRYPTO_PATH)/ec/ec2_mult.c \
+	$(CRYPTO_PATH)/ec/ec2_oct.c \
+	$(CRYPTO_PATH)/ec/ec2_smpl.c \
+	$(CRYPTO_PATH)/ec/ec_ameth.c \
+	$(CRYPTO_PATH)/ec/ec_asn1.c \
+	$(CRYPTO_PATH)/ec/ec_check.c \
+	$(CRYPTO_PATH)/ec/ec_curve.c \
+	$(CRYPTO_PATH)/ec/ec_cvt.c \
+	$(CRYPTO_PATH)/ec/ec_err.c \
+	$(CRYPTO_PATH)/ec/ec_key.c \
+	$(CRYPTO_PATH)/ec/ec_lib.c \
+	$(CRYPTO_PATH)/ec/ec_mult.c \
+	$(CRYPTO_PATH)/ec/ec_oct.c \
+	$(CRYPTO_PATH)/ec/ec_pmeth.c \
+	$(CRYPTO_PATH)/ec/ec_print.c \
+	$(CRYPTO_PATH)/ec/eck_prn.c \
+	$(CRYPTO_PATH)/ec/ecp_mont.c \
+	$(CRYPTO_PATH)/ec/ecp_nist.c \
+	$(CRYPTO_PATH)/ec/ecp_nistp224.c \
+	$(CRYPTO_PATH)/ec/ecp_nistp256.c \
+	$(CRYPTO_PATH)/ec/ecp_nistp521.c \
+	$(CRYPTO_PATH)/ec/ecp_nistputil.c \
+	$(CRYPTO_PATH)/ec/ecp_oct.c \
+	$(CRYPTO_PATH)/ec/ecp_smpl.c \
+	$(CRYPTO_PATH)/ecdh/ech_err.c \
+	$(CRYPTO_PATH)/ecdh/ech_key.c \
+	$(CRYPTO_PATH)/ecdh/ech_lib.c \
+	$(CRYPTO_PATH)/ecdh/ech_ossl.c \
+	$(CRYPTO_PATH)/ecdh/ech_kdf.c \
+	$(CRYPTO_PATH)/ecdsa/ecs_asn1.c \
+	$(CRYPTO_PATH)/ecdsa/ecs_err.c \
+	$(CRYPTO_PATH)/ecdsa/ecs_lib.c \
+	$(CRYPTO_PATH)/ecdsa/ecs_ossl.c \
+	$(CRYPTO_PATH)/ecdsa/ecs_sign.c \
+	$(CRYPTO_PATH)/ecdsa/ecs_vrf.c \
+	$(CRYPTO_PATH)/err/err.c \
+	$(CRYPTO_PATH)/err/err_all.c \
+	$(CRYPTO_PATH)/err/err_prn.c \
+	$(CRYPTO_PATH)/evp/bio_b64.c \
+	$(CRYPTO_PATH)/evp/bio_enc.c \
+	$(CRYPTO_PATH)/evp/bio_md.c \
+	$(CRYPTO_PATH)/evp/bio_ok.c \
+	$(CRYPTO_PATH)/evp/c_all.c \
+	$(CRYPTO_PATH)/evp/c_allc.c \
+	$(CRYPTO_PATH)/evp/c_alld.c \
+	$(CRYPTO_PATH)/evp/digest.c \
+	$(CRYPTO_PATH)/evp/e_aes.c \
+	$(CRYPTO_PATH)/evp/e_bf.c \
+	$(CRYPTO_PATH)/evp/e_des.c \
+	$(CRYPTO_PATH)/evp/e_des3.c \
+	$(CRYPTO_PATH)/evp/e_null.c \
+	$(CRYPTO_PATH)/evp/e_old.c \
+	$(CRYPTO_PATH)/evp/e_rc2.c \
+	$(CRYPTO_PATH)/evp/e_rc4.c \
+	$(CRYPTO_PATH)/evp/e_rc5.c \
+	$(CRYPTO_PATH)/evp/e_xcbc_d.c \
+	$(CRYPTO_PATH)/evp/encode.c \
+	$(CRYPTO_PATH)/evp/evp_acnf.c \
+	$(CRYPTO_PATH)/evp/evp_enc.c \
+	$(CRYPTO_PATH)/evp/evp_err.c \
+	$(CRYPTO_PATH)/evp/evp_key.c \
+	$(CRYPTO_PATH)/evp/evp_lib.c \
+	$(CRYPTO_PATH)/evp/evp_pbe.c \
+	$(CRYPTO_PATH)/evp/evp_pkey.c \
+	$(CRYPTO_PATH)/evp/m_dss.c \
+	$(CRYPTO_PATH)/evp/m_dss1.c \
+	$(CRYPTO_PATH)/evp/m_ecdsa.c \
+	$(CRYPTO_PATH)/evp/m_md4.c \
+	$(CRYPTO_PATH)/evp/m_md5.c \
+	$(CRYPTO_PATH)/evp/m_mdc2.c \
+	$(CRYPTO_PATH)/evp/m_null.c \
+	$(CRYPTO_PATH)/evp/m_ripemd.c \
+	$(CRYPTO_PATH)/evp/m_sha1.c \
+	$(CRYPTO_PATH)/evp/m_sigver.c \
+	$(CRYPTO_PATH)/evp/m_wp.c \
+	$(CRYPTO_PATH)/evp/names.c \
+	$(CRYPTO_PATH)/evp/p5_crpt.c \
+	$(CRYPTO_PATH)/evp/p5_crpt2.c \
+	$(CRYPTO_PATH)/evp/p_dec.c \
+	$(CRYPTO_PATH)/evp/p_enc.c \
+	$(CRYPTO_PATH)/evp/p_lib.c \
+	$(CRYPTO_PATH)/evp/p_open.c \
+	$(CRYPTO_PATH)/evp/p_seal.c \
+	$(CRYPTO_PATH)/evp/p_sign.c \
+	$(CRYPTO_PATH)/evp/p_verify.c \
+	$(CRYPTO_PATH)/evp/pmeth_fn.c \
+	$(CRYPTO_PATH)/evp/pmeth_gn.c \
+	$(CRYPTO_PATH)/evp/pmeth_lib.c \
+	$(CRYPTO_PATH)/hmac/hm_ameth.c \
+	$(CRYPTO_PATH)/hmac/hm_pmeth.c \
+	$(CRYPTO_PATH)/hmac/hmac.c \
+	$(CRYPTO_PATH)/krb5/krb5_asn.c \
+	$(CRYPTO_PATH)/lhash/lh_stats.c \
+	$(CRYPTO_PATH)/lhash/lhash.c \
+	$(CRYPTO_PATH)/md4/md4_dgst.c \
+	$(CRYPTO_PATH)/md4/md4_one.c \
+	$(CRYPTO_PATH)/md5/md5_dgst.c \
+	$(CRYPTO_PATH)/md5/md5_one.c \
+	$(CRYPTO_PATH)/modes/cbc128.c \
+	$(CRYPTO_PATH)/modes/ccm128.c \
+	$(CRYPTO_PATH)/modes/cfb128.c \
+	$(CRYPTO_PATH)/modes/ctr128.c \
+	$(CRYPTO_PATH)/modes/gcm128.c \
+	$(CRYPTO_PATH)/modes/ofb128.c \
+	$(CRYPTO_PATH)/modes/wrap128.c \
+	$(CRYPTO_PATH)/modes/xts128.c \
+	$(CRYPTO_PATH)/objects/o_names.c \
+	$(CRYPTO_PATH)/objects/obj_dat.c \
+	$(CRYPTO_PATH)/objects/obj_err.c \
+	$(CRYPTO_PATH)/objects/obj_lib.c \
+	$(CRYPTO_PATH)/objects/obj_xref.c \
+	$(CRYPTO_PATH)/ocsp/ocsp_asn.c \
+	$(CRYPTO_PATH)/ocsp/ocsp_cl.c \
+	$(CRYPTO_PATH)/ocsp/ocsp_err.c \
+	$(CRYPTO_PATH)/ocsp/ocsp_ext.c \
+	$(CRYPTO_PATH)/ocsp/ocsp_ht.c \
+	$(CRYPTO_PATH)/ocsp/ocsp_lib.c \
+	$(CRYPTO_PATH)/ocsp/ocsp_prn.c \
+	$(CRYPTO_PATH)/ocsp/ocsp_srv.c \
+	$(CRYPTO_PATH)/ocsp/ocsp_vfy.c \
+	$(CRYPTO_PATH)/pem/pem_all.c \
+	$(CRYPTO_PATH)/pem/pem_err.c \
+	$(CRYPTO_PATH)/pem/pem_info.c \
+	$(CRYPTO_PATH)/pem/pem_lib.c \
+	$(CRYPTO_PATH)/pem/pem_oth.c \
+	$(CRYPTO_PATH)/pem/pem_pk8.c \
+	$(CRYPTO_PATH)/pem/pem_pkey.c \
+	$(CRYPTO_PATH)/pem/pem_seal.c \
+	$(CRYPTO_PATH)/pem/pem_sign.c \
+	$(CRYPTO_PATH)/pem/pem_x509.c \
+	$(CRYPTO_PATH)/pem/pem_xaux.c \
+	$(CRYPTO_PATH)/pem/pvkfmt.c \
+	$(CRYPTO_PATH)/pkcs12/p12_add.c \
+	$(CRYPTO_PATH)/pkcs12/p12_asn.c \
+	$(CRYPTO_PATH)/pkcs12/p12_attr.c \
+	$(CRYPTO_PATH)/pkcs12/p12_crpt.c \
+	$(CRYPTO_PATH)/pkcs12/p12_crt.c \
+	$(CRYPTO_PATH)/pkcs12/p12_decr.c \
+	$(CRYPTO_PATH)/pkcs12/p12_init.c \
+	$(CRYPTO_PATH)/pkcs12/p12_key.c \
+	$(CRYPTO_PATH)/pkcs12/p12_kiss.c \
+	$(CRYPTO_PATH)/pkcs12/p12_mutl.c \
+	$(CRYPTO_PATH)/pkcs12/p12_npas.c \
+	$(CRYPTO_PATH)/pkcs12/p12_p8d.c \
+	$(CRYPTO_PATH)/pkcs12/p12_p8e.c \
+	$(CRYPTO_PATH)/pkcs12/p12_utl.c \
+	$(CRYPTO_PATH)/pkcs12/pk12err.c \
+	$(CRYPTO_PATH)/pkcs7/pk7_asn1.c \
+	$(CRYPTO_PATH)/pkcs7/pk7_attr.c \
+	$(CRYPTO_PATH)/pkcs7/pk7_doit.c \
+	$(CRYPTO_PATH)/pkcs7/pk7_lib.c \
+	$(CRYPTO_PATH)/pkcs7/pk7_mime.c \
+	$(CRYPTO_PATH)/pkcs7/pk7_smime.c \
+	$(CRYPTO_PATH)/pkcs7/pkcs7err.c \
+	$(CRYPTO_PATH)/rand/md_rand.c \
+	$(CRYPTO_PATH)/rand/rand_egd.c \
+	$(CRYPTO_PATH)/rand/rand_err.c \
+	$(CRYPTO_PATH)/rand/rand_lib.c \
+	$(CRYPTO_PATH)/rand/rand_unix.c \
+	$(CRYPTO_PATH)/rand/randfile.c \
+	$(CRYPTO_PATH)/rc2/rc2_cbc.c \
+	$(CRYPTO_PATH)/rc2/rc2_ecb.c \
+	$(CRYPTO_PATH)/rc2/rc2_skey.c \
+	$(CRYPTO_PATH)/rc2/rc2cfb64.c \
+	$(CRYPTO_PATH)/rc2/rc2ofb64.c \
+	$(CRYPTO_PATH)/rc4/rc4_enc.c \
+	$(CRYPTO_PATH)/rc4/rc4_skey.c \
+	$(CRYPTO_PATH)/ripemd/rmd_dgst.c \
+	$(CRYPTO_PATH)/ripemd/rmd_one.c \
+	$(CRYPTO_PATH)/rsa/rsa_ameth.c \
+	$(CRYPTO_PATH)/rsa/rsa_asn1.c \
+	$(CRYPTO_PATH)/rsa/rsa_chk.c \
+	$(CRYPTO_PATH)/rsa/rsa_crpt.c \
+	$(CRYPTO_PATH)/rsa/rsa_depr.c \
+	$(CRYPTO_PATH)/rsa/rsa_eay.c \
+	$(CRYPTO_PATH)/rsa/rsa_err.c \
+	$(CRYPTO_PATH)/rsa/rsa_gen.c \
+	$(CRYPTO_PATH)/rsa/rsa_lib.c \
+	$(CRYPTO_PATH)/rsa/rsa_none.c \
+	$(CRYPTO_PATH)/rsa/rsa_null.c \
+	$(CRYPTO_PATH)/rsa/rsa_oaep.c \
+	$(CRYPTO_PATH)/rsa/rsa_pk1.c \
+	$(CRYPTO_PATH)/rsa/rsa_pmeth.c \
+	$(CRYPTO_PATH)/rsa/rsa_prn.c \
+	$(CRYPTO_PATH)/rsa/rsa_pss.c \
+	$(CRYPTO_PATH)/rsa/rsa_saos.c \
+	$(CRYPTO_PATH)/rsa/rsa_sign.c \
+	$(CRYPTO_PATH)/rsa/rsa_ssl.c \
+	$(CRYPTO_PATH)/rsa/rsa_x931.c \
+	$(CRYPTO_PATH)/sha/sha1_one.c \
+	$(CRYPTO_PATH)/sha/sha1dgst.c \
+	$(CRYPTO_PATH)/sha/sha256.c \
+	$(CRYPTO_PATH)/sha/sha512.c \
+	$(CRYPTO_PATH)/sha/sha_dgst.c \
+	$(CRYPTO_PATH)/stack/stack.c \
+	$(CRYPTO_PATH)/ts/ts_err.c \
+	$(CRYPTO_PATH)/txt_db/txt_db.c \
+	$(CRYPTO_PATH)/ui/ui_compat.c \
+	$(CRYPTO_PATH)/ui/ui_err.c \
+	$(CRYPTO_PATH)/ui/ui_lib.c \
+	$(CRYPTO_PATH)/ui/ui_openssl.c \
+	$(CRYPTO_PATH)/ui/ui_util.c \
+	$(CRYPTO_PATH)/x509/by_dir.c \
+	$(CRYPTO_PATH)/x509/by_file.c \
+	$(CRYPTO_PATH)/x509/x509_att.c \
+	$(CRYPTO_PATH)/x509/x509_cmp.c \
+	$(CRYPTO_PATH)/x509/x509_d2.c \
+	$(CRYPTO_PATH)/x509/x509_def.c \
+	$(CRYPTO_PATH)/x509/x509_err.c \
+	$(CRYPTO_PATH)/x509/x509_ext.c \
+	$(CRYPTO_PATH)/x509/x509_lu.c \
+	$(CRYPTO_PATH)/x509/x509_obj.c \
+	$(CRYPTO_PATH)/x509/x509_r2x.c \
+	$(CRYPTO_PATH)/x509/x509_req.c \
+	$(CRYPTO_PATH)/x509/x509_set.c \
+	$(CRYPTO_PATH)/x509/x509_trs.c \
+	$(CRYPTO_PATH)/x509/x509_txt.c \
+	$(CRYPTO_PATH)/x509/x509_v3.c \
+	$(CRYPTO_PATH)/x509/x509_vfy.c \
+	$(CRYPTO_PATH)/x509/x509_vpm.c \
+	$(CRYPTO_PATH)/x509/x509cset.c \
+	$(CRYPTO_PATH)/x509/x509name.c \
+	$(CRYPTO_PATH)/x509/x509rset.c \
+	$(CRYPTO_PATH)/x509/x509spki.c \
+	$(CRYPTO_PATH)/x509/x509type.c \
+	$(CRYPTO_PATH)/x509/x_all.c \
+	$(CRYPTO_PATH)/x509v3/pcy_cache.c \
+	$(CRYPTO_PATH)/x509v3/pcy_data.c \
+	$(CRYPTO_PATH)/x509v3/pcy_lib.c \
+	$(CRYPTO_PATH)/x509v3/pcy_map.c \
+	$(CRYPTO_PATH)/x509v3/pcy_node.c \
+	$(CRYPTO_PATH)/x509v3/pcy_tree.c \
+	$(CRYPTO_PATH)/x509v3/v3_akey.c \
+	$(CRYPTO_PATH)/x509v3/v3_akeya.c \
+	$(CRYPTO_PATH)/x509v3/v3_alt.c \
+	$(CRYPTO_PATH)/x509v3/v3_bcons.c \
+	$(CRYPTO_PATH)/x509v3/v3_bitst.c \
+	$(CRYPTO_PATH)/x509v3/v3_conf.c \
+	$(CRYPTO_PATH)/x509v3/v3_cpols.c \
+	$(CRYPTO_PATH)/x509v3/v3_crld.c \
+	$(CRYPTO_PATH)/x509v3/v3_enum.c \
+	$(CRYPTO_PATH)/x509v3/v3_extku.c \
+	$(CRYPTO_PATH)/x509v3/v3_genn.c \
+	$(CRYPTO_PATH)/x509v3/v3_ia5.c \
+	$(CRYPTO_PATH)/x509v3/v3_info.c \
+	$(CRYPTO_PATH)/x509v3/v3_int.c \
+	$(CRYPTO_PATH)/x509v3/v3_lib.c \
+	$(CRYPTO_PATH)/x509v3/v3_ncons.c \
+	$(CRYPTO_PATH)/x509v3/v3_ocsp.c \
+	$(CRYPTO_PATH)/x509v3/v3_pci.c \
+	$(CRYPTO_PATH)/x509v3/v3_pcia.c \
+	$(CRYPTO_PATH)/x509v3/v3_pcons.c \
+	$(CRYPTO_PATH)/x509v3/v3_pku.c \
+	$(CRYPTO_PATH)/x509v3/v3_pmaps.c \
+	$(CRYPTO_PATH)/x509v3/v3_prn.c \
+	$(CRYPTO_PATH)/x509v3/v3_purp.c \
+	$(CRYPTO_PATH)/x509v3/v3_skey.c \
+	$(CRYPTO_PATH)/x509v3/v3_sxnet.c \
+	$(CRYPTO_PATH)/x509v3/v3_utl.c \
+	$(CRYPTO_PATH)/x509v3/v3err.c \
+	$(CRYPTO_PATH)/x509v3/v3_scts.c
+
+local_c_includes := \
+	$(LOCAL_PATH)/openssl \
+	$(LOCAL_PATH)/openssl/crypto \
+	$(LOCAL_PATH)/openssl/crypto/asn1 \
+	$(LOCAL_PATH)/openssl/crypto/evp \
+	$(LOCAL_PATH)/openssl/crypto/modes \
+	$(LOCAL_PATH)/openssl/include \
+	$(LOCAL_PATH)/openssl/include/openssl
+
+local_c_flags := -DNO_WINDOWS_BRAINDEATH
+
+
+include $(LOCAL_PATH)/openssl/android-config.mk
+LOCAL_SRC_FILES += $(local_src_files)
+LOCAL_CFLAGS += $(local_c_flags) -DPURIFY
+LOCAL_C_INCLUDES += $(local_c_includes)
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE:= libcrypto
+include $(BUILD_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+#LOCAL_MODULE    := crypto
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./boringssl/lib/libcrypto_armeabi-v7a.a
+    LOCAL_SRC_FILES := ./openssl/obj/local/armeabi-v7a/libcrypto.a
 else
     ifeq ($(TARGET_ARCH_ABI),armeabi)
-	LOCAL_SRC_FILES := ./boringssl/lib/libcrypto_armeabi.a
+	LOCAL_SRC_FILES := ./openssl/obj/local/armeabi/libcrypto.a
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
-	    LOCAL_SRC_FILES := ./boringssl/lib/libcrypto_x86.a
+	    LOCAL_SRC_FILES := ./openssl/obj/local/x86/libcrypto.a
         endif
     endif
 endif
 
-include $(PREBUILT_STATIC_LIBRARY)
+#include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
@@ -390,7 +914,7 @@ endif
 
 MY_DIR := libtgvoip
 
-LOCAL_C_INCLUDES := jni/opus/include jni/boringssl/include/ jni/libtgvoip/webrtc_dsp/
+LOCAL_C_INCLUDES := jni/opus/include jni/openssl/include/ jni/libtgvoip/webrtc_dsp/
 
 LOCAL_SRC_FILES := \
 ./libtgvoip/logging.cpp \
@@ -525,7 +1049,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CPPFLAGS := -Wall -std=c++11 -DANDROID -frtti -DHAVE_PTHREAD -finline-functions -ffast-math -O0
-LOCAL_C_INCLUDES += ./jni/boringssl/include/
+LOCAL_C_INCLUDES += ./jni/openssl/include/
 LOCAL_ARM_MODE := arm
 LOCAL_MODULE := tgnet
 LOCAL_STATIC_LIBRARIES := crypto
@@ -859,7 +1383,7 @@ LOCAL_C_INCLUDES    := \
 ./jni/opus/ \
 ./jni/opus/opusfile \
 ./jni/libyuv/include \
-./jni/boringssl/include \
+./jni/openssl/include \
 ./jni/breakpad/common/android/include \
 ./jni/breakpad \
 ./jni/ffmpeg \
