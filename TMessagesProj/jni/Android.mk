@@ -757,7 +757,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CPPFLAGS := -Wall -std=c++11 -DANDROID -frtti -DHAVE_PTHREAD -finline-functions -ffast-math -O0
-LOCAL_C_INCLUDES += ./jni/openssl/include/
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/openssl/include/
 LOCAL_ARM_MODE := arm
 LOCAL_MODULE := tgnet
 LOCAL_STATIC_LIBRARIES := crypto
@@ -1007,16 +1007,16 @@ LOCAL_SRC_FILES     += \
 ./opus/opusfile/stream.c
 
 LOCAL_C_INCLUDES    := \
-./jni/opus/include \
-./jni/opus/silk \
-./jni/opus/silk/fixed \
-./jni/opus/celt \
-./jni/opus/ \
-./jni/opus/opusfile \
-./jni/libyuv/include \
-./jni/openssl/include \
-./jni/ffmpeg/include \
-./jni/intro
+$(LOCAL_PATH)/opus/include \
+$(LOCAL_PATH)/opus/silk \
+$(LOCAL_PATH)/opus/silk/fixed \
+$(LOCAL_PATH)/opus/celt \
+$(LOCAL_PATH)/opus/ \
+$(LOCAL_PATH)/opus/opusfile \
+$(LOCAL_PATH)/libyuv/include \
+$(LOCAL_PATH)/openssl/include \
+$(LOCAL_PATH)/ffmpeg/include \
+$(LOCAL_PATH)/intro
 
 LOCAL_SRC_FILES     += \
 ./libyuv/source/compare_common.cc \
