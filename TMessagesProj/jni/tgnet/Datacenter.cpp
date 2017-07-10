@@ -877,12 +877,15 @@ inline bool factorizeValue(uint64_t what, uint32_t &p, uint32_t &q) {
 }
 
 inline bool check_prime(BIGNUM *p) {
-    int result = 0;
-    if (!BN_primality_test(&result, p, BN_prime_checks, bnContext, 0, NULL)) {
-        DEBUG_E("OpenSSL error at BN_primality_test");
-        return false;
+    switch (BN_is_prime_fasttest_ex(p, BN_prime_checks, bnContext, 0, NULL)) {
+        case 1:
+            return 1;
+        case 0:
+            return 0;
+        default:
+            DEBUG_E("OpenSSL error at BN_is_prime_fasttest_ex");
+            return 0;
     }
-    return result != 0;
 }
 
 inline bool isGoodPrime(BIGNUM *p, uint32_t g) {
