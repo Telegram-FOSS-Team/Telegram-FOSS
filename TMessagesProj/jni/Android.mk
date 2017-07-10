@@ -862,8 +862,8 @@ LOCAL_MODULE := breakpad
 LOCAL_CPPFLAGS := -Wall -std=c++11 -DANDROID -finline-functions -ffast-math -Os -fno-strict-aliasing
 
 LOCAL_C_INCLUDES := \
-./jni/breakpad/common/android/include \
-./jni/breakpad
+$(LOCAL_PATH)/breakpad/common/android/include \
+$(LOCAL_PATH)/breakpad
 
 LOCAL_SRC_FILES := \
 ./breakpad/client/linux/crash_generation/crash_generation_client.cc \
@@ -1049,7 +1049,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CPPFLAGS := -Wall -std=c++11 -DANDROID -frtti -DHAVE_PTHREAD -finline-functions -ffast-math -O0
-LOCAL_C_INCLUDES += ./jni/openssl/include/
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/openssl/include/
 LOCAL_ARM_MODE := arm
 LOCAL_MODULE := tgnet
 LOCAL_STATIC_LIBRARIES := crypto
@@ -1079,7 +1079,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS := -Wall -DANDROID -DHAVE_MALLOC_H -DHAVE_PTHREAD -DWEBP_USE_THREAD -finline-functions -ffast-math -ffunction-sections -fdata-sections -O0
-LOCAL_C_INCLUDES += ./jni/libwebp/src
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/libwebp/src
 LOCAL_ARM_MODE := arm
 LOCAL_STATIC_LIBRARIES := cpufeatures
 LOCAL_MODULE := webp
@@ -1376,17 +1376,17 @@ LOCAL_SRC_FILES     += \
 ./opus/opusfile/stream.c
 
 LOCAL_C_INCLUDES    := \
-./jni/opus/include \
-./jni/opus/silk \
-./jni/opus/silk/fixed \
-./jni/opus/celt \
-./jni/opus/ \
-./jni/opus/opusfile \
-./jni/libyuv/include \
-./jni/openssl/include \
-./jni/breakpad/common/android/include \
-./jni/breakpad \
-./jni/ffmpeg
+$(LOCAL_PATH)/opus/include \
+$(LOCAL_PATH)/opus/silk \
+$(LOCAL_PATH)/opus/silk/fixed \
+$(LOCAL_PATH)/opus/celt \
+$(LOCAL_PATH)/opus/ \
+$(LOCAL_PATH)/opus/opusfile \
+$(LOCAL_PATH)/libyuv/include \
+$(LOCAL_PATH)/openssl/include \
+$(LOCAL_PATH)/breakpad/common/android/include \
+$(LOCAL_PATH)/breakpad \
+$(LOCAL_PATH)/ffmpeg
 
 LOCAL_SRC_FILES     += \
 ./libyuv/source/compare_common.cc \
