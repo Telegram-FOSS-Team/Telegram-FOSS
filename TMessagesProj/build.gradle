@@ -163,6 +163,10 @@ android {
         targetSdkVersion 25
         versionName "4.2.1"
 
+        //obtain your own keys at https://core.telegram.org/api/obtaining_api_id
+        buildConfigField 'int', 'APP_ID', AppId
+        buildConfigField 'String', 'APP_HASH', AppHash
+
         externalNativeBuild {
             ndkBuild {
                 arguments "NDK_APPLICATION_MK:=jni/Application.mk", "APP_PLATFORM:=android-14"
