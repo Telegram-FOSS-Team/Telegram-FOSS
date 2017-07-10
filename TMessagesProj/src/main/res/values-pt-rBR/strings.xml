@@ -1305,7 +1305,7 @@
     <string name="ActionAddUserSelf">un1 retornou ao grupo</string>
     <string name="ActionAddUserSelfMega">un1 entrou no grupo</string>
     <string name="ActionAddUserSelfYou">Você retornou ao grupo</string>
-    <string name="UnsupportedMedia">Esta mensagem não é suportada na sua versão do Telegram. Para visualizá-la atualize seu aplicativo em https://telegram.org/update</string>
+    <string name="UnsupportedMedia">Esta mensagem não é suportada na sua versão do Telegram. Para visualizá-la atualize seu aplicativo em https://github.com/Telegram-FOSS-Team/Telegram-FOSS/blob/master/Update.md</string>
     <string name="AttachPhoto">Foto</string>
     <string name="AttachVideo">Vídeo</string>
     <string name="AttachPhotoExpired">A foto expirou</string>
