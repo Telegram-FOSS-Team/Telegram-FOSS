@@ -11,7 +11,7 @@ package org.telegram.messenger;
 public class BuildVars {
     public static boolean DEBUG_VERSION = false;
     public static boolean DEBUG_PRIVATE_VERSION = false;
-    public static int BUILD_VERSION = 1043;
+    public static int BUILD_VERSION = 1045;
     public static String BUILD_VERSION_STRING = "4.2";
     public static int APP_ID = BuildConfig.APP_ID; //obtain your own APP_ID at https://core.telegram.org/api/obtaining_api_id
     public static String APP_HASH = BuildConfig.APP_HASH; //obtain your own APP_HASH at https://core.telegram.org/api/obtaining_api_id
