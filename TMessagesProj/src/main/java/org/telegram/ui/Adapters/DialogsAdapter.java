@@ -43,6 +43,10 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
         return current != getItemCount() || current == 1;
     }
 
+    public void setDialogsType(int dialogsType) {
+        this.dialogsType = dialogsType;
+    }
+
     private ArrayList<TLRPC.TL_dialog> getDialogsArray() {
         if (dialogsType == 0) {
             return MessagesController.getInstance().dialogs;
@@ -50,6 +54,16 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
             return MessagesController.getInstance().dialogsServerOnly;
         } else if (dialogsType == 2) {
             return MessagesController.getInstance().dialogsGroupsOnly;
+        } else if (dialogsType == 3) {
+            return MessagesController.getInstance().dialogsBots;
+        } else if (dialogsType == 4) {
+            return MessagesController.getInstance().dialogsChannels;
+        } else if (dialogsType == 5) {
+            return MessagesController.getInstance().dialogsGroups;
+        } else if (dialogsType == 6) {
+            return MessagesController.getInstance().dialogsPeople;
+        } else if (dialogsType == 7) {
+            return MessagesController.getInstance().dialogsSecretChats;
         }
         return null;
     }

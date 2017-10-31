@@ -17,6 +17,7 @@ dependencies {
     compile 'com.googlecode.mp4parser:isoparser:1.0.6'
     compile 'com.stripe:stripe-android:2.0.2'
     compile 'org.osmdroid:osmdroid-android:5.6.4'
+    compile 'com.android.support:design:25.3.1'
 }
 
 android {
@@ -37,7 +38,7 @@ android {
     dexOptions {
         jumboMode = true
         // Telegram-FOSS uncomment if it doesn't compile
-        //javaMaxHeapSize "2g"
+        javaMaxHeapSize "2g"
     }
 
     compileOptions {

@@ -50,6 +50,13 @@ import java.util.concurrent.Semaphore;
 
 public class MessagesController implements NotificationCenter.NotificationCenterDelegate {
 
+
+    public ArrayList<TLRPC.TL_dialog> dialogsBots = new ArrayList();
+    public ArrayList<TLRPC.TL_dialog> dialogsChannels = new ArrayList();
+    public ArrayList<TLRPC.TL_dialog> dialogsSecretChats = new ArrayList();
+    public ArrayList<TLRPC.TL_dialog> dialogsPeople = new ArrayList();
+    public ArrayList<TLRPC.TL_dialog> dialogsGroups = new ArrayList();
+
     private ConcurrentHashMap<Integer, TLRPC.Chat> chats = new ConcurrentHashMap<>(100, 1.0f, 2);
     private ConcurrentHashMap<Integer, TLRPC.EncryptedChat> encryptedChats = new ConcurrentHashMap<>(10, 1.0f, 2);
     private ConcurrentHashMap<Integer, TLRPC.User> users = new ConcurrentHashMap<>(100, 1.0f, 2);
@@ -616,6 +623,13 @@ public class MessagesController implements NotificationCenter.NotificationCenter
         channelViewsToReload.clear();
         dialogsServerOnly.clear();
         dialogsGroupsOnly.clear();
+
+        dialogsBots.clear();
+        dialogsChannels.clear();
+        dialogsSecretChats.clear();
+        dialogsPeople.clear();
+        dialogsGroups.clear();
+
         dialogMessagesByIds.clear();
         dialogMessagesByRandomIds.clear();
         users.clear();
@@ -2140,6 +2154,13 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                         });
                     }
                     dialogsGroupsOnly.remove(dialog);
+
+                    dialogsBots.remove(dialog);
+                    dialogsChannels.remove(dialog);
+                    dialogsSecretChats.remove(dialog);
+                    dialogsPeople.remove(dialog);
+                    dialogsGroups.remove(dialog);
+
                     dialogs_dict.remove(did);
                     dialogs_read_inbox_max.remove(did);
                     dialogs_read_outbox_max.remove(did);
@@ -8047,6 +8068,13 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                 dialogs.remove(dialog);
                 dialogsServerOnly.remove(dialog);
                 dialogsGroupsOnly.remove(dialog);
+
+                dialogsBots.remove(dialog);
+                dialogsChannels.remove(dialog);
+                dialogsSecretChats.remove(dialog);
+                dialogsPeople.remove(dialog);
+                dialogsGroups.remove(dialog);
+
                 dialogs_dict.remove(dialog.id);
                 dialogs_read_inbox_max.remove(dialog.id);
                 dialogs_read_outbox_max.remove(dialog.id);
@@ -8124,6 +8152,13 @@ public class MessagesController implements NotificationCenter.NotificationCenter
     public void sortDialogs(HashMap<Integer, TLRPC.Chat> chatsDict) {
         dialogsServerOnly.clear();
         dialogsGroupsOnly.clear();
+
+        dialogsBots.clear();
+        dialogsChannels.clear();
+        dialogsSecretChats.clear();
+        dialogsPeople.clear();
+        dialogsGroups.clear();
+
         Collections.sort(dialogs, dialogComparator);
         for (int a = 0; a < dialogs.size(); a++) {
             TLRPC.TL_dialog d = dialogs.get(a);
@@ -8136,6 +8171,13 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                     if (chat != null && (chat.megagroup && (chat.admin_rights != null && chat.admin_rights.post_messages) || chat.creator)) {
                         dialogsGroupsOnly.add(d);
                     }
+                    if (chat != null) {
+                        if (chat.megagroup) {
+                            dialogsGroups.add(d);
+                        } else {
+                            dialogsChannels.add(d);
+                        }
+                    }
                 } else if (lower_id < 0) {
                     if (chatsDict != null) {
                         TLRPC.Chat chat = chatsDict.get(-lower_id);
@@ -8146,7 +8188,20 @@ public class MessagesController implements NotificationCenter.NotificationCenter
                         }
                     }
                     dialogsGroupsOnly.add(d);
+                    dialogsGroups.add(d);
+                } else {
+                    TLRPC.User user = getUser(lower_id);
+                    if (user != null) {
+                        if (user.bot) {
+                            dialogsBots.add(d);
+                        } else {
+                            dialogsPeople.add(d);
+                        }
+                    }
                 }
+            } else if (getEncryptedChat(high_id) != null) {
+                dialogsPeople.add(d);
+                dialogsSecretChats.add(d);
             }
         }
     }

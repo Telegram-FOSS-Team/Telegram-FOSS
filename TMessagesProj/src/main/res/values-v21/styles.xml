@@ -21,7 +21,7 @@
         <item name="android:navigationBarColor">#000000</item>
     </style>
 
-    <style name="Theme.TMessages" parent="@android:style/Theme.Material.Light">
+    <style name="Theme.TMessages" parent="Theme.AppCompat.Light">
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBarOverlay">false</item>
