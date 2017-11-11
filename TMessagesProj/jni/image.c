@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <setjmp.h>
 #include <android/bitmap.h>
-#include <libwebp/webp/decode.h>
-#include <libwebp/webp/encode.h>
+#include <libwebp/src/webp/decode.h>
+#include <libwebp/src/webp/encode.h>
 #include "utils.h"
 #include "image.h"
 
