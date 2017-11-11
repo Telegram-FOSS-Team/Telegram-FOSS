@@ -9,19 +9,18 @@ configurations {
 }
 
 dependencies {
-    compile 'com.android.support:support-core-ui:25.3.1'
-    compile 'com.android.support:support-compat:25.3.1'
-    compile 'com.android.support:support-core-utils:25.3.1'
-    compile 'com.android.support:support-v13:25.3.1'
-    compile 'com.android.support:palette-v7:25.3.1'
-    compile 'com.googlecode.mp4parser:isoparser:1.0.6'
-    compile 'com.stripe:stripe-android:2.0.2'
-    compile 'org.osmdroid:osmdroid-android:5.6.5'
+    implementation 'com.android.support:support-core-ui:25.3.1'
+    implementation 'com.android.support:support-compat:25.3.1'
+    implementation 'com.android.support:support-core-utils:25.3.1'
+    implementation 'com.android.support:support-v13:25.3.1'
+    implementation 'com.android.support:palette-v7:25.3.1'
+    implementation 'com.googlecode.mp4parser:isoparser:1.0.6'
+    implementation 'com.stripe:stripe-android:2.0.2'
+    implementation 'org.osmdroid:osmdroid-android:5.6.5'
 }
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.2'
 
     useLibrary 'org.apache.http.legacy'
     defaultConfig.applicationId = "org.telegram.messenger"
@@ -98,6 +97,8 @@ android {
     sourceSets.foss {
         manifest.srcFile 'config/foss/AndroidManifest.xml'
     }
+
+    flavorDimensions "default"
 
     productFlavors {
         x86 {
