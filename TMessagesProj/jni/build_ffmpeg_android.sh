@@ -1,5 +1,4 @@
 #!/bin/bash
-#apply fix http://permalink.gmane.org/gmane.comp.video.ffmpeg.devel/203198
 
 function build_one {
 
@@ -16,7 +15,7 @@ echo "Configuring..."
 --cpu=$CPU \
 --target-os=linux \
 --enable-cross-compile \
---yasmexe=$NDK/prebuilt/darwin-x86_64/bin/yasm \
+--x86asmexe=$NDK/prebuilt/linux-x86_64/bin/yasm \
 --prefix=$PREFIX \
 --enable-pic \
 --disable-shared \
@@ -30,7 +29,10 @@ echo "Configuring..."
 --enable-version3 \
 --enable-gpl \
 \
+--disable-linux-perf \
+\
 --disable-doc \
+--disable-htmlpages \
 --disable-avx \
 \
 --disable-everything \
@@ -42,6 +44,12 @@ echo "Configuring..."
 --disable-debug \
 --disable-programs \
 --disable-network \
+--disable-ffserver \
+--disable-ffplay \
+--disable-ffprobe \
+--disable-swscale \
+--disable-postproc \
+--disable-avdevice \
 \
 --enable-pthreads \
 --enable-protocol=file \
@@ -56,19 +64,23 @@ $ADDITIONAL_CONFIGURE_FLAG
 
 #echo "continue?"
 #read
-make -j8 install
+make -j8
+make install
 
 }
 
-NDK=/Applications/sdk/ndk-bundle
+# TODO: fix env variable for NDK
+# NDK=/opt/android-sdk/ndk-bundle
+
+cd ffmpeg
 
 #arm platform
-PLATFORM=$NDK/platforms/android-9/arch-arm
-PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.8/prebuilt/darwin-x86_64
+PLATFORM=$NDK/platforms/android-16/arch-arm
+PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
 LD=$PREBUILT/bin/arm-linux-androideabi-ld
 AR=$PREBUILT/bin/arm-linux-androideabi-ar
 NM=$PREBUILT/bin/arm-linux-androideabi-nm
-GCCLIB=$PREBUILT/lib/gcc/arm-linux-androideabi/4.8/libgcc.a
+GCCLIB=$PREBUILT/lib/gcc/arm-linux-androideabi/4.9.x/libgcc.a
 ARCH=arm
 CC=$PREBUILT/bin/arm-linux-androideabi-gcc
 CROSS_PREFIX=$PREBUILT/bin/arm-linux-androideabi-
@@ -88,12 +100,12 @@ ADDITIONAL_CONFIGURE_FLAG=--enable-neon
 build_one
 
 #x86 platform
-PLATFORM=$NDK/platforms/android-9/arch-x86
-PREBUILT=$NDK/toolchains/x86-4.8/prebuilt/darwin-x86_64
+PLATFORM=$NDK/platforms/android-16/arch-x86
+PREBUILT=$NDK/toolchains/x86-4.9/prebuilt/linux-x86_64
 LD=$PREBUILT/bin/i686-linux-android-ld
 AR=$PREBUILT/bin/i686-linux-android-ar
 NM=$PREBUILT/bin/i686-linux-android-nm
-GCCLIB=$PREBUILT/lib/gcc/i686-linux-android/4.8/libgcc.a
+GCCLIB=$PREBUILT/lib/gcc/i686-linux-android/4.9.x/libgcc.a
 ARCH=x86
 CC=$PREBUILT/bin/i686-linux-android-gcc
 CROSS_PREFIX=$PREBUILT/bin/i686-linux-android-
@@ -103,4 +115,5 @@ OPTIMIZE_CFLAGS="-march=$CPU"
 PREFIX=./android/$CPU
 ADDITIONAL_CONFIGURE_FLAG="--disable-mmx --disable-yasm"
 build_one
+
 
