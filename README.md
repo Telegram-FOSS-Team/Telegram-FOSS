@@ -74,11 +74,11 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
       ```
 
 4. If you want to publish a modified version of Telegram:
-      - You should get **your own API key** here: https://core.telegram.org/api/obtaining_api_id and update the file `TMessagesProj/build.gradle` accordingly.
-        Something like this will work, note the double quoting of the APP_HASH value:
+      - You should get **your own API key** here: https://core.telegram.org/api/obtaining_api_id and create a file called `API_KEYS` in the root source directory.
+        The contents should look something like this:
         ```
-        buildConfigField 'int', 'APP_ID', "12345"
-        buildConfigField 'String', 'APP_HASH', '"aaaaaaaabbbbbbccccccfffffff001122"'
+        APP_ID = 12345
+        APP_HASH = aaaaaaaabbbbbbccccccfffffff001122
         ```
       - Do not use the name Telegram and the standard logo (white paper plane in a blue circle) for your app — or make sure your users understand that it is unofficial
       - Take good care of your users' data and privacy
