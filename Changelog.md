@@ -1,3 +1,12 @@
+### v4.2.1a (FOSS maintenance release)
+- **SECURITY:** update openssl to 1.0.2m
+- **SECURITY:** update ffmpeg to 3.4
+- **SECURITY:** update sqlite and libwebp to latest versions.
+- inlcude armv6 libraries again
+- removed unused google breakpad library
+- should now be build with NDK r15c
+- add a [small patch](https://github.com/Telegram-FOSS-Team/Telegram-FOSS/commit/d692cfae16471e7ef70d92c2d5d61e13f3d278fe) to enable location sharing through intents
+
 #### v4.5 (not released as FOSS version)
 - Grouped Photos. Group media into albums when sharing multiple photos and videos. Choose the exact order of media you send.
 - Saved Messages. Bookmark messages by forwarding them to “Saved Messages”.

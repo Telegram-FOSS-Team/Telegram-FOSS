@@ -23,7 +23,7 @@ Join the [Telegram-FOSS Offtopics group](https://t.me/joinchat/AAAAAEFaw9LIC-VgK
 ## Changes:
 
 *Replacement of non-FOSS, untrustworthy or suspicious binaries or source code:*
-- Do location sharing with OpenStreetMap instead of Google Maps
+- Do location sharing with OpenStreetMap instead of Google Maps (+ a [minor tweak](https://github.com/Telegram-FOSS-Team/Telegram-FOSS/commit/d692cfae16471e7ef70d92c2d5d61e13f3d278fe))
 - Use emojiOne emoji set instead of Apple's emoji
 - Google Play Services GCM replaced with always-on Telegram's push service
 - BoringSSL bundled source and binaries are replaced with upstream OpenSSL source code built at compile time
