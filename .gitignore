@@ -6,6 +6,9 @@ obj/
 local.properties
 *.keystore
 gradle.properties
-
-TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
 API_KEYS
+*.hprof
+TMessagesProj/.externalNativeBuild/
+TMessagesProj/libs
+3rdParty/download
+3rdParty/unpacked
