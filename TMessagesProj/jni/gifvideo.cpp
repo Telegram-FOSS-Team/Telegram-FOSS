@@ -180,7 +180,7 @@ jint Java_org_telegram_ui_Components_AnimatedFileDrawable_createDecoder(JNIEnv *
     
     //LOGD("successfully opened file %s", info->src);
     
-    return (int) info;
+    return static_cast<int>(reinterpret_cast<uintptr_t>(info));
 }
 
 void Java_org_telegram_ui_Components_AnimatedFileDrawable_destroyDecoder(JNIEnv *env, jclass clazz, jobject ptr) {

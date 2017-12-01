@@ -120,6 +120,8 @@ public class NativeLoader {
             try {
                 if (Build.CPU_ABI.equalsIgnoreCase("armeabi-v7a")) {
                     folder = "armeabi-v7a";
+                } else if (Build.CPU_ABI.equalsIgnoreCase("arm64-v8a")) {
+                    folder = "arm64-v8a";
                 } else if (Build.CPU_ABI.equalsIgnoreCase("armeabi")) {
                     folder = "armeabi";
                 } else if (Build.CPU_ABI.equalsIgnoreCase("x86")) {

@@ -43,7 +43,7 @@ int Java_org_telegram_SQLite_SQLitePreparedStatement_prepare(JNIEnv *env, jobjec
         env->ReleaseStringUTFChars(sql, sqlStr);
     }
     
-    return (int) stmt_handle;
+    return static_cast<int>(reinterpret_cast<uintptr_t>(stmt_handle));
 }
 
 void Java_org_telegram_SQLite_SQLitePreparedStatement_reset(JNIEnv *env, jobject object, int statementHandle) {
@@ -158,7 +158,7 @@ int Java_org_telegram_SQLite_SQLiteDatabase_opendb(JNIEnv *env, jobject object, 
     if (tempDirStr != 0) {
         env->ReleaseStringUTFChars(tempDir, tempDirStr);
     }
-    return (int)handle;
+    return static_cast<int>(reinterpret_cast<uintptr_t>(handle));
 }
 
 int Java_org_telegram_SQLite_SQLiteCursor_columnType(JNIEnv *env, jobject object, int statementHandle, int columnIndex) {
@@ -235,7 +235,7 @@ int Java_org_telegram_SQLite_SQLiteCursor_columnByteBufferValue(JNIEnv *env, job
         return 0;
     }
     memcpy(buffer->bytes(), buf, length);
-	return (int) buffer;
+	return static_cast<int>(reinterpret_cast<uintptr_t>(buffer));
 }
 
 }

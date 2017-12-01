@@ -98,7 +98,7 @@ jint createLoadOpetation(JNIEnv *env, jclass c, jint dc_id, jlong id, jlong volu
         env->ReleaseStringUTFChars(temp, tempStr);
     }
 
-    return (jint) loadOperation;
+    return (jint) static_cast<int>(reinterpret_cast<uintptr_t>(loadOperation));
 }
 
 void startLoadOperation(JNIEnv *env, jclass c, jint address) {
@@ -121,7 +121,7 @@ static JNINativeMethod FileLoadOperationMethods[] = {
 };
 
 jint getFreeBuffer(JNIEnv *env, jclass c, jint length) {
-    return (jint) BuffersStorage::getInstance().getFreeBuffer(length);
+    return (jint) static_cast<int>(reinterpret_cast<uintptr_t>(BuffersStorage::getInstance().getFreeBuffer(length)));
 }
 
 jint limit(JNIEnv *env, jclass c, jint address) {
@@ -187,7 +187,7 @@ void sendRequest(JNIEnv *env, jclass c, jint object, jobject onComplete, jobject
         jint errorCode = 0;
         jstring errorText = nullptr;
         if (resp != nullptr) {
-            ptr = (jint) resp->response.get();
+            ptr = (jint) static_cast<int>(reinterpret_cast<uintptr_t>(resp->response.get()));
         } else if (error != nullptr) {
             errorCode = error->code;
             errorText = jniEnv->NewStringUTF(error->text.c_str());

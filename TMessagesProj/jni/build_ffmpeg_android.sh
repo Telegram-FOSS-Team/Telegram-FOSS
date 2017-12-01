@@ -116,4 +116,19 @@ PREFIX=./android/$CPU
 ADDITIONAL_CONFIGURE_FLAG="--disable-mmx --disable-yasm"
 build_one
 
+#arm64 
+PLATFORM=$NDK/platforms/android-21/arch-arm64
+PREBUILT=$NDK/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64
+LD=$PREBUILT/bin/aarch64-linux-android-ld
+AR=$PREBUILT/bin/aarch64-linux-android-ar
+NM=$PREBUILT/bin/aarch64-linux-android-nm
+GCCLIB=$PREBUILT/lib/gcc/aarch64-linux-android/4.9.x/libgcc.a
+ARCH=aarch64
+CC=$PREBUILT/bin/aarch64-linux-android-gcc
+CROSS_PREFIX=$PREBUILT/bin/aarch64-linux-android-
 
+CPU=armv8-a
+OPTIMIZE_CFLAGS="-march=$CPU -Dipv6mr_interface=ipv6mr_ifindex -fasm -Wno-psabi -fno-short-enums -fno-strict-aliasing"
+PREFIX=./android/$CPU
+ADDITIONAL_CONFIGURE_FLAG="--enable-neon"
+build_one

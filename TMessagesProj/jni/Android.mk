@@ -4,6 +4,16 @@
 MY_LOCAL_PATH := $(call my-dir)
 LOCAL_PATH := $(MY_LOCAL_PATH)
 
+# arm64
+my_arm_neon =
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+    my_arm_neon = yes
+endif
+
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+    my_arm_neon = yes
+endif
+
 LOCAL_MODULE    := avutil 
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
@@ -17,6 +27,11 @@ else
         ifeq ($(TARGET_ARCH_ABI),x86)
             FFMPEG_INCLUDE_PATH := $(LOCAL_PATH)/ffmpeg/android/i686/include
             LOCAL_SRC_FILES := ./ffmpeg/android/i686/lib/libavutil.a
+        else
+            ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+                FFMPEG_INCLUDE_PATH := $(LOCAL_PATH)/ffmpeg/android/armv8-a/include
+                LOCAL_SRC_FILES := ./ffmpeg/android/armv8-a/lib/libavutil.a
+            endif
         endif
     endif
 endif
@@ -35,6 +50,10 @@ else
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
 	    LOCAL_SRC_FILES := ./ffmpeg/android/i686/lib/libavformat.a
+        else
+            ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+                LOCAL_SRC_FILES := ./ffmpeg/android/armv8-a/lib/libavformat.a
+            endif
         endif
     endif
 endif
@@ -53,6 +72,10 @@ else
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
 	    LOCAL_SRC_FILES := ./ffmpeg/android/i686/lib/libavcodec.a
+        else
+            ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+                LOCAL_SRC_FILES := ./ffmpeg/android/armv8-a/lib/libavcodec.a
+            endif
         endif
     endif
 endif
@@ -71,6 +94,10 @@ else
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
 	    LOCAL_SRC_FILES := ./ffmpeg/android/i686/lib/libswresample.a
+        else
+            ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+                LOCAL_SRC_FILES := ./ffmpeg/android/armv8-a/lib/libswresample.a
+            endif
         endif
     endif
 endif
@@ -613,6 +640,10 @@ else
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
 	    LOCAL_SRC_FILES := ./openssl/obj/local/x86/libcrypto.a
+        else
+            ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+                LOCAL_SRC_FILES := ./openssl/obj/local/arm64-v8a/libcrypto.a
+            endif
         endif
     endif
 endif
@@ -625,7 +656,7 @@ LOCAL_MODULE := voip
 LOCAL_CPPFLAGS := -Wall -std=c++11 -DANDROID -finline-functions -ffast-math -Os -fno-strict-aliasing -O3 -frtti -D__STDC_LIMIT_MACROS
 LOCAL_CFLAGS := -O3 -DUSE_KISS_FFT -fexceptions -DWEBRTC_APM_DEBUG_DUMP=0 -DWEBRTC_POSIX -D__STDC_LIMIT_MACROS
 
-ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+ifdef my_arm_neon
 #    LOCAL_CPPFLAGS += -mfloat-abi=softfp -mfpu=neon
 #    LOCAL_CFLAGS += -mfloat-abi=softfp -mfpu=neon -DFLOATING_POINT
 #	LOCAL_ARM_NEON := true
@@ -746,19 +777,23 @@ LOCAL_SRC_FILES += \
 ./libtgvoip/webrtc_dsp/webrtc/modules/audio_processing/agc/legacy/analog_agc.c \
 ./libtgvoip/webrtc_dsp/webrtc/modules/audio_processing/agc/legacy/digital_agc.c
 
-ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+ifdef my_arm_neon
 LOCAL_SRC_FILES += \
 ./libtgvoip/webrtc_dsp/webrtc/modules/audio_processing/aecm/aecm_core_neon.cc.neon \
 ./libtgvoip/webrtc_dsp/webrtc/common_audio/signal_processing/min_max_operations_neon.c.neon \
 ./libtgvoip/webrtc_dsp/webrtc/common_audio/signal_processing/downsample_fast_neon.c.neon \
-./libtgvoip/webrtc_dsp/webrtc/common_audio/signal_processing/cross_correlation_neon.c.neon \
-./libtgvoip/webrtc_dsp/webrtc/common_audio/signal_processing/filter_ar_fast_q12_armv7.S.neon
+./libtgvoip/webrtc_dsp/webrtc/common_audio/signal_processing/cross_correlation_neon.c.neon
 #LOCAL_SRC_FILES += \
 #./libtgvoip/webrtc_dsp/webrtc/modules/audio_processing/aec/aec_core_neon.cc.neon
 #./libtgvoip/webrtc_dsp/webrtc/modules/audio_processing/utility/ooura_fft_neon.cc.neon
 LOCAL_SRC_FILES += \
 ./libtgvoip/webrtc_dsp/webrtc/modules/audio_processing/ns/nsx_core_neon.c.neon
 #LOCAL_ARM_NEON := true
+endif
+
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+LOCAL_SRC_FILES += \
+./libtgvoip/webrtc_dsp/webrtc/common_audio/signal_processing/filter_ar_fast_q12_armv7.S.neon
 endif
 
 ifeq ($(TARGET_ARCH_ABI),armeabi)
@@ -836,7 +871,8 @@ LOCAL_CFLAGS 	+= -DANDROID_NDK -DDISABLE_IMPORTGL -fno-strict-aliasing -fprefetc
 LOCAL_CPPFLAGS 	:= -DBSD=1 -ffast-math -Os -funroll-loops -std=c++11
 LOCAL_LDLIBS 	:= -ljnigraphics -llog -lz -latomic -lOpenSLES -lEGL -lGLESv2
 # https://stackoverflow.com/a/37235059
-LOCAL_LDLIBS += -Wl,--no-warn-shared-textrel
+# LOCAL_LDLIBS += -Wl,--no-warn-shared-textrel
+LOCAL_DISABLE_FATAL_LINKER_WARNINGS := true
 LOCAL_STATIC_LIBRARIES := webp sqlite tgnet avformat avcodec avutil swresample voip
 
 LOCAL_SRC_FILES     := \
@@ -851,7 +887,7 @@ LOCAL_SRC_FILES     := \
 ./opus/src/mlp.c \
 ./opus/src/mlp_data.c
 
-ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+ifdef my_arm_neon
     LOCAL_ARM_MODE := arm
     LOCAL_CPPFLAGS += -DLIBYUV_NEON
     LOCAL_CFLAGS += -DLIBYUV_NEON
@@ -1082,7 +1118,7 @@ LOCAL_SRC_FILES     += \
 ./libyuv/source/scale.cc \
 ./libyuv/source/video_common.cc
 
-ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+ifdef my_arm_neon
     LOCAL_CFLAGS += -DLIBYUV_NEON
     LOCAL_SRC_FILES += \
         ./libyuv/source/compare_neon.cc.neon    \
