@@ -54,7 +54,6 @@ import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.MessagesStorage;
-import org.telegram.messenger.NativeCrashManager;
 import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
@@ -145,7 +144,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ApplicationLoader.postInitApplication();
-        NativeCrashManager.handleDumpFiles(this);
         AndroidUtilities.checkDisplaySize(this, getResources().getConfiguration());
 
         if (!UserConfig.isClientActivated()) {
@@ -1943,7 +1941,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             passcodeView.onPause();
         }
         ConnectionsManager.getInstance().setAppPaused(true, false);
-        AndroidUtilities.unregisterUpdates();
         if (PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().onPause();
         }
@@ -2030,8 +2027,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             }
             passcodeView.onResume();
         }
-        AndroidUtilities.checkForCrashes(this);
-        AndroidUtilities.checkForUpdates(this);
         ConnectionsManager.getInstance().setAppPaused(false, false);
         updateCurrentConnectionState();
         if (PhotoViewer.getInstance().isVisible()) {
