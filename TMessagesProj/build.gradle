@@ -11,7 +11,6 @@ configurations {
 dependencies {
     compile 'com.google.android.gms:play-services-gcm:11.0.4'
     compile 'com.google.android.gms:play-services-maps:11.0.4'
-    compile 'com.google.android.gms:play-services-vision:11.0.4'
     compile 'com.google.android.gms:play-services-wallet:11.0.4'
     compile 'com.google.android.gms:play-services-wearable:11.0.4'
     compile 'com.android.support:support-core-ui:25.3.1'

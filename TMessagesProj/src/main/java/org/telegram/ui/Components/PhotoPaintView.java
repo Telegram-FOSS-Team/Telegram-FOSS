@@ -11,7 +11,6 @@ import android.graphics.*;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Looper;
-import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -26,10 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.Bitmaps;
@@ -43,7 +38,6 @@ import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Components.Paint.PhotoFace;
 import org.telegram.ui.Components.Paint.Views.EditTextOutline;
 import org.telegram.ui.Components.Paint.Views.EntitiesContainerView;
 import org.telegram.ui.Components.Paint.Views.EntityView;
@@ -109,7 +103,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
     private Animator colorPickerAnimator;
 
     private DispatchQueue queue;
-    private ArrayList<PhotoFace> faces;
+	// TFOSS: kill vision
+    //private ArrayList<PhotoFace> faces;
 
     private final static int gallery_menu_done = 1;
 
@@ -371,7 +366,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
     public void init() {
         renderView.setVisibility(View.VISIBLE);
-        detectFaces();
+		//TFOSS: kill vision
+        //detectFaces();
     }
 
     public void shutdown() {
@@ -1226,6 +1222,8 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         popupWindow.startAnimation();
     }
 
+    // TFOSS: kill vision
+    /*
     private int getFrameRotation() {
         switch (orientation) {
             case 90: {
@@ -1290,6 +1288,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
             }
         });
     }
+    */
 
     private StickerPosition calculateStickerPosition(TLRPC.Document document) {
         TLRPC.TL_maskCoords maskCoords = null;
@@ -1303,6 +1302,9 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
         }
 
         StickerPosition defaultPosition = new StickerPosition(centerPositionForEntity(), 0.75f, 0.0f);
+        // TFOSS: kill vision
+        return defaultPosition;
+        /*
         if (maskCoords == null || faces == null || faces.size() == 0) {
             return defaultPosition;
         } else {
@@ -1332,8 +1334,10 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
             return new StickerPosition(new Point(x, y), scale, angle);
         }
+        */
     }
-
+    // TFOSS: kill vision
+    /*
     private PhotoFace getRandomFaceWithVacantAnchor(int anchor, long documentId, TLRPC.TL_maskCoords maskCoords) {
         if (anchor < 0 || anchor > 3 || faces.isEmpty()) {
             return null;
@@ -1382,6 +1386,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
 
         return false;
     }
+    */
 
     private class StickerPosition {
         private Point position;
