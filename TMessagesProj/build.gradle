@@ -9,9 +9,6 @@ configurations {
 }
 
 dependencies {
-    compile 'com.google.android.gms:play-services-gcm:11.0.4'
-    compile 'com.google.android.gms:play-services-maps:11.0.4'
-    compile 'com.google.android.gms:play-services-wearable:11.0.4'
     compile 'com.android.support:support-core-ui:25.3.1'
     compile 'com.android.support:support-compat:25.3.1'
     compile 'com.android.support:support-core-utils:25.3.1'
@@ -195,5 +192,3 @@ android {
         }
     }
 }
-
-apply plugin: 'com.google.gms.google-services'
