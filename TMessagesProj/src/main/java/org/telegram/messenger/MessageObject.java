@@ -820,7 +820,7 @@ public class MessageObject {
             } else if (message.media instanceof TLRPC.TL_messageMediaInvoice) {
                 messageText = message.media.description;
             } else if (message.media instanceof TLRPC.TL_messageMediaUnsupported) {
-                messageText = LocaleController.getString("UnsupportedMedia", R.string.UnsupportedMedia);
+                messageText = LocaleController.getString("UnsupportedMedia", R.string.UnsupportedMedia).replace("https://telegram.org/update","https://github.com/Telegram-FOSS-Team/Telegram-FOSS/blob/master/Update.md");
             } else if (message.media instanceof TLRPC.TL_messageMediaDocument) {
                 if (isSticker()) {
                     String sch = getStrickerChar();
