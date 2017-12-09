@@ -23,9 +23,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.ui.Components.ForegroundDetector;
 
@@ -101,7 +98,6 @@ public class ApplicationLoader extends Application {
         }
 
         ApplicationLoader app = (ApplicationLoader)ApplicationLoader.applicationContext;
-        app.initPlayServices();
         FileLog.e("app initied");
 
         ContactsController.getInstance().checkAppAccount();
@@ -168,76 +164,5 @@ public class ApplicationLoader extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void initPlayServices() {
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkPlayServices()) {
-                    if (UserConfig.pushString != null && UserConfig.pushString.length() != 0) {
-                        FileLog.d("GCM regId = " + UserConfig.pushString);
-                    } else {
-                        FileLog.d("GCM Registration not found.");
-                    }
-
-                    //if (UserConfig.pushString == null || UserConfig.pushString.length() == 0) {
-                    Intent intent = new Intent(applicationContext, GcmRegistrationIntentService.class);
-                    startService(intent);
-                    //} else {
-                    //    FileLog.d("GCM regId = " + UserConfig.pushString);
-                    //}
-                } else {
-                    FileLog.d("No valid Google Play Services APK found.");
-                }
-            }
-        }, 1000);
-    }
-
-    /*private void initPlayServices() {
-        AndroidUtilities.runOnUIThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkPlayServices()) {
-                    if (UserConfig.pushString != null && UserConfig.pushString.length() != 0) {
-                        FileLog.d("GCM regId = " + UserConfig.pushString);
-                    } else {
-                        FileLog.d("GCM Registration not found.");
-                    }
-                    try {
-                        if (!FirebaseApp.getApps(ApplicationLoader.applicationContext).isEmpty()) {
-                            String token = FirebaseInstanceId.getInstance().getToken();
-                            if (token != null) {
-                                sendRegIdToBackend(token);
-                            }
-                        }
-                    } catch (Throwable e) {
-                        FileLog.e(e);
-                    }
-                } else {
-                    FileLog.d("No valid Google Play Services APK found.");
-                }
-            }
-        }, 2000);
-    }*/
-
-    private boolean checkPlayServices() {
-        try {
-            int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-            return resultCode == ConnectionResult.SUCCESS;
-        } catch (Exception e) {
-            FileLog.e(e);
-        }
-        return true;
-
-        /*if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i("tmessages", "This device is not supported.");
-            }
-            return false;
-        }
-        return true;*/
     }
 }
