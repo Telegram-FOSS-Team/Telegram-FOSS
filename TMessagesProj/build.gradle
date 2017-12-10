@@ -16,6 +16,7 @@ dependencies {
     compile 'com.android.support:palette-v7:25.3.1'
     compile 'com.googlecode.mp4parser:isoparser:1.0.6'
     compile 'com.stripe:stripe-android:2.0.2'
+    compile 'org.osmdroid:osmdroid-android:5.6.5'
 }
 
 //return an api key from a properties file.
