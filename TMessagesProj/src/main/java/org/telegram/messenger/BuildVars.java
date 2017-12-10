@@ -9,7 +9,7 @@
 package org.telegram.messenger;
 
 public class BuildVars {
-    public static boolean DEBUG_VERSION = false;
+    public static boolean DEBUG_VERSION = BuildConfig.DEBUG;
     public static boolean DEBUG_PRIVATE_VERSION = false;
     public static int BUILD_VERSION = 1155;
     public static String BUILD_VERSION_STRING = "4.6";
