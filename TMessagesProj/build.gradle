@@ -1,7 +1,8 @@
 apply plugin: 'com.android.application'
 
 repositories {
-    mavenCentral()
+    jcenter()
+    google()
 }
 
 configurations {
@@ -9,14 +10,14 @@ configurations {
 }
 
 dependencies {
-    compile 'com.android.support:support-core-ui:25.3.1'
-    compile 'com.android.support:support-compat:25.3.1'
-    compile 'com.android.support:support-core-utils:25.3.1'
-    compile 'com.android.support:support-v13:25.3.1'
-    compile 'com.android.support:palette-v7:25.3.1'
-    compile 'com.googlecode.mp4parser:isoparser:1.0.6'
-    compile 'com.stripe:stripe-android:2.0.2'
-    compile 'org.osmdroid:osmdroid-android:5.6.5'
+    implementation 'com.android.support:support-core-ui:25.3.1'
+    implementation 'com.android.support:support-compat:25.3.1'
+    implementation 'com.android.support:support-core-utils:25.3.1'
+    implementation 'com.android.support:support-v13:25.3.1'
+    implementation 'com.android.support:palette-v7:25.3.1'
+    implementation 'com.googlecode.mp4parser:isoparser:1.0.6'
+    implementation 'com.stripe:stripe-android:2.0.2'
+    implementation 'org.osmdroid:osmdroid-android:5.6.5'
 }
 
 //return an api key from a properties file.
@@ -33,7 +34,6 @@ def getAppHash(){
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.2'
 
 
     useLibrary 'org.apache.http.legacy'
@@ -49,6 +49,8 @@ android {
 
     dexOptions {
         jumboMode = true
+        // Telegram-FOSS
+        javaMaxHeapSize "2g"
     }
 
     compileOptions {
@@ -56,45 +58,19 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 
-    signingConfigs {
-        debug {
-            storeFile file("config/release.keystore")
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
-            v2SigningEnabled false
-        }
-
-        release {
-            storeFile file("config/release.keystore")
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
-            v2SigningEnabled false
-        }
-    }
-
     buildTypes {
         debug {
             debuggable true
             jniDebuggable true
-            signingConfig signingConfigs.debug
             applicationIdSuffix ".beta"
         }
 
         release {
             debuggable false
             jniDebuggable false
-            signingConfig signingConfigs.release
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-
-        foss {
-            debuggable false
-            jniDebuggable false
-            signingConfig signingConfigs.release
         }
     }
 
@@ -106,10 +82,6 @@ android {
 
     sourceSets.release {
         manifest.srcFile 'config/release/AndroidManifest.xml'
-    }
-
-    sourceSets.foss {
-        manifest.srcFile 'config/foss/AndroidManifest.xml'
     }
 
     flavorDimensions "minApi"
@@ -187,7 +159,7 @@ android {
 
         externalNativeBuild {
             ndkBuild {
-                arguments "NDK_APPLICATION_MK:=jni/Application.mk", "APP_PLATFORM:=android-16"
+                arguments "NDK_APPLICATION_MK:=jni/Application.mk", "APP_PLATFORM:=android-16", "-j5"
                 abiFilters "armeabi-v7a", "x86"
             }
         }
