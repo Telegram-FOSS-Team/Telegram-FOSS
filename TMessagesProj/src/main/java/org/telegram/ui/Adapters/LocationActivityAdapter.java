@@ -22,8 +22,6 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.support.widget.RecyclerView;
 import org.telegram.ui.Cells.EmptyCell;
 import org.telegram.ui.Cells.GraySectionCell;
-import org.telegram.ui.Cells.LocationCell;
-import org.telegram.ui.Cells.LocationLoadingCell;
 import org.telegram.ui.Cells.LocationPoweredCell;
 import org.telegram.ui.Cells.SendLocationCell;
 import org.telegram.ui.Cells.SharingLiveLocationCell;
@@ -148,13 +146,9 @@ public class LocationActivityAdapter extends BaseLocationAdapter {
                 view = new GraySectionCell(mContext);
                 break;
             case 3:
-                view = new LocationCell(mContext);
-                break;
             case 4:
-                view = new LocationLoadingCell(mContext);
-                break;
             case 5:
-                view = new LocationPoweredCell(mContext);
+                view = new EmptyCell(mContext);
                 break;
             case 6:
                 SendLocationCell cell = new SendLocationCell(mContext, true);
@@ -199,21 +193,7 @@ public class LocationActivityAdapter extends BaseLocationAdapter {
             case 2:
                 if (currentMessageObject != null) {
                     ((GraySectionCell) holder.itemView).setText(LocaleController.getString("LiveLocations", R.string.LiveLocations));
-                } else if (pulledUp) {
-                    ((GraySectionCell) holder.itemView).setText(LocaleController.getString("NearbyPlaces", R.string.NearbyPlaces));
-                } else {
-                    ((GraySectionCell) holder.itemView).setText(LocaleController.getString("ShowNearbyPlaces", R.string.ShowNearbyPlaces));
                 }
-                break;
-            case 3:
-                if (liveLocationType == 0) {
-                    ((LocationCell) holder.itemView).setLocation(places.get(position - 3), iconUrls.get(position - 3), true);
-                } else {
-                    ((LocationCell) holder.itemView).setLocation(places.get(position - 4), iconUrls.get(position - 4), true);
-                }
-                break;
-            case 4:
-                ((LocationLoadingCell) holder.itemView).setLoading(searching);
                 break;
             case 6:
                 ((SendLocationCell) holder.itemView).setHasLocation(gpsLocation != null);
@@ -287,15 +267,7 @@ public class LocationActivityAdapter extends BaseLocationAdapter {
                 return 5;
             }
         } else {
-            if (position == 1) {
-                return 1;
-            } else if (position == 2) {
-                return 2;
-            } else if (searching || !searching && places.isEmpty()) {
-                return 4;
-            } else if (position == places.size() + 3) {
-                return 5;
-            }
+            return position;
         }
         return 3;
     }
