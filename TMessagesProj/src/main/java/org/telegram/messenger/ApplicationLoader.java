@@ -16,7 +16,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -29,6 +28,8 @@ import org.telegram.ui.Components.ForegroundDetector;
 import java.io.File;
 
 public class ApplicationLoader extends Application {
+
+    private static PendingIntent pendingIntent;
 
     @SuppressLint("StaticFieldLeak")
     public static volatile Context applicationContext;
@@ -138,13 +139,15 @@ public class ApplicationLoader extends Application {
     }*/
 
     public static void startPushService() {
-        SharedPreferences preferences = applicationContext.getSharedPreferences("Notifications", MODE_PRIVATE);
+        // Telegram-FOSS: unconditionally enable push service
+        //if (preferences.getBoolean("pushService", true)) {
+        AlarmManager am = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent(applicationContext, ApplicationLoader.class);
+        pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, i, 0);
 
-        if (preferences.getBoolean("pushService", true)) {
-            applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
-        } else {
-            stopPushService();
-        }
+        am.cancel(pendingIntent);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
+        applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
     }
 
     public static void stopPushService() {
@@ -153,6 +156,7 @@ public class ApplicationLoader extends Application {
         PendingIntent pintent = PendingIntent.getService(applicationContext, 0, new Intent(applicationContext, NotificationsService.class), 0);
         AlarmManager alarm = (AlarmManager)applicationContext.getSystemService(Context.ALARM_SERVICE);
         alarm.cancel(pintent);
+        alarm.cancel(pendingIntent);
     }
 
     @Override
