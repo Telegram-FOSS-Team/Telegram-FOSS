@@ -115,7 +115,7 @@ public class ConnectionsManager {
         String systemVersion;
         String configPath = ApplicationLoader.getFilesDirFixed().toString();
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Activity.MODE_PRIVATE);
-        boolean enablePushConnection = preferences.getBoolean("pushConnection", true);
+        boolean enablePushConnection = true;
         try {
             systemLangCode = LocaleController.getSystemLocaleStringIso639();
             langCode = LocaleController.getLocaleStringIso639();
