@@ -1,9 +1,15 @@
+### v4.6a
+- **Telegram FOSS:**
+  - version bump to rebuild with NDK r14b
+
 ### v4.6
 - New granular settings for auto-downloading media.
 - Link previews for Instagram posts and tweets with multiple photos will now show all the media as an album.
 - Embeddable HTML-widget for messages in public channels and groups (available when viewing t.me links to messages in web-browsers).
 - Added support for albums to Secret Chats.
 - Added full support for MTProto 2.0.
+- **Telegram FOSS:**
+  - emojiOne replaced with Twemoji
 
 ### v4.2.1b
 - **Telegram FOSS:**
