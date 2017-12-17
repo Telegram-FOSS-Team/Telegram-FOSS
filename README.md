@@ -67,7 +67,7 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
       - `git clone --recursive https://github.com/Telegram-FOSS-Team/Telegram-FOSS.git`
 
 3. Build native FFmpeg dependency:
-      - Go to the `TMessagesProj/jni` folder and execute the following (define the path to your NDK r15 installation):
+      - Go to the `TMessagesProj/jni` folder and execute the following (define the path to your NDK r14b installation):
       
       ```
       export NDK=[PATH_TO_NDK]
