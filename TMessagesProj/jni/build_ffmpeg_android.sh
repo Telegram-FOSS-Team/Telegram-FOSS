@@ -64,7 +64,7 @@ $ADDITIONAL_CONFIGURE_FLAG
 
 #echo "continue?"
 #read
-make -j8
+make -j$(nproc)
 make install
 
 }
@@ -115,5 +115,3 @@ OPTIMIZE_CFLAGS="-march=$CPU"
 PREFIX=./android/$CPU
 ADDITIONAL_CONFIGURE_FLAG="--disable-mmx --disable-yasm"
 build_one
-
-
