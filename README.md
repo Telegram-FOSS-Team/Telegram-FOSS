@@ -1,5 +1,5 @@
 [![Releases](https://img.shields.io/github/release/Telegram-FOSS-Team/Telegram-FOSS.svg)](https://github.com/Telegram-FOSS-Team/Telegram-FOSS/releases/latest)
-[![Discussions](https://img.shields.io/badge/Offopics-Telegram-blue.svg)](https://t.me/joinchat/AAAAAEFaw9LIC-VgKVCevg)
+[![Discussions](https://img.shields.io/badge/Offtopics-Telegram-blue.svg)](https://t.me/joinchat/AAAAAEFaw9LIC-VgKVCevg)
 
 [![Donate](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/Telegram-FOSS/)
 
