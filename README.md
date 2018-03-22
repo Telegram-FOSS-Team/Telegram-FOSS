@@ -25,6 +25,8 @@ This version of Telegram is available on FDroid:
 
 Join the [Telegram-FOSS Offtopics group](https://t.me/joinchat/AAAAAEFaw9LIC-VgKVCevg)
 
+You can also join `#telegram-foss:matrix.org` via [matrix](https://matrix.to/#/#telegram-foss:matrix.org) or `#telegram-foss` on freenode.
+
 ## Changes:
 
 *Replacement of non-FOSS, untrustworthy or suspicious binaries or source code:*
