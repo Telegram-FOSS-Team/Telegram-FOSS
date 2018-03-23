@@ -714,7 +714,8 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
             return;
         }
         final IMapController controller = mapView.getController();
-        controller.setZoom(mapView.getMaxZoomLevel() - 1);
+        // Set a zoomed out default zoom-level to not end up lost in the saharan desert...
+        controller.setZoom(4);
 
         if (messageObject != null) {
             if (messageObject.isLiveLocation()) {
@@ -963,6 +964,9 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 if (l != null) {
                     break;
                 }
+            }
+            if (l == null){
+                l = new Location(userLocation);
             }
             return l;
         }
