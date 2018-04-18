@@ -64,7 +64,7 @@ $ADDITIONAL_CONFIGURE_FLAG
 
 #echo "continue?"
 #read
-make -j8
+make -j$(nproc)
 make install
 
 }
