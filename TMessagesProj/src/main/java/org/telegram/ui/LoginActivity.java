@@ -10,6 +10,8 @@ package org.telegram.ui;
 
 import android.Manifest;
 import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.StateListAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -576,7 +578,7 @@ public class LoginActivity extends BaseFragment {
         }
     }
 
-    public class PhoneView extends SlideView implements AdapterView.OnItemSelectedListener {
+    public class PhoneView extends SlideView implements AdapterView.OnItemSelectedListener, NotificationCenter.NotificationCenterDelegate {
 
         private EditTextBoldCursor codeField;
         private HintEditText phoneField;
@@ -857,6 +859,37 @@ public class LoginActivity extends BaseFragment {
             textView2.setGravity(LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT);
             textView2.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
             addView(textView2, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 0, 28, 0, 10));
+
+            TextView textViewProxy = new TextView(context);
+            textViewProxy.setText("You may need to set up a proxy before you login, in case your country or ISP blocks Telegram");
+            textViewProxy.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+            textViewProxy.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+            textViewProxy.setGravity(LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT);
+            textViewProxy.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
+            addView(textViewProxy, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 0, 28, 0, 10));
+
+            TextView addProxyButton = new TextView(context);
+            addProxyButton.setText("SET A PROXY");
+            addProxyButton.setGravity(Gravity.CENTER);
+            addProxyButton.setTextColor(0xffffffff);
+            addProxyButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+            addProxyButton.setBackgroundResource(R.drawable.regbtn_states);
+            if (Build.VERSION.SDK_INT >= 21) {
+                StateListAnimator animator = new StateListAnimator();
+                animator.addState(new int[]{android.R.attr.state_pressed}, ObjectAnimator.ofFloat(addProxyButton, "translationZ", AndroidUtilities.dp(2), AndroidUtilities.dp(4)).setDuration(200));
+                animator.addState(new int[]{}, ObjectAnimator.ofFloat(addProxyButton, "translationZ", AndroidUtilities.dp(4), AndroidUtilities.dp(2)).setDuration(200));
+                addProxyButton.setStateListAnimator(animator);
+            }
+            addProxyButton.setPadding(AndroidUtilities.dp(20), AndroidUtilities.dp(10), AndroidUtilities.dp(20), AndroidUtilities.dp(10));
+            addView(addProxyButton, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM, 10, 0, 10, 10));
+
+            addProxyButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    presentFragment(new ProxySettingsActivity());
+                    NotificationCenter.getInstance().addObserver(PhoneView.this, NotificationCenter.didUpdatedConnectionState);
+                }
+            });
 
             HashMap<String, String> languageMap = new HashMap<>();
             try {
@@ -1210,6 +1243,24 @@ public class LoginActivity extends BaseFragment {
             if (phone != null) {
                 phoneField.setText(phone);
             }
+        }
+
+        @Override
+        public void didReceivedNotification(int id, Object... args) {
+            if (id == NotificationCenter.didUpdatedConnectionState) {
+                FileLog.d("TFOSS: LoginActivity didUpdatedConnectionState");
+                if (ConnectionsManager.getInstance().getConnectionState() == ConnectionsManager.ConnectionStateConnectingToProxy) {
+                    FileLog.d("TFOSS: LoginActivity ConnectionStateConnectingToProxy");
+                    NotificationCenter.getInstance().removeObserver(this, NotificationCenter.didUpdatedConnectionState);
+                    ConnectionsManager.getInstance().checkConnection();
+                }
+            }
+        }
+
+
+        @Override
+        public void onDestroyActivity() {
+            NotificationCenter.getInstance().removeObserver(this, NotificationCenter.didUpdatedConnectionState);
         }
     }
 
