@@ -31,6 +31,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -267,7 +268,7 @@ public class ConnectionsManager {
         native_setUserId(id);
     }
 
-    private void checkConnection() {
+    public void checkConnection() {
         native_setUseIpv6(useIpv6Address());
         native_setNetworkAvailable(isNetworkOnline(), getCurrentNetworkType());
     }
@@ -687,7 +688,13 @@ public class ConnectionsManager {
                 httpConnection.setConnectTimeout(5000);
                 httpConnection.setReadTimeout(5000);
                 httpConnection.connect();
-                InputStream httpConnectionStream = httpConnection.getInputStream();
+                InputStream httpConnectionStream = null;
+                try {
+                    httpConnectionStream = httpConnection.getInputStream();
+                } catch (IOException e) {
+                    FileLog.d("TFOSS: Google Domain Fronting failed(DNS?)");
+                    return null;
+                }
 
                 ByteArrayOutputStream outbuf = new ByteArrayOutputStream();
 
@@ -771,7 +778,13 @@ public class ConnectionsManager {
                 httpConnection.setConnectTimeout(5000);
                 httpConnection.setReadTimeout(5000);
                 httpConnection.connect();
-                InputStream httpConnectionStream = httpConnection.getInputStream();
+                InputStream httpConnectionStream = null;
+                try {
+                    httpConnectionStream = httpConnection.getInputStream();
+                } catch (IOException e) {
+                    FileLog.d("TFOSS: Google Domain Fronting failed(DC?)");
+                    return null;
+                }
 
                 ByteArrayOutputStream outbuf = new ByteArrayOutputStream();
 
