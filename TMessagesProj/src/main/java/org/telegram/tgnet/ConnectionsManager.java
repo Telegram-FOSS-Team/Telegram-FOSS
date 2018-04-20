@@ -445,11 +445,11 @@ public class ConnectionsManager {
         }
         lastDnsRequestTime = System.currentTimeMillis();
         if (second == 1) {
-            DnsTxtLoadTask task = new DnsTxtLoadTask();
+            DnsLoadTask task = new DnsLoadTask();
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null, null, null);
             currentTask = task;
         } else {
-            DnsLoadTask task = new DnsLoadTask();
+            DnsTxtLoadTask task = new DnsTxtLoadTask();
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null, null, null);
             currentTask = task;
         }
@@ -744,6 +744,7 @@ public class ConnectionsManager {
                     builder.append(arrayList.get(a).replace("\"", ""));
                 }
                 byte[] bytes = Base64.decode(builder.toString(), Base64.DEFAULT);
+                FileLog.d("TFOSS: Google Domain Fronting 2(DNS) Received");
                 NativeByteBuffer buffer = new NativeByteBuffer(bytes.length);
                 buffer.writeBytes(bytes);
                 return buffer;
@@ -756,9 +757,15 @@ public class ConnectionsManager {
         @Override
         protected void onPostExecute(NativeByteBuffer result) {
             if (result != null) {
+                currentTask = null;
                 native_applyDnsConfig(result.address);
+                FileLog.d("TFOSS apply new DC(DNS)");
+                //ConnectionsManager.getInstance().checkConnection();
+            } else {
+                DnsLoadTask task = new DnsLoadTask();
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null, null, null);
+                currentTask = task;
             }
-            currentTask = null;
         }
     }
 
@@ -767,14 +774,11 @@ public class ConnectionsManager {
         protected NativeByteBuffer doInBackground(Void... voids) {
             try {
                 URL downloadUrl;
-                if (native_isTestBackend() != 0) {
-                    downloadUrl = new URL("https://google.com/test/");
-                } else {
-                    downloadUrl = new URL("https://google.com");
-                }
+                downloadUrl = new URL("https://software-download.microsoft.com/prod/config.txt");
+
                 URLConnection httpConnection = downloadUrl.openConnection();
                 httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1");
-                httpConnection.addRequestProperty("Host", String.format(Locale.US, "dns-telegram%1$s.appspot.com", dnsConfigVersion == 0 ? "" : "" + dnsConfigVersion));
+                httpConnection.addRequestProperty("Host", "tcdnb.azureedge.net");
                 httpConnection.setConnectTimeout(5000);
                 httpConnection.setReadTimeout(5000);
                 httpConnection.connect();
@@ -782,7 +786,7 @@ public class ConnectionsManager {
                 try {
                     httpConnectionStream = httpConnection.getInputStream();
                 } catch (IOException e) {
-                    FileLog.d("TFOSS: Google Domain Fronting failed(DC?)");
+                    FileLog.d("TFOSS: Azure Domain Fronting failed(Simple?)");
                     return null;
                 }
 
@@ -810,6 +814,7 @@ public class ConnectionsManager {
                     FileLog.e(e);
                 }
                 byte[] bytes = Base64.decode(outbuf.toByteArray(), Base64.DEFAULT);
+                FileLog.d("TFOSS: Azure Domain Fronting Received");
                 NativeByteBuffer buffer = new NativeByteBuffer(bytes.length);
                 buffer.writeBytes(bytes);
                 return buffer;
@@ -822,13 +827,11 @@ public class ConnectionsManager {
         @Override
         protected void onPostExecute(NativeByteBuffer result) {
             if (result != null) {
-                currentTask = null;
                 native_applyDnsConfig(result.address);
-            } else {
-                DnsTxtLoadTask task = new DnsTxtLoadTask();
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null, null, null);
-                currentTask = task;
+                FileLog.d("TFOSS apply new DC");
+                //ConnectionsManager.getInstance().checkConnection();
             }
+            currentTask = null;
         }
     }
 }

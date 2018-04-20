@@ -2591,6 +2591,8 @@ void ConnectionsManager::applyDnsConfig(NativeByteBuffer *buffer) {
                     TL_ipPort *ipPort = iter->get();
                     addresses.push_back(TcpAddress(ipPort->ipv4, ipPort->port, 0));
                     DEBUG_D("got address %s and port %d for dc%d", ipPort->ipv4.c_str(), ipPort->port, config->dc_id);
+
+                    applyDatacenterAddress(config->dc_id, ipPort->ipv4, ipPort->port);
                 }
                 if (!addresses.empty()) {
                     datacenter->replaceAddresses(addresses, TcpAddressFlagTemp);
