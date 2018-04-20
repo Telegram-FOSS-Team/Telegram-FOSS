@@ -1381,7 +1381,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                                 abi = "universal";
                                 break;
                         }
-                        ((TextInfoCell) view).setText(LocaleController.formatString("TelegramVersion", R.string.TelegramVersion, String.format(Locale.US, "v%s (%d) %s", pInfo.versionName, code, abi)));
+                        ((TextInfoCell) view).setText(String.format("Telegram-FOSS %1$s", String.format(Locale.US, "v%s (%d) %s", pInfo.versionName, code, abi)));
                     } catch (Exception e) {
                         FileLog.e(e);
                     }
