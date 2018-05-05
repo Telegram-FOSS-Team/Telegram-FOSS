@@ -68,7 +68,7 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
 ## Building
 
 **Important:**
-1. You need the [Android-NDK](https://developer.android.com/ndk/downloads/index.html) r14b to build the apk.
+1. You need the [Android NDK, Revision 14b (March 2017)](https://developer.android.com/ndk/downloads/older_releases) to build the apk.
 
 2. Don't forget to include the submodules when you clone:
       - `git clone --recursive https://github.com/Telegram-FOSS-Team/Telegram-FOSS.git`
