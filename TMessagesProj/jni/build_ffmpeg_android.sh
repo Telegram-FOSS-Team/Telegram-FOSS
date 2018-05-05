@@ -15,7 +15,7 @@ echo "Configuring..."
 --cpu=$CPU \
 --target-os=linux \
 --enable-cross-compile \
---x86asmexe=$NDK/prebuilt/linux-x86_64/bin/yasm \
+--x86asmexe=$NDK/prebuilt/$BUILD_PLATFORM/bin/yasm \
 --prefix=$PREFIX \
 --enable-pic \
 --disable-shared \
@@ -64,10 +64,46 @@ $ADDITIONAL_CONFIGURE_FLAG
 
 #echo "continue?"
 #read
-make -j$(nproc)
+make -j$COMPILATION_PROC_COUNT
 make install
 
 }
+
+function setCurrentPlatform {
+
+    PLATFORM="$(uname -s)"
+    case "${PLATFORM}" in
+        Darwin*)
+                    BUILD_PLATFORM=darwin-x86_64
+                    COMPILATION_PROC_COUNT=`sysctl -n hw.physicalcpu`
+                    ;;
+        Linux*)
+                    BUILD_PLATFORM=linux-x86_64
+                    COMPILATION_PROC_COUNT=$(nproc)
+                    ;;
+        *)
+                    echo "\033[33mWarning! Unknown platform ${PLATFORM}! falling back to linux-x86_64\033[0m"
+                    BUILD_PLATFORM=linux-x86_64
+                    COMPILATION_PROC_COUNT=1
+                    ;;
+    esac
+
+    echo "build platform: ${BUILD_PLATFORM}"
+    echo "parallel jobs: ${COMPILATION_PROC_COUNT}"
+
+}
+
+function checkSubmodules {
+
+    if ! [ -d "ffmpeg" ]; then
+        echo "\033[31mError! Submodule 'ffmpeg' not found!\033[0m"
+        echo "\033[31mTry to run: 'git submodule init && git submodule update'\033[0m"
+        exit
+    fi
+}
+
+setCurrentPlatform
+checkSubmodules
 
 # TODO: fix env variable for NDK
 # NDK=/opt/android-sdk/ndk-bundle
@@ -76,7 +112,7 @@ cd ffmpeg
 
 #arm platform
 PLATFORM=$NDK/platforms/android-16/arch-arm
-PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
+PREBUILT=$NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/$BUILD_PLATFORM
 LD=$PREBUILT/bin/arm-linux-androideabi-ld
 AR=$PREBUILT/bin/arm-linux-androideabi-ar
 NM=$PREBUILT/bin/arm-linux-androideabi-nm
@@ -101,7 +137,7 @@ build_one
 
 #x86 platform
 PLATFORM=$NDK/platforms/android-16/arch-x86
-PREBUILT=$NDK/toolchains/x86-4.9/prebuilt/linux-x86_64
+PREBUILT=$NDK/toolchains/x86-4.9/prebuilt/$BUILD_PLATFORM
 LD=$PREBUILT/bin/i686-linux-android-ld
 AR=$PREBUILT/bin/i686-linux-android-ar
 NM=$PREBUILT/bin/i686-linux-android-nm
