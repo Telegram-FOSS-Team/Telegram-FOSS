@@ -1,0 +1,1773 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="AppName">Телеграм</string>
+    <string name="AppNameBeta">Телеграм - бета версия</string>
+    <!--signin view-->
+    <string name="YourPhone">Вашият телефон</string>
+    <string name="StartText">Проверете дали сме въвели правилно кода на страната Ви и въведете телефонния си номер.</string>
+    <string name="WrongCountry">Грешен код на страна</string>
+    <!--code enter view-->
+    <string name="CallText">Ще ви се обадим след %1$d:%2$02d</string>
+    <string name="SmsText">Ще ви изпратим SMS след %1$d:%2$02d</string>
+    <string name="Calling">Обаждане...</string>
+    <string name="WrongNumber">Грешен номер?</string>
+    <string name="CancelAccountReset">Откажи</string>
+    <string name="CancelAccountResetInfo">Получихме заявка от вашият номер **%1$s** за изтриване на целия ви профил. \n
+  \n
+  Ако вие не сте заявявали нищо подобно, моля въведете кода, който ви изпратихме на SMS, за да откажете заявката.</string>
+    <string name="CancelLinkExpired">Връзката е невалидна или много стара.</string>
+    <string name="CancelLinkSuccess">Изтриването на %1$s беше спряно. Можете да затворите този прозорец.</string>
+    <!--signup view-->
+    <string name="YourName">Вашето име</string>
+    <!---->
+    
+    
+    <string name="CancelRegistration">Откажи регистрацията</string>
+    <!--payments view-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--chats view-->
+    
+    
+    
+    
+    <string name="Yesterday">вчера</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="AwaitingEncryption">Изчакване на %s да влезе на линия...</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="ChatHints">ЧАТОВЕ</string>
+    <string name="ChatHintsDelete">Да изтрия ли %1$s от предложенията?</string>
+    
+    
+    
+    <string name="ArticleByAuthor">от %1$s</string>
+    <string name="ArticleDateByAuthor">%1$s от %2$s</string>
+    
+    
+    
+    
+    
+    <string name="Bold">Удебелено</string>
+    
+    
+    
+    
+    
+    <!--channels-->
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="ActionCreateMega">Групата е създадена</string>
+    
+    
+    
+    
+    
+    
+    
+    <string name="ActionPinnedText">un1 окачи \"%1$s\"</string>
+    <string name="ActionPinnedNoText">un1 окачи съобщение</string>
+    <string name="ActionPinnedPhoto">un1 окачи снимка</string>
+    <string name="ActionPinnedVideo">un1 окачи видео клипче</string>
+    <string name="ActionPinnedFile">un1 окачи файл</string>
+    <string name="ActionPinnedSticker">un1 окачи стикер</string>
+    <string name="ActionPinnedVoice">un1 окачи гласово съобщение</string>
+    <string name="ActionPinnedRound">un1 окачи видео съобщение</string>
+    <string name="ActionPinnedContact">un1 окачи един абонат</string>
+    <string name="ActionPinnedGame">un1 окачи %1$s</string>
+    <string name="ActionPinnedGeo">un1 окачи карта</string>
+    <string name="ActionPinnedGeoLive">un1 окачи текущо местоположение</string>
+    <string name="ActionPinnedGif">un1 окачи GIF анимацийка</string>
+    <string name="ActionPinnedMusic">un1 окачи музикален файл</string>
+    <string name="ActionMigrateFromGroup">Групата беше превърната в Супер-група</string>
+    <string name="ActionMigrateFromGroupNotify">%1$s беше превърната в Супер-група</string>
+    
+    
+    
+    
+    <string name="AddMutual">Добавете хора в канала си</string>
+    
+    
+    <string name="ChannelUsernamePlaceholder">линк</string>
+    <string name="ChannelPrivateLinkHelp">Хората ще могат да влизат в канала ви, следвайки този линк. Можете да деактивирате линка когато си искате.</string>
+    
+    
+    
+    
+    <string name="ChannelPublic">Публичен канал</string>
+    
+    <string name="ChannelPublicInfo">Публичните канали могат да бъдат намирани през търсачката и всеки може да влиза в тях.</string>
+    
+    <string name="ChannelPrivate">Частен канал</string>
+    
+    <string name="ChannelPrivateInfo">В частните канали се влиза само с покана</string>
+    
+    <string name="ChannelLinkTitle">Линк</string>
+    <string name="ChannelInviteLinkTitle">Линк с покана</string>
+    <string name="ChannelAddMembers">Добави още хора</string>
+    
+    
+    <string name="ChannelSettings">Настройки</string>
+    <string name="ChannelJoin">ВЛЕЗ</string>
+    <string name="ChannelBroadcast">Излъчване</string>
+    
+    <string name="ChannelAlertTitle">Какво е канал?</string>
+    <string name="ChannelAlertText">Канала е прекалено нов, за да може да изпраща съобщенията ви до много хора.</string>
+    <string name="ChannelAlertCreate">СЪЗДАЙ КАНАЛ</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="ChannelMembers">Членове</string>
+    <string name="ChannelSubscribers">Абонати</string>
+    <string name="ChannelBlacklist">Черен списък</string>
+    <string name="ChannelBlockedUsers">Изгонени</string>
+    <string name="ChannelRestrictedUsers">Ограничени потребители</string>
+    <string name="ChannelAdministrators">Администратори</string>
+    <string name="ChannelDelete">Изтрий канала</string>
+    <string name="ChannelDeleteMenu">Изтрий канала</string>
+    <string name="ChannelDeleteAlert">Чакайте! Ако изтриете канала, всички членове и съобщения ще бъдат безвъзвратно изгубени! Сигурни ли сте, че искате да го изтриете?</string>
+    <string name="ChannelLeaveAlert">Наистина ли искате да излезете от канала?</string>
+    <string name="ChannelDeleteInfo">Всички съобщения в канала ще бъдат изтрити.</string>
+    <string name="ChannelEdit">Промяна</string>
+    
+    <string name="ActionCreateChannel">Канала е създаден</string>
+    <string name="ActionChannelChangedPhoto">Снимката на канала беше сменена</string>
+    <string name="ActionChannelRemovedPhoto">Снимката на канала беше премахната</string>
+    <string name="ActionChannelChangedTitle">Името на канала беше променено на un2</string>
+    <string name="ChangePublicLimitReached">Съжаляваме, но сте си запазили прекалено имена.</string>
+    <string name="ChannelCreator">Създател</string>
+    <string name="ChannelMute">ЗАГЛУШИ</string>
+    
+    <string name="ChannelAddAdmin">Добави администратор</string>
+    <string name="ChannelBlockUser">Изгони</string>
+    <string name="Unban">Махни ban-a</string>
+    
+    <string name="ChannelInviteViaLink">Покани чрез линк</string>
+    
+    <string name="ChannelMembersInfo">Само администраторите виждат този списък.</string>
+    <string name="ChannelLinkInfo">Всеки, който има Телеграм ще може да влезе в канала ви, като цъкне на този линк.</string>
+    <string name="ChannelAdminsInfo">Можете да добавите администратори, които да ви помогнат при управлението на канала. Задръжте пръст върху име, за да го отстраните.</string>
+    <string name="ChannelJoinTo">Искате ли да влезете в канал \'%1$s\'?</string>
+    <string name="ChannelCantOpenPrivate">За съжаление, този чат вече не е достъпен.</string>
+    <string name="ChannelCantOpenBanned">За съжаление, бяхте отстранени от участие в публични групи.</string>
+    <string name="ChannelCantOpenNa">За съжаление, този канал вече не е достъпен.</string>
+    <string name="ChannelAddTo">Да добавя ли %1$s в канала?</string>
+    <string name="ChannelUserLeftError">За съжаление, този човек е решил да напусне канала, така че не можете да го поканите обратно.</string>
+    <string name="ChannelUserCantAdd">За съжаление, не можете да добавяте този човек към канали.</string>
+    <string name="ChannelUserCantAdmin">Администраторите в канала са прекалено много.</string>
+    <string name="ChannelUserCantBot">Боговете в канала са прекалено много.</string>
+    <string name="ChannelUserAddLimit">За съжаление, можете да добавите не повече от 200 души към канала. След това, безкрайно количество хора могат да влязат, следвайки линка на канала.</string>
+    <string name="ChannelAddedBy">un1 ви добави в този канал</string>
+    <string name="ChannelJoined">Влязохте в този канал</string>
+    <string name="ChannelMegaJoined">Влязохте в тази група</string>
+    <string name="ChannelRemoveUser">Премахни от канала</string>
+    <string name="ChannelCantSendMessage">За съжаление, не можете да изпращате съобщения в този канал.</string>
+    <string name="ChannelAddedByNotification">%1$s ви добави в канал %2$s</string>
+    <string name="ChannelPhotoEditNotification">Канал %1$s обнови снимката</string>
+    <string name="ChannelMessageNoText">%1$s изпрати съобщение</string>
+    <string name="ChannelMessagePhoto">%1$s изпрати снимка</string>
+    <string name="ChannelMessageVideo">%1$s изпрати видео клип</string>
+    <string name="ChannelMessageContact">%1$s изпрати контакт</string>
+    <string name="ChannelMessageMap">%1$s изпрати местоположение</string>
+    <string name="ChannelMessageDocument">%1$s изпрати файл</string>
+    <string name="ChannelMessageGIF">%1$s изпрати GIF</string>
+    <string name="ChannelMessageAudio">%1$s изпрати гласово съобщение</string>
+    <string name="ChannelMessageRound">%1$s изпрати видео съобщение</string>
+    <string name="ChannelMessageMusic">%1$s изпрати песен</string>
+    <string name="ChannelMessageSticker">%1$s изпрати стикер</string>
+    <string name="ChannelMessageStickerEmoji">%1$s изпрати стикер %2$s</string>
+    <string name="WhoCanAddMembers">Кой може да добавя нови членове?</string>
+    <string name="WhoCanAddMembersAllMembers">Всеки член</string>
+    <string name="WhoCanAddMembersAdmins">Само администраторите</string>
+    <string name="ChannelNotifyMembersInfoOn">Всички членовете ще бъдат известявани когато вие пишете тук</string>
+    <string name="ChannelNotifyMembersInfoOff">Членовете няма да бъдат известявани когато вие пишете тук</string>
+    
+    <string name="ChannelSignMessagesInfo">Показвай имената на администраторите, заедно със съобщенията им.</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="UserRestrictionsRead">Може да чете съобщенията</string>
+    <string name="UserRestrictionsCanDo">Какви права има този човек?</string>
+    <string name="UserRestrictionsSend">Може да изпраща съобщения</string>
+    <string name="UserRestrictionsSendMedia">Може да изпраща \'медия\'</string>
+    <string name="UserRestrictionsSendStickers">Може да изпраща стикери</string>
+    <string name="UserRestrictionsEmbedLinks">Може да праща линкове</string>
+    <string name="UserRestrictionsUntil">Баннат до</string>
+    <string name="UserRestrictionsUntilForever">Завинаги</string>
+    <string name="UserRestrictionsBlock">Изгони от групата завинаги</string>
+    
+    
+    
+    
+    <string name="ChatHistory">Чат история за нови членове</string>
+    <string name="ChatHistoryVisible">Историята е видима</string>
+    <string name="ChatHistoryVisibleInfo">Новите членове ще виждат всичко написано преди да влязат.</string>
+    <string name="ChatHistoryHidden">Историята е скрита</string>
+    <string name="ChatHistoryHiddenInfo">Новите членове няма да виждат съобщенията, писани преди да влязат.</string>
+    <!--event log-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--broadcasts-->
+    
+    
+    
+    <string name="AddRecipient">Добави получател</string>
+    
+    <!--audio view-->
+    
+    <string name="AttachMusic">Музика</string>
+    <string name="AudioUnknownArtist">Незнаен изпълнител</string>
+    <string name="AudioUnknownTitle">Песен без име</string>
+    <string name="Shuffle">Разбъркай</string>
+    
+    <!--documents view-->
+    
+    
+    <string name="UnknownError">Грешка</string>
+    <string name="AccessError">Грешка при опита за достъп</string>
+    
+    
+    <string name="UsbActive">Активно е прехвърляне през USB</string>
+    
+    
+    
+    
+    
+    
+    <!--group stickers-->
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--chat view-->
+    
+    <string name="Typing">пише...</string>
+    
+    <string name="AreTyping">пишат...</string>
+    
+    <string name="AreTypingGroup">%1$s пишат...</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="ChatGallery">Галерия</string>
+    <string name="ChatLocation">Местоположение</string>
+    <string name="ChatVideo">Видео</string>
+    <string name="ChatDocument">Файл</string>
+    <string name="ChatCamera">Камера</string>
+    
+    
+    
+    
+    
+    
+    <string name="TypeMessage">Съобщение</string>
+    
+    <string name="AddToContacts">Добави в контакти</string>
+    
+    
+    
+    
+    
+    
+    
+    <string name="YouWereKicked">Премахнаха ви от групата</string>
+    <string name="YouLeft">Напуснахте тази група</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="ApplyLocalizationFile">Приложи друг език от файл</string>
+    <string name="ApplyThemeFile">Приложи тема от файл</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="AddContactChat">Добави</string>
+    
+    
+    
+    
+    
+    
+    <string name="ShareSendTo">Прати на...</string>
+    
+    <string name="TapHereGifs">Цъкни тук за запазените GIF-ове</string>
+    
+    
+    <string name="UnpinMessage">Откачи</string>
+    
+    
+    <string name="UnpinMessageAlert">Да откача ли съобщението?</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="AttachBotsHelp">Дай надолу за ботове</string>
+    <string name="TimeToEdit">%1$s</string>
+    <string name="TimeToEditExpired">Вече не можете да направите промяна.</string>
+    <string name="AddShortcut">Добави \'лесен достъп\'</string>
+    
+    <string name="ChatYourSelf">препращайте тук за да си запазвате каквото решите</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="TextCopied">Текста е копиран</string>
+    
+    
+    
+    
+    
+    
+    
+    <string name="AttachMediaRestricted">Администраторите на групата са ограничили възможността за добавяне на \'медия\' до %1$s</string>
+    
+    <string name="AttachStickersRestricted">Администраторите на групата са ограничили възможността за добавяне на стикери до %1$s</string>
+    
+    <string name="AttachMediaRestrictedForever">Администраторите на групата са ограничили възможността за добавяне на \'медия\'</string>
+    
+    <string name="AttachStickersRestrictedForever">Администраторите на групата са ограничили възможността за изпращане на стикери</string>
+    
+    <string name="ChatAdmin">администратор</string>
+    <!--notification-->
+    
+    
+    
+    
+    <string name="YouHaveNewMessage">Имате ново съобщение</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--contacts view-->
+    
+    
+    
+    <string name="TodayAt">в</string>
+    <string name="YesterdayAt">вчера в</string>
+    
+    
+    
+    
+    
+    
+    
+    <string name="WithinAWeek">на линия миналата седмица</string>
+    <string name="WithinAMonth">на линия преди повече от месец</string>
+    <string name="ALongTimeAgo">последно на линия: отдавна</string>
+    
+    
+    
+    <string name="ShareTelegram">Сподели Телеграм...</string>
+    
+    
+    <!--group create view-->
+    
+    <string name="SoftUserLimitAlert">Ще можете да добавите още хора след като завършите създаването на групата и я направите Супер-група</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="ShareLink">Сподели линк</string>
+    
+    <!--set admins view-->
+    
+    
+    
+    
+    <!--group info view-->
+    
+    <string name="SharedMedia">Споделена \'медия\'</string>
+    
+    <string name="AddSubscriber">Добави абонат</string>
+    <string name="AddMember">Добави член</string>
+    
+    <string name="BanFromTheGroup">ИЗГОНИ ОТ ГРУПАТА</string>
+    
+    
+    
+    
+    <string name="UpgradeGroup">Направи Супер-група</string>
+    
+    
+    
+    
+    
+    
+    
+    <!--contact info view-->
+    
+    <string name="AddContact">Добави</string>
+    <string name="AddContactTitle">Добави контакт</string>
+    
+    
+    <string name="BlockContact">Блокирай</string>
+    
+    
+    
+    
+    
+    
+    
+    <string name="UserBio">За мен:</string>
+    <string name="UserBioEmpty">Празно</string>
+    <string name="UserBioInfo">Можете да напишете нещо за себе си. Който отвори профила ви ще вижда този текст.</string>
+    <string name="StartEncryptedChat">Започни таен чат</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="ShortMessageLifetimeForever">Изключено</string>
+    
+    
+    
+    
+    
+    <!--usernames-->
+    <string name="Username">Username</string>
+    
+    <string name="UsernameInUse">За съжаление, този username не е свободен.</string>
+    <string name="UsernameInvalid">Username-a не е валиден.</string>
+    <string name="UsernameInvalidShort">Името трябва да е от поне 5 символа.</string>
+    
+    <string name="UsernameInvalidStartNumber">Не може да започва с число.</string>
+    
+    
+    <string name="UsernameChecking">Проверявам username-a...</string>
+    <string name="UsernameAvailable">%1$s е свободно.</string>
+    <string name="UsernameEmpty">Празно</string>
+    
+    <!--stickers view-->
+    <string name="StickersName">Стикери</string>
+    <string name="AddStickers">Добави стикери</string>
+    
+    <string name="AddToStickers">Добави към стикерите</string>
+    <string name="AddToFavorites">Добави в любими</string>
+    <string name="AddedToFavorites">Стикера е добавен към любимите ви.</string>
+    
+    
+    
+    
+    
+    
+    <string name="AddStickersNotFound">Не бяха намерени стикери</string>
+    <string name="StickersRemoved">Стикерите бяха премахнати</string>
+    
+    <string name="AddStickersInstalled">Добавени са нови стикери</string>
+    
+    <string name="StickersHide">Архивирай</string>
+    <string name="StickersShare">Сподели</string>
+    <string name="StickersCopy">Копирай линка</string>
+    <string name="StickersRemove">Премахни</string>
+    
+    
+    
+    
+    
+    
+    <string name="ArchivedStickers">Архивирани стикери</string>
+    
+    <string name="ArchivedStickersEmpty">Няма архивирани стикери</string>
+    
+    <string name="ArchivedStickersInfo">Можете да имате най-много 200 вида стикери. Когато инсталирате нови, тези които не използвате ще бъдат архивирани автоматично.</string>
+    
+    
+    <string name="ArchivedStickersAlertTitle">Архивирани стикери</string>
+    <string name="ArchivedStickersAlertInfo">Някой от по-старите ви стикери бяха архивирани. Можете пак да ги активирате  от Настройки на стикери</string>
+    
+    
+    <!--theme view-->
+    <string name="Theme">Тема</string>
+    <string name="ThemeDark">Тъмно</string>
+    <string name="ThemeBlue">Синьо</string>
+    
+    
+    
+    
+    
+    
+    <string name="ApplyTheme">Приложи</string>
+    <string name="ThemePreview">Преглед на темата</string>
+    
+    
+    
+    
+    <!--settings view-->
+    
+    
+    <string name="AskAQuestion">Задайте въпрос</string>
+    
+    <string name="Unblock">Отблокирай</string>
+    
+    
+    
+    
+    
+    
+    <string name="Sound">Звук</string>
+    
+    
+    
+    <string name="Vibrate">Вибрация</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="BlockedUsers">Блокирани</string>
+    
+    
+    
+    
+    
+    <string name="ChatBackground">Фон на чата</string>
+    
+    
+    <string name="TerminateAllSessions">Прекрати всички останали сесии</string>
+    
+    
+    
+    
+    
+    <string name="AskAQuestionInfo">Моля, имайте предвид, че Телеграм се подържа от доброволци. Отговаряме максимално бързо на всички запитвания, но отделяме внимание на всеки и това все пак отнема време.\n
+    \n
+    Вероятно ще намерите полезна информация и на <a href="https://telegram.org/faq#general">нашия сайт</a>, моля посетете го. Там има <a href="https://telegram.org/faq#troubleshooting">отговори на най-често задаваните въпроси, както и важни съвети при проблеми:</a>.</string>
+    <string name="AskButton">Попитай доброволец</string>
+    <string name="TelegramFAQ">Телеграм: въпроси и отговори</string>
+    <string name="TelegramFaq">Телеграм: въпроси и отговори</string>
+    <string name="TelegramFaqUrl">https://telegram.org/faq</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="SortBy">Нареди по</string>
+    
+    <string name="SortFirstName">Първо име</string>
+    <string name="SortLastName">Фамилно име</string>
+    
+    
+    
+    
+    
+    <string name="AlwaysShowPopup">Винаги показвай прозорче</string>
+    <string name="BadgeNumber">Брояч на баджове</string>
+    <string name="Short">Късо</string>
+    
+    <string name="AutomaticMediaDownload">Автоматично сваляне на \'медия\'</string>
+    <string name="AutoDownloadMedia">Автоматично свалена \'медия\'</string>
+    
+    
+    <string name="WhenUsingMobileData">При използване на 4G</string>
+    <string name="WhenConnectedOnWiFi">При свързаност с Wi-Fi</string>
+    <string name="WhenRoaming">При роуминг</string>
+    
+    <string name="AutoplayGifs">Автоматично възпроизвеждане на GIF анимацийки</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="ChangePhoneNewNumber">Нов номер</string>
+    <string name="ChangePhoneHelp">Ще ви изпратим SMS с код за потвърждение на новия ви номер.</string>
+    <string name="ChangePhoneNumberOccupied">Номер %1$s вече е използван в Телеграм. Моля, първо изтрийте профила с този номер, за да можете да го използвате в сегашния си профил.</string>
+    
+    <string name="VibrationDisabled">Изключено</string>
+    
+    
+    
+    
+    
+    
+    
+    <string name="SmartNotifications">\'Умни\' известия</string>
+    <string name="SmartNotificationsInfo">%1$d / %2$s</string>
+    <string name="SmartNotificationsDisabled">Изключено</string>
+    
+    <string name="SmartNotificationsDetail">%1$s във %2$s</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="TelegramVersion">Telegram за Android %1$s</string>
+    
+    
+    
+    
+    
+    
+    
+    <string name="ChangeLanguageLater">Можете да смените езика и после, от Настройки.</string>
+    
+    
+    
+    
+    <string name="UseProxySettings">Use proxy settings</string>
+    <string name="UseProxyAddress">Сървър</string>
+    <string name="UseProxyPassword">Парола</string>
+    <string name="UseProxyPort">Port</string>
+    <string name="UseProxyUsername">Username</string>
+    <string name="UseProxyInfo">SOCKS5 proxy settings</string>
+    <string name="UseProxyForCalls">Използвай proxy за разговорите</string>
+    <string name="UseProxyForCallsInfo">През proxy качеството може да е по-лошо.</string>
+    
+    
+    
+    
+    <string name="AutodownloadContacts">Контакти</string>
+    <string name="AutodownloadPrivateChats">Лични чатове</string>
+    <string name="AutodownloadGroupChats">Групови чатове</string>
+    <string name="AutodownloadChannels">Канали</string>
+    <string name="AutodownloadSizeLimit">Ограничени по размер</string>
+    <string name="AutodownloadSizeLimitUpTo">най-много %1$s</string>
+    <!--cache view-->
+    
+    
+    
+    
+    <string name="CacheClear">Изчисти</string>
+    <string name="CalculatingSize">Изчисляване...</string>
+    
+    
+    
+    
+    
+    
+    
+    <string name="CacheEmpty">Празно</string>
+    
+    
+    
+    <string name="AudioAutodownload">Гласови съобщения</string>
+    
+    <!--sessions view-->
+    
+    
+    
+    
+    
+    
+    <string name="TerminateSessionInfo">Цъкнете върху сесията, за да я прекратите</string>
+    <string name="TerminateSessionQuestion">Да прекратя ли сесията?</string>
+    
+    <!--passcode view-->
+    
+    <string name="ChangePasscode">Смяна на кода</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="AutoLock">Самозаключване</string>
+    <string name="AutoLockInfo">Изисквай парола, ако ме няма определено време.</string>
+    <string name="AutoLockInTime">след %1$s</string>
+    <string name="AutoLockDisabled">Изключено</string>
+    <string name="UnlockFingerprint">Отключване с отпечатък</string>
+    
+    
+    
+    
+    
+    <!--media view-->
+    
+    <string name="SharedMediaTitle">Споделена \'медия\'</string>
+    
+    <string name="AudioTitle">Споделена музика</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--map view-->
+    
+    
+    
+    
+    
+    
+    
+    <string name="StopLiveLocation">Спри споделянето на местоположението</string>
+    <string name="StopLiveLocationAlertToUser">Сигурни ли сте, че искате да спрете да споделяте местоположението си с %1$s?</string>
+    <string name="StopLiveLocationAlertToGroup">Сигурни ли сте, че искате да спрете да споделяте местоположението си с %1$s?</string>
+    <string name="StopLiveLocationAlertAll">Сигурни ли сте, че искате да спрете да споделяте местоположението си?</string>
+    
+    
+    <string name="ShareLocation">Местоположение</string>
+    <string name="SharedPlace">Място</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="SharingYouAndOtherName">Вие и %1$s</string>
+    <string name="AttachLiveLocationIsSharing">%1$s споделя с %2$s</string>
+    <string name="StopAllLocationSharings">СПРИ</string>
+    <string name="SharingLiveLocationTitle">Споделяте текущото си местоположение с %1$s</string>
+    
+    
+    
+    <!--photo gallery view-->
+    <string name="ShowAllMedia">Покажи всичко</string>
+    <string name="ShowInChat">Покажи в чата</string>
+    
+    
+    
+    <string name="AllPhotos">Всички снимки</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="Sharpen">Наостри</string>
+    
+    
+    
+    
+    
+    
+    
+    <string name="BlurOff">Изключено</string>
+    <string name="BlurLinear">Линейно</string>
+    <string name="BlurRadial">Радиално</string>
+    <string name="AreYouSureDeletePhoto">Сигурни ли сте, че искате да изтриете тази снимка?</string>
+    <string name="AreYouSureDeleteVideo">Сигурни ли сте, че искате да изтриете този видео клип?</string>
+    
+    
+    
+    <string name="AddCaption">Добавите описание...</string>
+    
+    
+    
+    <string name="Caption">Описание</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--password view-->
+    <string name="TwoStepVerification">Двустепенно идентифициране</string>
+    
+    
+    <string name="YourPassword">Вашата парола</string>
+    
+    
+    
+    
+    
+    <string name="YourEmail">Вашия имейл</string>
+    
+    <string name="YourEmailSkip">Пропусни</string>
+    <string name="YourEmailSkipWarning">Внимание</string>
+    <string name="YourEmailSkipWarningText">Съвсем сериозно!!!\n
+ \n
+ Ако забравите паролата си, ние не можем да ви я възстановим! Ще изгубите достъп до профила си в Телеграм.</string>
+    <string name="YourEmailAlmostThere">Почти е готово!</string>
+    
+    <string name="YourPasswordSuccess">Стана!</string>
+    
+    <string name="ChangePassword">Смяна на паролата</string>
+    <string name="TurnPasswordOff">Изключи паролата</string>
+    
+    <string name="ChangeRecoveryEmail">Смяна на имейл адреса за възстановяване</string>
+    <string name="TurnPasswordOffQuestion">Сигурни ли сте, че искате да изключите паролата?</string>
+    
+    
+    
+    <string name="AbortPassword">Откажи включването двустепенната идентификация</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--data settings-->
+    
+    
+    <string name="StorageUsage">Използвано място на телефона</string>
+    
+    
+    
+    
+    
+    
+    <string name="BytesSent">байта изпратени</string>
+    <string name="BytesReceived">байта получени</string>
+    
+    <string name="CallsDataUsage">Разговори</string>
+    
+    
+    <string name="CallsTotalTime">Продължителност</string>
+    <string name="TotalDataUsage">Общо</string>
+    
+    
+    
+    <!--privacy settings-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="AddExceptions">Добави изключение</string>
+    
+    <string name="AlwaysShareWith">Винаги споделяй с</string>
+    
+    
+    <string name="AlwaysShareWithTitle">Винаги споделяй</string>
+    <string name="AlwaysShareWithPlaceholder">Винаги споделяй с тези хора...</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="AlwaysAllow">Винаги позволявам</string>
+    
+    <string name="AlwaysAllowPlaceholder">Винаги позволявам...</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--edit video view-->
+    
+    
+    <!--bot-->
+    <string name="Bot">бот</string>
+    <string name="BotShare">Сподели</string>
+    <string name="BotInvite">Добави към група</string>
+    <string name="BotSettings">Настройки</string>
+    <string name="BotHelp">Помощ</string>
+    <string name="BotStatusRead">има достъп до съобщенията</string>
+    <string name="BotStatusCantRead">няма достъп до съобщенията</string>
+    <string name="BotInfoTitle">Какво може да прави този бот?</string>
+    <string name="BotStart">СТАРТ</string>
+    <string name="BotUnblock">РЕСТАРТИРАНЕ</string>
+    <string name="BotStop">Спри бота</string>
+    <string name="BotRestart">Рестартирай бота</string>
+    <!--button titles-->
+    
+    
+    
+    <string name="Cancel">Откажи</string>
+    
+    <string name="Add">Добави</string>
+    
+    
+    <string name="Call">Звънни</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--messages-->
+    <string name="ActionInviteYou">Влязохте в групата с покана</string>
+    <string name="ActionInviteUser">un1 влезе в групата с покана</string>
+    <string name="ActionKickUser">un1 изгони un2</string>
+    <string name="ActionLeftUser">un1 напусна групата</string>
+    <string name="ActionAddUser">un1 добави un2</string>
+    <string name="ActionRemovedPhoto">un1 премахна снимката на групата</string>
+    <string name="ActionChangedPhoto">un1 промени снимката на групата</string>
+    <string name="ActionChangedTitle">un1 промени името на групата на un2</string>
+    <string name="ActionCreateGroup">un1 влезе в групата</string>
+    <string name="ActionYouKickUser">Премахнахте un2</string>
+    <string name="ActionYouLeftUser">Напуснахте групата</string>
+    <string name="ActionYouAddUser">Добавихте un2</string>
+    
+    
+    
+    
+    <string name="ActionYouRemovedPhoto">Премахнахте снимката на групата</string>
+    <string name="ActionYouChangedPhoto">Променихте снимката на групата</string>
+    <string name="ActionYouChangedTitle">Променихте името на групата на un2</string>
+    <string name="ActionYouCreateGroup">Създадохте групата</string>
+    <string name="ActionKickUserYou">un1 ви изгони</string>
+    <string name="ActionAddUserYou">un1 ви добави</string>
+    <string name="ActionAddUserSelf">un1 се върна в групата</string>
+    <string name="ActionAddUserSelfMega">un1 влезе в групата</string>
+    <string name="ActionAddUserSelfYou">Завърнахте се в групата</string>
+    
+    <string name="AttachPhoto">Снимка</string>
+    <string name="AttachVideo">Видео</string>
+    <string name="AttachPhotoExpired">Приложената снимка е изтекла</string>
+    <string name="AttachVideoExpired">Приложеното видео е изтекло</string>
+    <string name="AttachGif">GIF анимацийка</string>
+    <string name="AttachLocation">Местоположение</string>
+    <string name="AttachLiveLocation">Текущо местоположение</string>
+    <string name="AttachContact">Контакт</string>
+    <string name="AttachDocument">Файл</string>
+    <string name="AttachSticker">Стикер</string>
+    <string name="AttachAudio">Гласово съобщение</string>
+    <string name="AttachRound">Видео съобщение</string>
+    <string name="AttachGame">Игра</string>
+    
+    <string name="ActionTakeScreenshootYou">Направихте снимка на екрана си!</string>
+    <string name="ActionTakeScreenshoot">un1 направи снимка на екрана си!</string>
+    <!--Alert messages-->
+    
+    <string name="BannedPhoneNumber">Забранен телефонен номер</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="AreYouSure">Сигурни ли сте?</string>
+    <string name="AddToTheGroupTitle">Добавяте ли %1$s към чата %2$s?</string>
+    <string name="AddToTheGroupForwardCount">Брой на съобщения за препращане:</string>
+    <string name="AddToTheGroup">Добавяте ли %1$s към групата?</string>
+    
+    
+    
+    <string name="AreYouSureLogout">Сигурни ли сте, че искате да излезете?\n
+    \n
+    Ако излезете, всички тайни чатове ще бъдат прекъснати. \n
+    \n
+    Можете да използвате Телеграм едновременно на няколко устройства.</string>
+    <string name="AreYouSureSessions">Сигурни ли сте, че искате да затворите всички останали сесии?</string>
+    <string name="AreYouSureDeleteAndExit">Сигурни ли сте, че искате да изтриете тази група?</string>
+    <string name="AreYouSureDeleteThisChat">Сигурни ли сте, че искате да изтриете този чат?</string>
+    <string name="ShareYouLocationTitle">Ще споделите ли местоположението си?</string>
+    <string name="ShareYouLocationInfo">Ще изпратите местоположението си на бота.</string>
+    <string name="ShareYouLocationUnable">Не можахме да установим местоположението ви</string>
+    <string name="ShareYouLocationUnableManually">Изберете ръчно</string>
+    
+    <string name="ShareYouPhoneNumberTitle">Ще споделите ли телефонния си номер?</string>
+    <string name="AreYouSureShareMyContactInfoBot">Бота ще знае телефонния Ви номер. Това може да е полезно когато се съвместяват и използват различни услуги.</string>
+    <string name="AreYouSureShareMyContactInfoUser">Наистина ли искате да споделите телефонен номер %1$s с **%2$s**?</string>
+    <string name="AreYouSureShareMyContactInfo">Сигурни ли сте, че искате да споделите телефонния си номер?</string>
+    <string name="AreYouSureBlockContact">Наистина ли искате да блокирате този човек?</string>
+    <string name="AreYouSureUnblockContact">Сигурни ли сте, че искате да отблокирате този човек?</string>
+    <string name="AreYouSureDeleteContact">Сигурни ли сте, че искате да изтриете този човек от контактите си?</string>
+    <string name="AreYouSureSecretChat">Сигурни ли сте, че искате да започнете таен чат?</string>
+    <string name="AreYouSureRegistration">Наистина ли се отказвате от регистрацията?</string>
+    <string name="AreYouSureClearHistory">Сигурни ли сте, че искате да изтриете историята?</string>
+    <string name="AreYouSureClearHistoryChannel">Наистина ли искате да изтриете всички картинки, звуци и текст от канала?</string>
+    <string name="AreYouSureClearHistoryGroup">Наистина ли искате да изтриете всички картинки, звуци и текст от групата?</string>
+    <string name="AreYouSureDeleteMessages">Сигурни ли сте, че искате да изтриете %1$s?</string>
+    
+    
+    
+    
+    <string name="BotCantJoinGroups">Този бот не може да влиза в групи.</string>
+    
+    
+    
+    <string name="AllowReadSms">Моля, разрешете на Телеграм да получава SMS-и директно, за да може да въведе автоматично кода за потвърждение.</string>
+    <string name="AllowReadCall">Моля, разрешете на Телеграм да приема обаждания, за да въведе автоматично кода за потвърждение.</string>
+    <string name="AllowFillNumber">Моля, разрешете на Телеграм да приема обаждания и SMS-и, за да не се налага да въвеждате ръчно телефония си номер и кода за подвърждение.</string>
+    <string name="AllowReadCallAndSms">Моля, разрешете на Телеграм да приема обаждания и SMS-и, за да въведе автоматично кода за потвърждение.</string>
+    
+    
+    
+    <string name="AddAdminErrorNotAMember">Този човек не може да стане администратор, защото не е член на групата, а вие не можете да го вкарате в нея.</string>
+    <string name="AddAdminErrorBlacklisted">Този човек не може да стане администратор, защото е в черния списък, а вие не можете да го махнете от там.</string>
+    <string name="AddBannedErrorAdmin">Не можете да изгоните този човек, защото е администратор, а вие нямате достатъчно права, за да го отстраните.</string>
+    
+    
+    <!--permissions-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--Intro view-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!-- VoIP -->
+    <string name="AccountSettings">Настройки на акаунта</string>
+    <string name="VoipUseLessData">Използвай по-малко мегабайти при разговор</string>
+    <string name="VoipIncoming">Входящо обаждане</string>
+    <string name="VoipConnecting">Свързване...</string>
+    <string name="VoipExchangingKeys">Exchanging encryption keys</string>
+    <string name="VoipWaiting">Изчакване</string>
+    
+    <string name="VoipHangingUp">Затваряне...</string>
+    <string name="VoipCallEnded">Разговора приключи</string>
+    <string name="VoipFailed">Неуспешна връзка</string>
+    <string name="VoipRinging">Звъни :)</string>
+    <string name="VoipBusy">Заето</string>
+    <string name="VoipInCallBranding">Обаждане през Телеграм</string>
+    
+    <string name="VoipEndCall">Затвори</string>
+    
+    
+    
+    <string name="VoipSettingsRingtone">Мелодийка</string>
+    
+    <string name="Calls">Разговори</string>
+    <string name="WhoCanCallMe">Кой може да ми звънне?</string>
+    
+    
+    <string name="UseLessDataNever">Никога</string>
+    <string name="UseLessDataOnMobile">Само през 4G</string>
+    <string name="UseLessDataAlways">Винаги</string>
+    <string name="VoipAnswerCall">Вдигни</string>
+    <string name="VoipDeclineCall">Откажи</string>
+    
+    
+    <string name="VoipOfflineTitle">Извън линия</string>
+    
+    <string name="VoipOfflineOpenSettings">Настройки</string>
+    <string name="CallMessageOutgoing">Изходящо обаждане</string>
+    <string name="CallMessageIncoming">Входящо обаждане</string>
+    <string name="CallMessageIncomingMissed">Пропуснато обаждане</string>
+    <string name="CallMessageOutgoingMissed">Отказано обаждане</string>
+	<string name="CallMessageIncomingDeclined">Отказано обаждане</string>
+    <string name="CallMessageWithDuration">%1$s (%2$s)</string>
+    
+    
+    
+    
+    
+    
+    <string name="CallBack">Върни обаждането</string>
+    <string name="CallAgain">Звънни пак</string>
+    
+    
+    <string name="CallViaTelegram">Обади се през Телеграм</string>
+	<string name="VoipAudioRoutingEarpiece">Слушалка</string>
+    <string name="VoipAudioRoutingSpeaker">Високоговорител</string>
+    <string name="VoipAudioRoutingBluetooth">Bluetooth</string>
+    
+    <string name="CallNotAvailable">Съжаляеаме, **%1$s** не приема обаждания.</string>
+    
+	<string name="CallMessageReportProblem">Оцени качеството на разговора</string>
+    <string name="CallReportHint">Какво се обърка?</string>
+    <string name="CallReportIncludeLogs">Включи техническите особености</string>
+    <string name="CallReportLogsExplain">Това няма да включва подробности, просто ще ни помогне да разрешим проблема.</string>
+    <string name="CallReportSent">Благодарим Ви, че помагате на Телеграм да подобри качеството на разговорите.</string>
+    <!--plural-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="TelegramContacts_zero">%1$d контакта имат Телеграм</string>
+    <string name="TelegramContacts_one">%1$d контакт има Телеграм</string>
+    <string name="TelegramContacts_two">%1$d контакта имат Телеграм</string>
+    <string name="TelegramContacts_few">%1$d контакта имат Телеграм</string>
+    <string name="TelegramContacts_many">%1$d контакта имат Телеграм</string>
+    <string name="TelegramContacts_other">%1$d контакта имат Телеграм</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="AndMoreTyping_zero">и още %2$d души в момента пишат</string>
+    <string name="AndMoreTyping_one">и още %2$d души в момента пишат</string>
+    <string name="AndMoreTyping_two">и още %2$d души в момента пишат</string>
+    <string name="AndMoreTyping_few">и още %2$d души в момента пишат</string>
+    <string name="AndMoreTyping_many">и още %2$d души в момента пишат</string>
+    <string name="AndMoreTyping_other">и още %2$d души в момента пишат</string>
+    <string name="AndMoreTypingGroup_zero">%1$s и още %2$d души в момента пишат</string>
+    <string name="AndMoreTypingGroup_one">%1$s и още %2$d души в момента пишат</string>
+    <string name="AndMoreTypingGroup_two">%1$s и още %2$d души в момента пишат</string>
+    <string name="AndMoreTypingGroup_few">%1$s и още %2$d души в момента пишат</string>
+    <string name="AndMoreTypingGroup_many">%1$s и още %2$d души в момента пишат</string>
+    <string name="AndMoreTypingGroup_other">%1$s и още %2$d души в момента пишат</string>
+    
+    
+    
+    
+    
+    
+    <string name="messages_zero">няма съобщения</string>
+    <string name="messages_one">%1$d съобщение</string>
+    <string name="messages_two">%1$d съобщения</string>
+    <string name="messages_few">%1$d съобщения</string>
+    <string name="messages_many">%1$d съобщение</string>
+    <string name="messages_other">%1$d съобщения</string>
+    <string name="items_zero">no items</string>
+    <string name="items_one">%1$d item</string>
+    <string name="items_two">%1$d items</string>
+    <string name="items_few">%1$d items</string>
+    <string name="items_many">%1$d items</string>
+    <string name="items_other">%1$d items</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="Years_zero">%1$d години</string>
+    <string name="Years_one">%1$d година</string>
+    <string name="Years_two">%1$d години</string>
+    <string name="Years_few">%1$d години</string>
+    <string name="Years_many">%1$d години</string>
+    <string name="Years_other">%1$d години</string>
+    
+    
+    
+    
+    
+    
+    <string name="Times_zero">%1$d пъти</string>
+    <string name="Times_one">%1$d път</string>
+    <string name="Times_two">%1$d пъти</string>
+    <string name="Times_few">%1$d пъти</string>
+    <string name="Times_many">%1$d пъти</string>
+    <string name="Times_other">%1$d пъти</string>
+    
+    
+    
+    
+    
+    
+    <string name="Stickers_zero">Стикери %1$d</string>
+    <string name="Stickers_one">Стикер %1$d</string>
+    <string name="Stickers_two">Стикери %1$d</string>
+    <string name="Stickers_few">Стикери %1$d</string>
+    <string name="Stickers_many">Стикери %1$d</string>
+    <string name="Stickers_other">Стикери %1$d</string>
+    <string name="Subscribers_zero">%1$d абоната</string>
+    <string name="Subscribers_one">%1$d абонат</string>
+    <string name="Subscribers_two">%1$d абоната</string>
+    <string name="Subscribers_few">%1$d абоната</string>
+    <string name="Subscribers_many">%1$d абоната</string>
+    <string name="Subscribers_other">%1$d абоната</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--forwarded messages-->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <string name="AndOther_zero">и още %1$d други</string>
+    <string name="AndOther_one">и още %1$d друг</string>
+    <string name="AndOther_two">и още %1$d други</string>
+    <string name="AndOther_few">и още %1$d други</string>
+    <string name="AndOther_many">и още %1$d други</string>
+    <string name="AndOther_other">и още %1$d други</string>
+    <!--date formatters-->
+    <string name="formatterStats12H">MMM dd yyyy, h:mm a</string>
+    <string name="formatterStats24H">MMM dd yyyy, HH:mm</string>
+    <string name="formatterBannedUntil12H">MMM dd yyyy, h:mm a</string>
+    <string name="formatterBannedUntil24H">MMM dd yyyy, HH:mm</string>
+    <string name="formatterBannedUntilThisYear12H">MMM dd, h:mm a</string>
+    <string name="formatterBannedUntilThisYear24H">MMM dd, HH:mm</string>
+    <string name="formatterMonthYear">MMMM yyyy</string>
+    <string name="formatterMonth">MMM dd</string>
+    <string name="formatterYear">dd.MM.yy</string>
+    <string name="formatterYearMax">dd.MM.yyyy</string>
+    <string name="chatDate">MMMM d</string>
+    <string name="chatFullDate">MMMM d, yyyy</string>
+    <string name="formatterWeek">EEE</string>
+    <string name="formatterDay24H">HH:mm</string>
+    <string name="formatterDay12H">h:mm a</string>
+    <string name="formatDateAtTime">%1$s в %2$s</string>
+</resources>
