@@ -1765,6 +1765,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         if (photoPathsArray != null) {
             if (sendingText != null && sendingText.length() <= 200 && photoPathsArray.size() == 1) {
                 photoPathsArray.get(0).caption = sendingText;
+                sendingText = null;
             }
             SendMessagesHelper.prepareSendingMedia(photoPathsArray, did, null, null, false, false);
         }
