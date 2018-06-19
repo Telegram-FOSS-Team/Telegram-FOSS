@@ -7,13 +7,16 @@ LOCAL_PATH := $(MY_LOCAL_PATH)
 LOCAL_MODULE    := avutil 
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libavutil.a
+    FFMPEG_INCLUDE_PATH := $(LOCAL_PATH)/ffmpeg/android/armv7-a/include
+    LOCAL_SRC_FILES := ./ffmpeg/android/armv7-a/lib/libavutil.a
 else
     ifeq ($(TARGET_ARCH_ABI),armeabi)
-	LOCAL_SRC_FILES := ./ffmpeg/armv5te/libavutil.a
+        FFMPEG_INCLUDE_PATH := $(LOCAL_PATH)/ffmpeg/android/armv5te/include
+        LOCAL_SRC_FILES := ./ffmpeg/android/armv5te/lib/libavutil.a
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
-	    LOCAL_SRC_FILES := ./ffmpeg/i686/libavutil.a
+            FFMPEG_INCLUDE_PATH := $(LOCAL_PATH)/ffmpeg/android/i686/include
+            LOCAL_SRC_FILES := ./ffmpeg/android/i686/lib/libavutil.a
         endif
     endif
 endif
@@ -25,13 +28,13 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := avformat
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libavformat.a
+    LOCAL_SRC_FILES := ./ffmpeg/android/armv7-a/lib/libavformat.a
 else
     ifeq ($(TARGET_ARCH_ABI),armeabi)
-	LOCAL_SRC_FILES := ./ffmpeg/armv5te/libavformat.a
+    LOCAL_SRC_FILES := ./ffmpeg/android/armv5te/lib/libavformat.a
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
-	    LOCAL_SRC_FILES := ./ffmpeg/i686/libavformat.a
+        LOCAL_SRC_FILES := ./ffmpeg/android/i686/lib/libavformat.a
         endif
     endif
 endif
@@ -43,13 +46,31 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := avcodec 
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libavcodec.a
+    LOCAL_SRC_FILES := ./ffmpeg/android/armv7-a/lib/libavcodec.a
 else
     ifeq ($(TARGET_ARCH_ABI),armeabi)
-	LOCAL_SRC_FILES := ./ffmpeg/armv5te/libavcodec.a
+    LOCAL_SRC_FILES := ./ffmpeg/android/armv5te/lib/libavcodec.a
     else
         ifeq ($(TARGET_ARCH_ABI),x86)
-	    LOCAL_SRC_FILES := ./ffmpeg/i686/libavcodec.a
+        LOCAL_SRC_FILES := ./ffmpeg/android/i686/lib/libavcodec.a
+        endif
+    endif
+endif
+
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := swresample
+
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+    LOCAL_SRC_FILES := ./ffmpeg/android/armv7-a/lib/libswresample.a
+else
+    ifeq ($(TARGET_ARCH_ABI),armeabi)
+    LOCAL_SRC_FILES := ./ffmpeg/android/armv5te/lib/libswresample.a
+    else
+        ifeq ($(TARGET_ARCH_ABI),x86)
+        LOCAL_SRC_FILES := ./ffmpeg/android/i686/lib/libswresample.a
         endif
     endif
 endif
@@ -290,7 +311,9 @@ LOCAL_CFLAGS 	+= -Drestrict='' -D__EMX__ -DOPUS_BUILD -DFIXED_POINT -DUSE_ALLOCA
 LOCAL_CFLAGS 	+= -DANDROID_NDK -DDISABLE_IMPORTGL -fno-strict-aliasing -fprefetch-loop-arrays -DAVOID_TABLES -DANDROID_TILE_BASED_DECODE -DANDROID_ARMV6_IDCT -ffast-math -D__STDC_CONSTANT_MACROS
 LOCAL_CPPFLAGS 	:= -DBSD=1 -ffast-math -Os -funroll-loops -std=c++11
 LOCAL_LDLIBS 	:= -ljnigraphics -llog -lz -latomic -lOpenSLES -lEGL -lGLESv2
-LOCAL_STATIC_LIBRARIES := webp sqlite tgnet avformat avcodec avutil voip
+# https://stackoverflow.com/a/37235059
+LOCAL_LDLIBS += -Wl,--no-warn-shared-textrel
+LOCAL_STATIC_LIBRARIES := webp sqlite tgnet avformat avcodec avutil swresample voip
 
 LOCAL_SRC_FILES     := \
 ./opus/src/opus.c \
@@ -491,7 +514,7 @@ $(LOCAL_PATH)/opus/ \
 $(LOCAL_PATH)/opus/opusfile \
 $(LOCAL_PATH)/libyuv/include \
 $(LOCAL_PATH)/boringssl/include \
-$(LOCAL_PATH)/ffmpeg/include \
+$(FFMPEG_INCLUDE_PATH) \
 $(LOCAL_PATH)/emoji \
 $(LOCAL_PATH)/intro
 
