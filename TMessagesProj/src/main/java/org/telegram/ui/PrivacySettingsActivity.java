@@ -108,16 +108,9 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
         callsSectionRow = rowCount++;
         callsP2PRow = rowCount++;
         callsDetailRow = rowCount++;
-
-        if (MessagesController.getInstance().secretWebpagePreview != 1) {
-            secretSectionRow = rowCount++;
-            secretWebpageRow = rowCount++;
-            secretDetailRow = rowCount++;
-        } else {
-            secretSectionRow = -1;
-            secretWebpageRow = -1;
-            secretDetailRow = -1;
-        }
+        secretSectionRow = rowCount++;
+        secretWebpageRow = rowCount++;
+        secretDetailRow = rowCount++;
 
         NotificationCenter.getInstance().addObserver(this, NotificationCenter.privacyRulesUpdated);
         VoIPHelper.upgradeP2pSetting();
