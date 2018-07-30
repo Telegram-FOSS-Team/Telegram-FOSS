@@ -86,36 +86,16 @@ public class PhotoPickerSearchCell extends LinearLayout {
         super(context);
         setOrientation(HORIZONTAL);
 
-        SearchButton searchButton = new SearchButton(context);
-        searchButton.textView1.setText(LocaleController.getString("SearchImages", R.string.SearchImages));
-        searchButton.textView2.setText(LocaleController.getString("SearchImagesInfo", R.string.SearchImagesInfo));
-        searchButton.imageView.setImageResource(R.drawable.search_web);
-        addView(searchButton);
-        LayoutParams layoutParams = (LayoutParams) searchButton.getLayoutParams();
-        layoutParams.weight = 0.5f;
-        layoutParams.topMargin = AndroidUtilities.dp(4);
-        layoutParams.height = AndroidUtilities.dp(48);
-        layoutParams.width = 0;
-        searchButton.setLayoutParams(layoutParams);
-        searchButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (delegate != null) {
-                    delegate.didPressedSearchButton(0);
-                }
-            }
-        });
-
         FrameLayout frameLayout = new FrameLayout(context);
         frameLayout.setBackgroundColor(0);
         addView(frameLayout);
-        layoutParams = (LayoutParams) frameLayout.getLayoutParams();
+        LayoutParams layoutParams = (LayoutParams) frameLayout.getLayoutParams();
         layoutParams.topMargin = AndroidUtilities.dp(4);
         layoutParams.height = AndroidUtilities.dp(48);
         layoutParams.width = AndroidUtilities.dp(4);
         frameLayout.setLayoutParams(layoutParams);
 
-        searchButton = new SearchButton(context);
+        SearchButton searchButton = new SearchButton(context);
         searchButton.textView1.setText(LocaleController.getString("SearchGifs", R.string.SearchGifs));
         searchButton.textView2.setText("GIPHY");
         searchButton.imageView.setImageResource(R.drawable.search_gif);
