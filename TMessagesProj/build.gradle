@@ -14,7 +14,6 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:17.1.0'
     compile 'com.google.firebase:firebase-config:16.0.0'
     compile 'com.google.android.gms:play-services-maps:15.0.1'
-    compile 'com.google.android.gms:play-services-vision:15.0.2'
     compile 'com.google.android.gms:play-services-wallet:15.0.1'
     compile 'com.google.android.gms:play-services-wearable:15.0.1'
     implementation 'com.android.support:support-core-ui:27.1.1'
