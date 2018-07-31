@@ -3219,7 +3219,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                             currentMapProvider = -1;
                         }
                     } else {
+                        // default to Telegram
                         currentMapProvider = MessagesController.getInstance(messageObject.currentAccount).mapProvider;
+                        if (currentMapProvider != -1) {
+                            currentMapProvider = 2;
+                        }
                     }
                     if (currentMapProvider == -1) {
                         photoImage.setImage((TLObject) null, null, Theme.chat_locationDrawable[messageObject.isOutOwner() ? 1 : 0], null, 0);
