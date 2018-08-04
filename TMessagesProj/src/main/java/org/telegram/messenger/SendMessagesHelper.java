@@ -4518,6 +4518,43 @@ public class SendMessagesHelper implements NotificationCenter.NotificationCenter
     }
 
     @UiThread
+    public static void prepareSendingLocation(final Location location, final long dialog_id) {
+        final int currentAccount = UserConfig.selectedAccount;
+        MessagesStorage.getInstance(currentAccount).getStorageQueue().postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                Utilities.stageQueue.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        AndroidUtilities.runOnUIThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                CharSequence venueTitle = location.getExtras().getCharSequence("venueTitle");
+                                CharSequence venueAddress = location.getExtras().getCharSequence("venueAddress");
+                                TLRPC.MessageMedia sendingMedia;
+                                if(venueTitle != null || venueAddress != null) {
+                                    sendingMedia = new TLRPC.TL_messageMediaVenue();
+                                    sendingMedia.address = venueAddress == null ? "" : venueAddress.toString();
+                                    sendingMedia.title = venueTitle == null ? "" : venueTitle.toString();
+                                    sendingMedia.provider = "";
+                                    sendingMedia.venue_id = "";
+                                }
+                                else {
+                                    sendingMedia = new TLRPC.TL_messageMediaGeo();
+                                }
+                                sendingMedia.geo = new TLRPC.TL_geoPoint();
+                                sendingMedia.geo.lat = location.getLatitude();
+                                sendingMedia.geo._long = location.getLongitude();
+                                SendMessagesHelper.getInstance(currentAccount).sendMessage(sendingMedia, dialog_id, null, null, null);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    @UiThread
     public static void prepareSendingPhoto(String imageFilePath, Uri imageUri, long dialog_id, MessageObject reply_to_msg, CharSequence caption, ArrayList<TLRPC.MessageEntity> entities, ArrayList<TLRPC.InputDocument> stickers, InputContentInfoCompat inputContent, int ttl, MessageObject editingMessageObject) {
         SendingMediaInfo info = new SendingMediaInfo();
         info.path = imageFilePath;
