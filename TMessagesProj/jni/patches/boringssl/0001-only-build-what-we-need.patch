@@ -1,0 +1,147 @@
+From 928c16697c15121fc8f6192bcf9e8d37c6755a13 Mon Sep 17 00:00:00 2001
+From: Marcus Hoffmann <bubu@bubu1.eu>
+Date: Tue, 31 Jul 2018 22:23:54 +0200
+Subject: [PATCH] only build what we need
+
+---
+ CMakeLists.txt        | 37 +-----------------------
+ crypto/CMakeLists.txt | 65 -------------------------------------------
+ 2 files changed, 1 insertion(+), 101 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 104e50cd..bcbf91f0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -361,33 +361,9 @@ if (${ARCH} STREQUAL "x86" AND APPLE AND ${CMAKE_VERSION} VERSION_LESS "3.0")
+   set(ARCH "x86_64")
+ endif()
+ 
+-# Add minimal googletest targets. The provided one has many side-effects, and
+-# googletest has a very straightforward build.
+-add_library(boringssl_gtest third_party/googletest/src/gtest-all.cc)
+-target_include_directories(boringssl_gtest PRIVATE third_party/googletest)
+-
+-include_directories(third_party/googletest/include)
+-
+-# Declare a dummy target to build all unit tests. Test targets should inject
+-# themselves as dependencies next to the target definition.
+-add_custom_target(all_tests)
+-
+-add_custom_command(
+-  OUTPUT crypto_test_data.cc
+-  COMMAND ${GO_EXECUTABLE} run util/embed_test_data.go ${CRYPTO_TEST_DATA} >
+-  ${CMAKE_CURRENT_BINARY_DIR}/crypto_test_data.cc
+-  DEPENDS util/embed_test_data.go ${CRYPTO_TEST_DATA}
+-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+-
+-add_library(crypto_test_data OBJECT crypto_test_data.cc)
+-
+ add_subdirectory(crypto)
+ add_subdirectory(third_party/fiat)
+-add_subdirectory(ssl)
+-add_subdirectory(ssl/test)
+-add_subdirectory(fipstools)
+-add_subdirectory(tool)
+-add_subdirectory(decrepit)
++
+ 
+ if(FUZZ)
+   if(LIBFUZZER_FROM_DEPS)
+@@ -405,14 +381,3 @@ if (NOT ${CMAKE_VERSION} VERSION_LESS "3.2")
+   # USES_TERMINAL is only available in CMake 3.2 or later.
+   set(MAYBE_USES_TERMINAL USES_TERMINAL)
+ endif()
+-
+-add_custom_target(
+-    run_tests
+-    COMMAND ${GO_EXECUTABLE} run util/all_tests.go -build-dir
+-            ${CMAKE_BINARY_DIR}
+-    COMMAND cd ssl/test/runner &&
+-            ${GO_EXECUTABLE} test -shim-path $<TARGET_FILE:bssl_shim>
+-              ${RUNNER_ARGS}
+-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+-    DEPENDS all_tests bssl_shim handshaker
+-    ${MAYBE_USES_TERMINAL})
+diff --git a/crypto/CMakeLists.txt b/crypto/CMakeLists.txt
+index 526fec84..ba74b133 100644
+--- a/crypto/CMakeLists.txt
++++ b/crypto/CMakeLists.txt
+@@ -124,8 +124,6 @@ add_subdirectory(x509v3)
+ add_subdirectory(pkcs7)
+ add_subdirectory(pkcs8)
+ 
+-# Test support code
+-add_subdirectory(test)
+ 
+ add_subdirectory(fipsmodule)
+ 
+@@ -216,66 +214,3 @@ if(NOT MSVC AND NOT ANDROID)
+   target_link_libraries(crypto pthread)
+ endif()
+ 
+-# TODO(davidben): Convert the remaining tests to GTest.
+-add_executable(
+-  crypto_test
+-
+-  asn1/asn1_test.cc
+-  base64/base64_test.cc
+-  buf/buf_test.cc
+-  bio/bio_test.cc
+-  bytestring/bytestring_test.cc
+-  chacha/chacha_test.cc
+-  cipher_extra/aead_test.cc
+-  cipher_extra/cipher_test.cc
+-  cmac/cmac_test.cc
+-  compiler_test.cc
+-  constant_time_test.cc
+-  curve25519/ed25519_test.cc
+-  curve25519/spake25519_test.cc
+-  curve25519/x25519_test.cc
+-  ecdh_extra/ecdh_test.cc
+-  dh/dh_test.cc
+-  digest_extra/digest_test.cc
+-  dsa/dsa_test.cc
+-  err/err_test.cc
+-  evp/evp_extra_test.cc
+-  evp/evp_test.cc
+-  evp/pbkdf_test.cc
+-  evp/scrypt_test.cc
+-  fipsmodule/aes/aes_test.cc
+-  fipsmodule/bn/bn_test.cc
+-  fipsmodule/ec/ec_test.cc
+-  fipsmodule/ec/p256-x86_64_test.cc
+-  fipsmodule/ecdsa/ecdsa_test.cc
+-  fipsmodule/modes/gcm_test.cc
+-  fipsmodule/rand/ctrdrbg_test.cc
+-  hkdf/hkdf_test.cc
+-  hmac_extra/hmac_test.cc
+-  lhash/lhash_test.cc
+-  obj/obj_test.cc
+-  pkcs7/pkcs7_test.cc
+-  pkcs8/pkcs8_test.cc
+-  pkcs8/pkcs12_test.cc
+-  poly1305/poly1305_test.cc
+-  pool/pool_test.cc
+-  refcount_test.cc
+-  rsa_extra/rsa_test.cc
+-  self_test.cc
+-  test/file_test_gtest.cc
+-  thread_test.cc
+-  x509/x509_test.cc
+-  x509/x509_time_test.cc
+-  x509v3/tab_test.cc
+-  x509v3/v3name_test.cc
+-
+-  $<TARGET_OBJECTS:crypto_test_data>
+-  $<TARGET_OBJECTS:boringssl_gtest_main>
+-  $<TARGET_OBJECTS:test_support>
+-)
+-
+-target_link_libraries(crypto_test crypto boringssl_gtest)
+-if (WIN32)
+-  target_link_libraries(crypto_test ws2_32)
+-endif()
+-add_dependencies(all_tests crypto_test)
+-- 
+2.17.1
+

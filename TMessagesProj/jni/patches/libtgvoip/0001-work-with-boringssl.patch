@@ -1,0 +1,33 @@
+From b40710f5520edb5d71d392f46dc7f45fc8834261 Mon Sep 17 00:00:00 2001
+From: Marcus Hoffmann <bubu@bubu1.eu>
+Date: Tue, 31 Jul 2018 16:26:46 +0200
+Subject: [PATCH] work with boringssl
+
+---
+ VoIPController.cpp | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/VoIPController.cpp b/VoIPController.cpp
+index e361dcb..bed489c 100644
+--- a/VoIPController.cpp
++++ b/VoIPController.cpp
+@@ -55,7 +55,6 @@ bool VoIPController::didInitWin32TimeScale = false;
+ extern "C" {
+ #include <openssl/sha.h>
+ #include <openssl/aes.h>
+-#include <openssl/modes.h>
+ #include <openssl/rand.h>
+ }
+ 
+@@ -86,7 +85,7 @@ void tgvoip_openssl_sha256(uint8_t* msg, size_t len, uint8_t* output){
+ void tgvoip_openssl_aes_ctr_encrypt(uint8_t* inout, size_t length, uint8_t* key, uint8_t* iv, uint8_t* ecount, uint32_t* num){
+ 	AES_KEY akey;
+ 	AES_set_encrypt_key(key, 32*8, &akey);
+-	CRYPTO_ctr128_encrypt(inout, inout, length, &akey, iv, ecount, num, (block128_f) AES_encrypt);
++	AES_ctr128_encrypt(inout, inout, length, &akey, iv, ecount, num);
+ }
+ 
+ void tgvoip_openssl_aes_cbc_encrypt(uint8_t* in, uint8_t* out, size_t length, uint8_t* key, uint8_t* iv){
+-- 
+2.17.1
+
