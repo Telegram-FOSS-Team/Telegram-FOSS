@@ -21,6 +21,7 @@ dependencies {
     implementation 'com.android.support:exifinterface:28.0.0-rc01'
     implementation 'com.googlecode.mp4parser:isoparser:1.0.6'
     implementation 'com.stripe:stripe-android:2.0.2'
+    implementation 'org.osmdroid:osmdroid-android:6.0.2'
 }
 
 //return an api key from a properties file.
