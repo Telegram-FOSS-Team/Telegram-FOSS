@@ -102,7 +102,7 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
       - Take good care of your users' data and privacy
       - **Please remember to publish your code too in order to comply with the licenses**
 
-6. Building under Windows may be problematic and won't be fixed
+6. ![Building under Windows may be problematic and won't be fixed](https://storage.theel0ja.info/imgup-syncthing/tgfoss-build-under-win.gif)
 
 The project can be built with Android Studio or from the command line with gradle:
 
