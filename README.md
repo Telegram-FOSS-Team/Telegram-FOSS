@@ -72,6 +72,8 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
 
 ## Building
 
+**NOTE: Building under Windows may be problematic and won't be fixed**
+
 **Important:**
 1. You need the [Android NDK, revision 16b](https://developer.android.com/ndk/downloads/older_releases), Go(Golang) and [Ninja](https://ninja-build.org/) to build the apk.
 
@@ -101,8 +103,6 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
       - Do not use the name Telegram and the standard logo (white paper plane in a blue circle) for your app — or make sure your users understand that it is unofficial
       - Take good care of your users' data and privacy
       - **Please remember to publish your code too in order to comply with the licenses**
-
-6. Building under Windows may be problematic and won't be fixed
 
 The project can be built with Android Studio or from the command line with gradle:
 
