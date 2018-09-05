@@ -72,9 +72,11 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
 
 ## Building
 
-**NOTE: Building under Windows may be problematic and won't be fixed**
+**NOTE: Building on Windows is, unfortunately, not supported.  
+Consider using a Linux VM or install it as dual boot.**
 
 **Important:**
+
 1. You need the [Android NDK, revision 16b](https://developer.android.com/ndk/downloads/older_releases), Go(Golang) and [Ninja](https://ninja-build.org/) to build the apk.
 
 2. Don't forget to include the submodules when you clone:
