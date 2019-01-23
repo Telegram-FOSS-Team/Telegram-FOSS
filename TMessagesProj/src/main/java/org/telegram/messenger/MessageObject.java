@@ -4678,7 +4678,7 @@ public class MessageObject {
                 } else if (getMedia(messageOwner) instanceof TLRPC.TL_messageMediaInvoice) {
                     messageText = getMedia(messageOwner).description;
                 } else if (getMedia(messageOwner) instanceof TLRPC.TL_messageMediaUnsupported) {
-                    messageText = LocaleController.getString(R.string.UnsupportedMedia2);
+                    messageText = LocaleController.getString(R.string.UnsupportedMedia2).replace("Please update to the latest version.","Please update to the latest version, if available. https://github.com/Telegram-FOSS-Team/Telegram-FOSS/blob/master/Update.md");
                 } else if (getMedia(messageOwner) instanceof TLRPC.TL_messageMediaDocument) {
                     if (isSticker() || isAnimatedStickerDocument(getDocument(), true)) {
                         String sch = getStickerChar();
