@@ -104,13 +104,13 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := crypto
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./boringssl/lib/libcrypto_armeabi-v7a.a
+    LOCAL_SRC_FILES := ./boringssl/build/armeabi-v7a/crypto/libcrypto.a
 else ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-    LOCAL_SRC_FILES := ./boringssl/lib/libcrypto_arm64-v8a.a
+    LOCAL_SRC_FILES := ./boringssl/build/arm64-v8a/crypto/libcrypto.a
 else ifeq ($(TARGET_ARCH_ABI),x86)
-    LOCAL_SRC_FILES := ./boringssl/lib/libcrypto_x86.a
+    LOCAL_SRC_FILES := ./boringssl/build/x86/crypto/libcrypto.a
 else ifeq ($(TARGET_ARCH_ABI),x86_64)
-    LOCAL_SRC_FILES := ./boringssl/lib/libcrypto_x86_64.a
+    LOCAL_SRC_FILES := ./boringssl/build/x86_64/crypto/libcrypto.a
 endif
 
 include $(PREBUILT_STATIC_LIBRARY)
