@@ -2833,9 +2833,6 @@ public class MessagesController implements NotificationCenter.NotificationCenter
             AndroidUtilities.runOnUIThread(passwordCheckRunnable);
             lastPasswordCheckTime = currentTime;
         }
-        if (lastPushRegisterSendTime != 0 && Math.abs(SystemClock.elapsedRealtime() - lastPushRegisterSendTime) >= 3 * 60 * 60 * 1000) {
-            GcmPushListenerService.sendRegistrationToServer(SharedConfig.pushString);
-        }
         LocationController.getInstance(currentAccount).update();
         checkProxyInfoInternal(false);
         checkTosUpdate();
