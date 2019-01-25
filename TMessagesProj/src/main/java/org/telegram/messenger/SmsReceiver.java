@@ -19,8 +19,6 @@ import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.text.TextUtils;
 
-import com.google.android.gms.auth.api.phone.SmsRetriever;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +27,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        /*
         if (intent == null) {
             return;
         }
@@ -73,6 +72,6 @@ public class SmsReceiver extends BroadcastReceiver {
             }
         } catch (Throwable e) {
             FileLog.e(e);
-        }
+        }*/
     }
 }
