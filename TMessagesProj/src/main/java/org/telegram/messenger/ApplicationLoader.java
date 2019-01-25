@@ -26,10 +26,6 @@ import android.os.PowerManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.firebase.iid.FirebaseInstanceId;
-
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Components.ForegroundDetector;
@@ -137,7 +133,6 @@ public class ApplicationLoader extends Application {
         }
 
         ApplicationLoader app = (ApplicationLoader)ApplicationLoader.applicationContext;
-        app.initPlayServices();
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("app initied");
         }
@@ -147,8 +142,6 @@ public class ApplicationLoader extends Application {
             ContactsController.getInstance(a).checkAppAccount();
             DownloadController.getInstance(a);
         }
-
-        WearDataLayerListenerService.updateWatchConnectionState();
     }
 
     @Override
@@ -195,49 +188,6 @@ public class ApplicationLoader extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void initPlayServices() {
-        AndroidUtilities.runOnUIThread(() -> {
-            if (checkPlayServices()) {
-                final String currentPushString = SharedConfig.pushString;
-                if (!TextUtils.isEmpty(currentPushString)) {
-                    if (BuildVars.LOGS_ENABLED) {
-                        FileLog.d("GCM regId = " + currentPushString);
-                    }
-                } else {
-                    if (BuildVars.LOGS_ENABLED) {
-                        FileLog.d("GCM Registration not found.");
-                    }
-                }
-                Utilities.globalQueue.postRunnable(() -> {
-                    try {
-                        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(instanceIdResult -> {
-                            String token = instanceIdResult.getToken();
-                            if (!TextUtils.isEmpty(token)) {
-                                GcmPushListenerService.sendRegistrationToServer(token);
-                            }
-                        });
-                    } catch (Throwable e) {
-                        FileLog.e(e);
-                    }
-                });
-            } else {
-                if (BuildVars.LOGS_ENABLED) {
-                    FileLog.d("No valid Google Play Services APK found.");
-                }
-            }
-        }, 1000);
-    }
-
-    private boolean checkPlayServices() {
-        try {
-            int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-            return resultCode == ConnectionResult.SUCCESS;
-        } catch (Exception e) {
-            FileLog.e(e);
-        }
-        return true;
     }
 
     /*
