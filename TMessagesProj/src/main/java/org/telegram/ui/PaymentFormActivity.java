@@ -59,16 +59,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.wallet.AutoResolveHelper;
-import com.google.android.gms.wallet.IsReadyToPayRequest;
-import com.google.android.gms.wallet.PaymentData;
-import com.google.android.gms.wallet.PaymentDataRequest;
-import com.google.android.gms.wallet.PaymentsClient;
-import com.google.android.gms.wallet.Wallet;
-import com.google.android.gms.wallet.WalletConstants;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
 import com.stripe.android.exception.APIConnectionException;
@@ -168,8 +158,6 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
     private HashMap<String, String> countriesMap = new HashMap<>();
     private HashMap<String, String> codesMap = new HashMap<>();
     private HashMap<String, String> phoneFormatMap = new HashMap<>();
-
-    private PaymentsClient paymentsClient;
 
     private EditTextBoldCursor[] inputFields;
     private RadioCell[] radioCells;
@@ -2115,10 +2103,10 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                 shippingAddressParameters.put("allowedCountryCodes", allowedCountryCodes);
                 paymentDataRequest.put("shippingAddressParameters", shippingAddressParameters);*/
 
-                PaymentDataRequest request = PaymentDataRequest.fromJson(paymentDataRequest.toString());
+                /*PaymentDataRequest request = PaymentDataRequest.fromJson(paymentDataRequest.toString());
                 if (request != null) {
                     AutoResolveHelper.resolveTask(paymentsClient.loadPaymentData(request), getParentActivity(), LOAD_PAYMENT_DATA_REQUEST_CODE);
-                }
+                }*/
             } catch (JSONException e) {
                 throw new RuntimeException("The price cannot be deserialized from the JSON object.");
             }
@@ -2311,7 +2299,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
         if (Build.VERSION.SDK_INT < 19 || getParentActivity() == null) {
             return;
         }
-        Wallet.WalletOptions walletOptions = new Wallet.WalletOptions.Builder()
+       /* Wallet.WalletOptions walletOptions = new Wallet.WalletOptions.Builder()
                 .setEnvironment(paymentForm.invoice.test ? WalletConstants.ENVIRONMENT_TEST : WalletConstants.ENVIRONMENT_PRODUCTION)
                 .setTheme(WalletConstants.THEME_LIGHT)
                 .build();
@@ -2341,7 +2329,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                     } else {
                         FileLog.e("isReadyToPay failed", task1.getException());
                     }
-                });
+                });*/
     }
 
     private String getTotalPriceString(ArrayList<TLRPC.TL_labeledPrice> prices) {
@@ -2362,6 +2350,10 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
 
     @Override
     public boolean onFragmentCreate() {
+        if (TextUtils.isEmpty(stripeApiKey)) {
+            Toast.makeText(ApplicationLoader.applicationContext, "AndroidPay is not supported on Telegram-FOSS.", Toast.LENGTH_LONG).show();
+            return false;
+        }
         NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.twoStepPasswordChanged);
         NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.didRemoveTwoStepPassword);
         if (currentStep != 4) {
@@ -2447,7 +2439,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOAD_PAYMENT_DATA_REQUEST_CODE) {
             AndroidUtilities.runOnUIThread(() -> {
-                if (resultCode == Activity.RESULT_OK) {
+               /* if (resultCode == Activity.RESULT_OK) {
                     PaymentData paymentData = PaymentData.getFromIntent(data);
                     final String paymentInfo = paymentData.toJson();
                     if (paymentInfo == null) {
@@ -2485,7 +2477,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                         Status status = AutoResolveHelper.getStatusFromIntent(data);
                         FileLog.e("android pay error " + status.getStatusMessage());
                     }
-                }
+                }*/
                 showEditDoneProgress(true, false);
                 setDonePressed(false);
                 googlePayButton.setClickable(true);
