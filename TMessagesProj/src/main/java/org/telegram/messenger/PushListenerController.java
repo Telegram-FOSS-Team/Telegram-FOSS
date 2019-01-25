@@ -8,10 +8,6 @@ import android.util.SparseBooleanArray;
 import androidx.annotation.IntDef;
 import androidx.collection.LongSparseArray;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.firebase.messaging.FirebaseMessaging;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.telegram.tgnet.ConnectionsManager;
@@ -1345,7 +1341,7 @@ public class PushListenerController {
                 if (BuildVars.LOGS_ENABLED) {
                     FileLog.d("FCM Registration not found.");
                 }
-            }
+            }/*
             Utilities.globalQueue.postRunnable(() -> {
                 try {
                     SharedConfig.pushStringGetTimeStart = SystemClock.elapsedRealtime();
@@ -1368,11 +1364,12 @@ public class PushListenerController {
                 } catch (Throwable e) {
                     FileLog.e(e);
                 }
-            });
+            });*/
         }
 
         @Override
         public boolean hasServices() {
+        	return false;/*
             if (hasServices == null) {
                 try {
                     int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ApplicationLoader.applicationContext);
@@ -1382,7 +1379,7 @@ public class PushListenerController {
                     hasServices = false;
                 }
             }
-            return hasServices;
+            return hasServices;*/
         }
     }
 }
