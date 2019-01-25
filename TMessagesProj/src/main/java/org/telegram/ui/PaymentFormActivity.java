@@ -56,7 +56,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
 import com.stripe.android.exception.APIConnectionException;
@@ -149,8 +148,6 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
     private HashMap<String, String> countriesMap = new HashMap<>();
     private HashMap<String, String> codesMap = new HashMap<>();
     private HashMap<String, String> phoneFormatMap = new HashMap<>();
-
-    private GoogleApiClient googleApiClient;
 
     private EditTextBoldCursor[] inputFields;
     private RadioCell[] radioCells;
@@ -393,16 +390,10 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                 FileLog.e(e);
             }
         }
-        if (googleApiClient != null) {
-            googleApiClient.connect();
-        }
     }
 
     @Override
     public void onPause() {
-        if (googleApiClient != null) {
-            googleApiClient.disconnect();
-        }
     }
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
