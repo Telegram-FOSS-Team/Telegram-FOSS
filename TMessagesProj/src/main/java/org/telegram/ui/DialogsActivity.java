@@ -867,12 +867,21 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                     final boolean hasUnread = dialog.unread_count != 0 || dialog.unread_mark;
 
+                    //Mute item
+                    boolean isMuted = MessagesController.getInstance(currentAccount).isDialogMuted(selectedDialog);
+                    String muteString = LocaleController.getString(
+                        isMuted ? "UnmuteNotifications" : "MuteNotifications",
+                        isMuted ? R.string.UnmuteNotifications : R.string.MuteNotifications
+                    );
+                    //
+
                     if (DialogObject.isChannel(dialog)) {
                         final TLRPC.Chat chat = MessagesController.getInstance(currentAccount).getChat(-lower_id);
                         CharSequence items[];
                         int icons[] = new int[]{
                                 dialog.pinned ? R.drawable.chats_unpin : R.drawable.chats_pin,
                                 hasUnread ? R.drawable.menu_read : R.drawable.menu_unread,
+                                isMuted ? R.drawable.notify_members_off : R.drawable.notify_members_on,
                                 R.drawable.chats_clear,
                                 R.drawable.chats_leave
                         };
@@ -880,18 +889,21 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             items = new CharSequence[]{
                                     null,
                                     hasUnread ? LocaleController.getString("MarkAsRead", R.string.MarkAsRead) : LocaleController.getString("MarkAsUnread", R.string.MarkAsUnread),
+                                    muteString,
                                     LocaleController.getString("ClearHistoryCache", R.string.ClearHistoryCache),
                                     null};
                         } else if (chat != null && chat.megagroup) {
                             items = new CharSequence[]{
                                     dialog.pinned ? LocaleController.getString("UnpinFromTop", R.string.UnpinFromTop) : LocaleController.getString("PinToTop", R.string.PinToTop),
                                     hasUnread ? LocaleController.getString("MarkAsRead", R.string.MarkAsRead) : LocaleController.getString("MarkAsUnread", R.string.MarkAsUnread),
+                                    muteString,
                                     TextUtils.isEmpty(chat.username) ? LocaleController.getString("ClearHistory", R.string.ClearHistory) : LocaleController.getString("ClearHistoryCache", R.string.ClearHistoryCache),
                                     LocaleController.getString("LeaveMegaMenu", R.string.LeaveMegaMenu)};
                         } else {
                             items = new CharSequence[]{
                                     dialog.pinned ? LocaleController.getString("UnpinFromTop", R.string.UnpinFromTop) : LocaleController.getString("PinToTop", R.string.PinToTop),
                                     hasUnread ? LocaleController.getString("MarkAsRead", R.string.MarkAsRead) : LocaleController.getString("MarkAsUnread", R.string.MarkAsUnread),
+                                    muteString,
                                     LocaleController.getString("ClearHistoryCache", R.string.ClearHistoryCache),
                                     LocaleController.getString("LeaveChannelMenu", R.string.LeaveChannelMenu)};
                         }
@@ -912,13 +924,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 } else {
                                     MessagesController.getInstance(currentAccount).markDialogAsUnread(selectedDialog, null, 0);
                                 }
+                            } else if (which == 2) {
+                                toggleMute(selectedDialog);
                             } else {
-                                AlertsCreator.createClearOrDeleteDialogAlert(DialogsActivity.this, which == 2, chat, null, lower_id == 0, () -> {
-                                    if (which == 2 && (!chat.megagroup || !TextUtils.isEmpty(chat.username))) {
+                                int nextToLast = 3;
+                                AlertsCreator.createClearOrDeleteDialogAlert(DialogsActivity.this, which == nextToLast, chat, null, lower_id == 0, () -> {
+                                    if (which == nextToLast && (!chat.megagroup || !TextUtils.isEmpty(chat.username))) {
                                         MessagesController.getInstance(currentAccount).deleteDialog(selectedDialog, 2);
                                     } else {
-                                        undoView.showWithAction(selectedDialog, which == 2, () -> {
-                                            if (which == 2) {
+                                        undoView.showWithAction(selectedDialog, which == nextToLast, () -> {
+                                            if (which == nextToLast) {
                                                 MessagesController.getInstance(currentAccount).deleteDialog(selectedDialog, 1);
                                             } else {
                                                 MessagesController.getInstance(currentAccount).deleteUserFromChat((int) -selectedDialog, UserConfig.getInstance(currentAccount).getCurrentUser(), null);
@@ -933,7 +948,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         });
                         BottomSheet sheet = builder.create();
                         showDialog(sheet);
-                        sheet.setItemColor(3, Theme.getColor(Theme.key_dialogTextRed2), Theme.getColor(Theme.key_dialogRedIcon));
+                        sheet.setItemColor(icons.length - 1, Theme.getColor(Theme.key_dialogTextRed2), Theme.getColor(Theme.key_dialogRedIcon));
                     } else {
                         final boolean isChat = lower_id < 0 && high_id != 1;
                         TLRPC.User user;
@@ -949,15 +964,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             user = !isChat && lower_id > 0 && high_id != 1 ? MessagesController.getInstance(currentAccount).getUser(lower_id) : null;
                         }
                         final boolean isBot = user != null && user.bot && !MessagesController.isSupportUser(user);
+                        int icons[];
 
                         builder.setItems(new CharSequence[]{
                                 dialog.pinned ? LocaleController.getString("UnpinFromTop", R.string.UnpinFromTop) : LocaleController.getString("PinToTop", R.string.PinToTop),
                                 hasUnread ? LocaleController.getString("MarkAsRead", R.string.MarkAsRead) : LocaleController.getString("MarkAsUnread", R.string.MarkAsUnread),
+                                muteString,
                                 LocaleController.getString("ClearHistory", R.string.ClearHistory),
                                 isChat ? LocaleController.getString("DeleteChat", R.string.DeleteChat) : isBot ? LocaleController.getString("DeleteAndStop", R.string.DeleteAndStop) : LocaleController.getString("Delete", R.string.Delete)
-                        }, new int[]{
+                        }, icons = new int[]{
                                 dialog.pinned ? R.drawable.chats_unpin : R.drawable.chats_pin,
                                 hasUnread ? R.drawable.menu_read : R.drawable.menu_unread,
+                                isMuted ? R.drawable.notify_members_off : R.drawable.notify_members_on,
                                 R.drawable.chats_clear,
                                 isChat ? R.drawable.chats_leave : R.drawable.chats_delete
                         }, (d, which) -> {
@@ -977,9 +995,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 } else {
                                     MessagesController.getInstance(currentAccount).markDialogAsUnread(selectedDialog, null, 0);
                                 }
+                            } else if (which == 2) {
+                                toggleMute(selectedDialog);
                             } else {
-                                AlertsCreator.createClearOrDeleteDialogAlert(DialogsActivity.this, which == 2, chat, user, lower_id == 0, () -> undoView.showWithAction(selectedDialog, which == 2, () -> {
-                                    if (which != 2) {
+                                int nextToLast = 3;
+                                AlertsCreator.createClearOrDeleteDialogAlert(DialogsActivity.this, which == nextToLast, chat, user, lower_id == 0, () -> undoView.showWithAction(selectedDialog, which == nextToLast, () -> {
+                                    if (which != nextToLast) {
                                         if (isChat) {
                                             TLRPC.Chat currentChat = MessagesController.getInstance(currentAccount).getChat((int) -selectedDialog);
                                             if (currentChat != null && ChatObject.isNotInChat(currentChat)) {
@@ -1004,7 +1025,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         });
                         BottomSheet sheet = builder.create();
                         showDialog(sheet);
-                        sheet.setItemColor(3, Theme.getColor(Theme.key_dialogTextRed2), Theme.getColor(Theme.key_dialogRedIcon));
+                        sheet.setItemColor(icons.length - 1, Theme.getColor(Theme.key_dialogTextRed2), Theme.getColor(Theme.key_dialogRedIcon));
                     }
                 }
                 return true;
@@ -1567,6 +1588,23 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         } else {
             closeSearchFieldOnHide = true;
+        }
+    }
+
+    private void toggleMute(long dialog_id) {
+        boolean isMuted = MessagesController.getInstance(currentAccount).isDialogMuted(dialog_id);
+        if (!isMuted) {
+            showDialog(AlertsCreator.createMuteAlert(getParentActivity(), dialog_id));
+        } else {
+            org.telegram.messenger.MessagesStorage.getInstance(currentAccount).setDialogFlags(dialog_id, 0);
+            SharedPreferences.Editor editor = MessagesController.getNotificationsSettings(currentAccount).edit();
+            editor.putInt("notify2_" + dialog_id, 0);
+            editor.commit();
+            TLRPC.TL_dialog dialog = MessagesController.getInstance(currentAccount).dialogs_dict.get(dialog_id);
+            if (dialog != null) {
+                dialog.notify_settings = new TLRPC.TL_peerNotifySettings();
+            }
+            org.telegram.messenger.NotificationsController.getInstance(currentAccount).updateServerNotificationsSettings(dialog_id);
         }
     }
 
