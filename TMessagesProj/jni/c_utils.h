@@ -17,11 +17,19 @@
 #define LOGV(...)
 #endif
 
+#ifdef __cplusplus
+// Use std::min/std::max from <algorithm> rather than the macros used for C
+// since the macros will collide with things like numeric_limits::max.
+#include <algorithm>
+using std::min;
+using std::max;
+#else
 #ifndef MAX
 #define MAX(x, y) ((x) > (y)) ? (x) : (y)
 #endif
 #ifndef MIN
 #define MIN(x, y) ((x) < (y)) ? (x) : (y)
+#endif
 #endif
 
 #endif
