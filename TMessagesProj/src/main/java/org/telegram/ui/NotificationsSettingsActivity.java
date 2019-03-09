@@ -170,7 +170,6 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         otherSection2Row = rowCount++;
 
         otherSectionRow = rowCount++;
-        notificationsServiceRow = rowCount++;
         notificationsServiceConnectionRow = rowCount++;
         androidAutoAlertRow = -1;
         repeatRow = rowCount++;
@@ -535,11 +534,15 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                 enabled = preferences.getBoolean("pushConnection", true);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putBoolean("pushConnection", !enabled);
+                enabled = preferences.getBoolean("pushService", true);
+                editor.putBoolean("pushService", !enabled);
                 editor.commit();
                 if (!enabled) {
                     ConnectionsManager.getInstance(currentAccount).setPushConnectionEnabled(true);
+                    ApplicationLoader.startPushService();
                 } else {
                     ConnectionsManager.getInstance(currentAccount).setPushConnectionEnabled(false);
+                    ApplicationLoader.stopPushService();
                 }
             } else if (position == accountsAllRow) {
                 SharedPreferences preferences = MessagesController.getGlobalNotificationsSettings();
@@ -558,17 +561,6 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                             NotificationsController.getInstance(a).hideNotifications();
                         }
                     }
-                }
-            } else if (position == notificationsServiceRow) {
-                SharedPreferences preferences = MessagesController.getNotificationsSettings(currentAccount);
-                enabled = preferences.getBoolean("pushService", true);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean("pushService", !enabled);
-                editor.commit();
-                if (!enabled) {
-                    ApplicationLoader.startPushService();
-                } else {
-                    ApplicationLoader.stopPushService();
                 }
             } else if (position == callsVibrateRow) {
                 if (getParentActivity() == null) {
@@ -812,8 +804,6 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                         checkCell.setTextAndCheck(LocaleController.getString("PinnedMessages", R.string.PinnedMessages), preferences.getBoolean("PinnedMessages", true), false);
                     } else if (position == androidAutoAlertRow) {
                         checkCell.setTextAndCheck("Android Auto", preferences.getBoolean("EnableAutoNotifications", false), true);
-                    } else if (position == notificationsServiceRow) {
-                        checkCell.setTextAndValueAndCheck(LocaleController.getString("NotificationsService", R.string.NotificationsService), "You won't be notified of new messages, if you disable this", preferences.getBoolean("pushService", true), true, true);
                     } else if (position == notificationsServiceConnectionRow) {
                         checkCell.setTextAndValueAndCheck(LocaleController.getString("NotificationsServiceConnection", R.string.NotificationsServiceConnection), "You won't be notified of new messages, if you disable this", preferences.getBoolean("pushConnection", true), true, true);
                     } else if (position == badgeNumberShowRow) {
