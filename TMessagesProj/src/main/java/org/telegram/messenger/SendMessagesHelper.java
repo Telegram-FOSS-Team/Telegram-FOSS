@@ -5030,6 +5030,27 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
     }
 
     @UiThread
+    public static void prepareSendingLocation(AccountInstance accountInstance, final Location location, final long dialog_id) {
+        accountInstance.getMessagesStorage().getStorageQueue().postRunnable(() -> Utilities.stageQueue.postRunnable(() -> AndroidUtilities.runOnUIThread(() -> {
+            CharSequence venueTitle = location.getExtras().getCharSequence("venueTitle");
+            CharSequence venueAddress = location.getExtras().getCharSequence("venueAddress");
+            TLRPC.MessageMedia sendingMedia;
+            if(venueTitle != null || venueAddress != null) {
+                sendingMedia = new TLRPC.TL_messageMediaVenue();
+                sendingMedia.address = venueAddress == null ? "" : venueAddress.toString();
+                sendingMedia.title = venueTitle == null ? "" : venueTitle.toString();
+                sendingMedia.provider = "";
+                sendingMedia.venue_id = "";
+            }
+            else {
+                sendingMedia = new TLRPC.TL_messageMediaGeo();
+            }
+            sendingMedia.geo = new TLRPC.TL_geoPoint();
+            sendingMedia.geo.lat = location.getLatitude();
+            sendingMedia.geo._long = location.getLongitude();
+            accountInstance.getSendMessagesHelper().sendMessage(sendingMedia, dialog_id, null, null, null);
+        })));
+    }
     public static void prepareSendingBotContextResult(AccountInstance accountInstance, final TLRPC.BotInlineResult result, final HashMap<String, String> params, final long dialog_id, final MessageObject reply_to_msg, boolean notify, int scheduleDate) {
         if (result == null) {
             return;
