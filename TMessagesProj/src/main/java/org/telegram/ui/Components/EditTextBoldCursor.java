@@ -138,8 +138,8 @@ public class EditTextBoldCursor extends EditText {
                 mShowCursorField = editorClass.getDeclaredField("mShowCursor");
                 mShowCursorField.setAccessible(true);
                 if (Build.VERSION.SDK_INT >= 28) {
-                    mCursorDrawableField = editorClass.getDeclaredField("mDrawableForCursor");
-                    mCursorDrawableField.setAccessible(true);
+                    //mCursorDrawableField = editorClass.getDeclaredField("mDrawableForCursor");
+                    //mCursorDrawableField.setAccessible(true);
                 } else {
                     mCursorDrawableField = editorClass.getDeclaredField("mCursorDrawable");
                     mCursorDrawableField.setAccessible(true);
