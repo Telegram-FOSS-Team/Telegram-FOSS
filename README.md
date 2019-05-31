@@ -30,6 +30,7 @@ This version of Telegram is available on FDroid:
 - [vn971](https://github.com/vn971)
 - [theel0ja](https://github.com/theel0ja)
 - [AnXh3L0](https://github.com/AnXh3L0)
+- [noplanman](https://github.com/noplanman)
 
 ## Discussion
 
