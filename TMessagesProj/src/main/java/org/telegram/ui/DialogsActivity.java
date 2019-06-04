@@ -653,7 +653,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                 };
                 setDialogsListFrozen(true);
-                if (Utilities.random.nextInt(1000) == 1) {
+                if (Utilities.random.nextInt(10) == 1) {
                     if (pacmanAnimation == null) {
                         pacmanAnimation = new PacmanAnimation(listView);
                     }
