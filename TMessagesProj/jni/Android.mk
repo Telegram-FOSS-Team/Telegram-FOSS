@@ -111,7 +111,7 @@ include $(CLEAR_VARS)
 
 LOCAL_CPPFLAGS := -Wall -std=c++14 -DANDROID -frtti -DHAVE_PTHREAD -finline-functions -ffast-math -Os
 
-LOCAL_C_INCLUDES += ./jni/boringssl/include/
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/boringssl/include/
 LOCAL_ARM_MODE := arm
 LOCAL_MODULE := tgnet
 LOCAL_STATIC_LIBRARIES := crypto
@@ -142,7 +142,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_CFLAGS := -Wall -DANDROID -DHAVE_MALLOC_H -DHAVE_PTHREAD -DWEBP_USE_THREAD -finline-functions -ffast-math -ffunction-sections -fdata-sections -Os
-LOCAL_C_INCLUDES += ./jni/libwebp/src
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/libwebp/src
 LOCAL_ARM_MODE := arm
 LOCAL_STATIC_LIBRARIES := cpufeatures
 LOCAL_MODULE := webp
@@ -228,7 +228,7 @@ LOCAL_CPPFLAGS := -frtti
 LOCAL_CFLAGS += -DVERSION="1.3.1" -DFLAC__NO_MD5 -DFLAC__INTEGER_ONLY_LIBRARY -DFLAC__NO_ASM
 LOCAL_CFLAGS += -D_REENTRANT -DPIC -DU_COMMON_IMPLEMENTATION -fPIC -DHAVE_SYS_PARAM_H
 LOCAL_CFLAGS += -O3 -funroll-loops -finline-functions
-LOCAL_C_INCLUDES := ./jni/exoplayer/libFLAC/include
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/exoplayer/libFLAC/include
 LOCAL_ARM_MODE := arm
 LOCAL_CPP_EXTENSION := .cc
 LOCAL_MODULE := flac
@@ -302,11 +302,11 @@ else ifeq ($(TARGET_ARCH_ABI),$(filter $(TARGET_ARCH_ABI),arm64-v8a))
 endif
 
 LOCAL_C_INCLUDES := \
-./jni/rlottie/inc \
-./jni/rlottie/src/vector/ \
-./jni/rlottie/src/vector/pixman \
-./jni/rlottie/src/vector/freetype \
-./jni/rlottie/src/vector/stb
+$(LOCAL_PATH)/rlottie/inc \
+$(LOCAL_PATH)/rlottie/src/vector/ \
+$(LOCAL_PATH)/rlottie/src/vector/pixman \
+$(LOCAL_PATH)/rlottie/src/vector/freetype \
+$(LOCAL_PATH)/rlottie/src/vector/stb
 
 LOCAL_SRC_FILES     := \
 ./rlottie/src/lottie/lottieanimation.cpp \
@@ -554,22 +554,22 @@ LOCAL_SRC_FILES     += \
 ./opus/opusfile/stream.c
 
 LOCAL_C_INCLUDES    := \
-./jni/opus/include \
-./jni/opus/silk \
-./jni/opus/silk/fixed \
-./jni/opus/celt \
-./jni/opus/ \
-./jni/opus/opusfile \
-./jni/libyuv/include \
-./jni/boringssl/include \
-./jni/ffmpeg/include \
-./jni/emoji \
-./jni/exoplayer/include \
-./jni/exoplayer/libFLAC/include \
-./jni/intro \
-./jni/rlottie/inc \
-./jni/ton \
-./jni/lz4
+$(LOCAL_PATH)/opus/include \
+$(LOCAL_PATH)/opus/silk \
+$(LOCAL_PATH)/opus/silk/fixed \
+$(LOCAL_PATH)/opus/celt \
+$(LOCAL_PATH)/opus/ \
+$(LOCAL_PATH)/opus/opusfile \
+$(LOCAL_PATH)/libyuv/include \
+$(LOCAL_PATH)/boringssl/include \
+$(LOCAL_PATH)/ffmpeg/include \
+$(LOCAL_PATH)/emoji \
+$(LOCAL_PATH)/exoplayer/include \
+$(LOCAL_PATH)/exoplayer/libFLAC/include \
+$(LOCAL_PATH)/intro \
+$(LOCAL_PATH)/rlottie/inc \
+$(LOCAL_PATH)/ton \
+$(LOCAL_PATH)/lz4
 
 LOCAL_SRC_FILES     += \
 ./libyuv/source/compare_common.cc \
