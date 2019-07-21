@@ -22,6 +22,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.SystemClock;
@@ -229,7 +230,11 @@ public class ApplicationLoader extends Application {
             am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 60000, pendingIntent);
             try {
                 Log.d("TFOSS", "Starting push service...");
-                applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    applicationContext.startForegroundService(new Intent(applicationContext, NotificationsService.class));
+                } else {
+                    applicationContext.startService(new Intent(applicationContext, NotificationsService.class));
+                }
             } catch (Throwable e) {
                 Log.d("TFOSS", "Failed to start push service");
             }
