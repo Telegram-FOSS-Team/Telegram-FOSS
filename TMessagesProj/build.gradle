@@ -12,6 +12,7 @@ configurations {
 
 dependencies {
     implementation 'androidx.core:core:1.1.0-beta01'
+    implementation 'androidx.viewpager:viewpager:1.0.0'
     implementation 'androidx.palette:palette:1.0.0'
     implementation 'androidx.exifinterface:exifinterface:1.1.0-beta01'
 
