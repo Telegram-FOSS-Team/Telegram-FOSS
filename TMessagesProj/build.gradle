@@ -147,7 +147,6 @@ android {
             sourceSets.release {
                 manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
             }
-            minSdkVersion 23
             ext {
                 abiVersionCode = 3
             }
@@ -162,7 +161,6 @@ android {
             sourceSets.release {
                 manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
             }
-            minSdkVersion 23
             ext {
                 abiVersionCode = 4
             }
@@ -193,7 +191,6 @@ android {
             sourceSets.release {
                 manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
             }
-            minSdkVersion 23
             ext {
                 abiVersionCode = 7
             }
@@ -208,7 +205,6 @@ android {
             sourceSets.release {
                 manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
             }
-            minSdkVersion 23
             ext {
                 abiVersionCode = 8
             }
