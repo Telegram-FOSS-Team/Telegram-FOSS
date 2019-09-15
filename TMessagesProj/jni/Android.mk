@@ -4,13 +4,17 @@ LOCAL_PATH := $(MY_LOCAL_PATH)
 LOCAL_MODULE    := avutil 
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libavutil.a
+    FFMPEG_INCLUDE_PATH := $(LOCAL_PATH)/ffmpeg/build/armv7-a/include
+    LOCAL_SRC_FILES := ./ffmpeg/build/armv7-a/lib/libavutil.a
 else ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-    LOCAL_SRC_FILES := ./ffmpeg/arm64/libavutil.a
+    FFMPEG_INCLUDE_PATH := $(LOCAL_PATH)/ffmpeg/build/arm64-v8a/include
+    LOCAL_SRC_FILES := ./ffmpeg/build/arm64-v8a/lib/libavutil.a
 else ifeq ($(TARGET_ARCH_ABI),x86)
-    LOCAL_SRC_FILES := ./ffmpeg/i686/libavutil.a
+    FFMPEG_INCLUDE_PATH := $(LOCAL_PATH)/ffmpeg/build/i686/include
+    LOCAL_SRC_FILES := ./ffmpeg/build/i686/lib/libavutil.a
 else ifeq ($(TARGET_ARCH_ABI),x86_64)
-    LOCAL_SRC_FILES := ./ffmpeg/x86_64/libavutil.a
+    FFMPEG_INCLUDE_PATH := $(LOCAL_PATH)/ffmpeg/build/x86_64/include
+    LOCAL_SRC_FILES := ./ffmpeg/build/x86_64/lib/libavutil.a
 endif
 
 include $(PREBUILT_STATIC_LIBRARY)
@@ -20,13 +24,13 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := avformat
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libavformat.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/armv7-a/lib/libavformat.a
 else ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-    LOCAL_SRC_FILES := ./ffmpeg/arm64/libavformat.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/arm64-v8a/lib/libavformat.a
 else ifeq ($(TARGET_ARCH_ABI),x86)
-    LOCAL_SRC_FILES := ./ffmpeg/i686/libavformat.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/i686/lib/libavformat.a
 else ifeq ($(TARGET_ARCH_ABI),x86_64)
-    LOCAL_SRC_FILES := ./ffmpeg/x86_64/libavformat.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/x86_64/lib/libavformat.a
 endif
 
 include $(PREBUILT_STATIC_LIBRARY)
@@ -36,13 +40,13 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := avcodec
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libavcodec.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/armv7-a/lib/libavcodec.a
 else ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-    LOCAL_SRC_FILES := ./ffmpeg/arm64/libavcodec.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/arm64-v8a/lib/libavcodec.a
 else ifeq ($(TARGET_ARCH_ABI),x86)
-    LOCAL_SRC_FILES := ./ffmpeg/i686/libavcodec.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/i686/lib/libavcodec.a
 else ifeq ($(TARGET_ARCH_ABI),x86_64)
-    LOCAL_SRC_FILES := ./ffmpeg/x86_64/libavcodec.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/x86_64/lib/libavcodec.a
 endif
 
 include $(PREBUILT_STATIC_LIBRARY)
@@ -52,13 +56,29 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := avresample
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libavresample.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/armv7-a/lib/libavresample.a
 else ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-    LOCAL_SRC_FILES := ./ffmpeg/arm64/libavresample.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/arm64-v8a/lib/libavresample.a
 else ifeq ($(TARGET_ARCH_ABI),x86)
-    LOCAL_SRC_FILES := ./ffmpeg/i686/libavresample.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/i686/lib/libavresample.a
 else ifeq ($(TARGET_ARCH_ABI),x86_64)
-    LOCAL_SRC_FILES := ./ffmpeg/x86_64/libavresample.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/x86_64/lib/libavresample.a
+endif
+
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := swresample
+
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+    LOCAL_SRC_FILES := ./ffmpeg/build/armv7-a/lib/libswresample.a
+else ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+    LOCAL_SRC_FILES := ./ffmpeg/build/arm64-v8a/lib/libswresample.a
+else ifeq ($(TARGET_ARCH_ABI),x86)
+    LOCAL_SRC_FILES := ./ffmpeg/build/i686/lib/libswresample.a
+else ifeq ($(TARGET_ARCH_ABI),x86_64)
+    LOCAL_SRC_FILES := ./ffmpeg/build/x86_64/lib/libswresample.a
 endif
 
 include $(PREBUILT_STATIC_LIBRARY)
@@ -68,13 +88,13 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := swscale
 
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ./ffmpeg/armv7-a/libswscale.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/armv7-a/lib/libswscale.a
 else ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-    LOCAL_SRC_FILES := ./ffmpeg/arm64/libswscale.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/arm64-v8a/lib/libswscale.a
 else ifeq ($(TARGET_ARCH_ABI),x86)
-    LOCAL_SRC_FILES := ./ffmpeg/i686/libswscale.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/i686/lib/libswscale.a
 else ifeq ($(TARGET_ARCH_ABI),x86_64)
-    LOCAL_SRC_FILES := ./ffmpeg/x86_64/libswscale.a
+    LOCAL_SRC_FILES := ./ffmpeg/build/x86_64/lib/libswscale.a
 endif
 
 include $(PREBUILT_STATIC_LIBRARY)
@@ -282,7 +302,7 @@ LOCAL_CFLAGS 	+= -Drestrict='' -D__EMX__ -DOPUS_BUILD -DFIXED_POINT -DUSE_ALLOCA
 LOCAL_CFLAGS 	+= -DANDROID_NDK -DDISABLE_IMPORTGL -fno-strict-aliasing -fprefetch-loop-arrays -DAVOID_TABLES -DANDROID_TILE_BASED_DECODE -DANDROID_ARMV6_IDCT -ffast-math -D__STDC_CONSTANT_MACROS
 LOCAL_CPPFLAGS 	:= -DBSD=1 -ffast-math -Os -funroll-loops -std=c++14 -DPACKAGE_NAME='"drinkless/org/ton"'
 LOCAL_LDLIBS 	:= -ljnigraphics -llog -lz -lEGL -lGLESv2 -landroid
-LOCAL_STATIC_LIBRARIES := webp sqlite lz4 rlottie tgnet swscale avformat avcodec avresample avutil flac
+LOCAL_STATIC_LIBRARIES := webp sqlite lz4 rlottie tgnet swscale avformat avcodec avresample avutil swresample flac
 
 LOCAL_SRC_FILES     := \
 ./opus/src/opus.c \
@@ -485,7 +505,7 @@ $(LOCAL_PATH)/opus/ \
 $(LOCAL_PATH)/opus/opusfile \
 $(LOCAL_PATH)/libyuv/include \
 $(LOCAL_PATH)/boringssl/include \
-$(LOCAL_PATH)/ffmpeg/include \
+$(FFMPEG_INCLUDE_PATH) \
 $(LOCAL_PATH)/emoji \
 $(LOCAL_PATH)/exoplayer/include \
 $(LOCAL_PATH)/exoplayer/libFLAC/include \
