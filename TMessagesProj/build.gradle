@@ -39,6 +39,18 @@ dependencies {
     implementation files('libs/libgsaverification-client.aar')
 }
 
+//return an api key from a properties file.
+def getAppId(){
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("./API_KEYS"))
+    return properties.get("APP_ID")
+}
+def getAppHash(){
+    Properties properties = new Properties()
+    properties.load(new FileInputStream("./API_KEYS"))
+    return "\"" + properties.get("APP_HASH") + "\""
+}
+
 android {
     compileSdkVersion 29
     buildToolsVersion '29.0.3'
@@ -384,6 +396,9 @@ android {
         versionName "6.1.0"
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
+        //obtain your own keys at https://core.telegram.org/api/obtaining_api_id
+        buildConfigField 'int', 'APP_ID', getAppId()
+        buildConfigField 'String', 'APP_HASH', getAppHash()
 
         externalNativeBuild {
             ndkBuild {
