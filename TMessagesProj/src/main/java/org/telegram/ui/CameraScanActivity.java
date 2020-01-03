@@ -33,9 +33,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.barcode.Barcode;
-import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.LuminanceSource;
 import com.google.zxing.PlanarYUVLuminanceSource;
@@ -90,7 +87,7 @@ public class CameraScanActivity extends BaseFragment implements Camera.PreviewCa
     private boolean recognized;
 
     private QRCodeReader qrReader;
-    private BarcodeDetector visionQrReader;
+    //private BarcodeDetector visionQrReader;
 
     private boolean needGalleryButton;
 
@@ -174,7 +171,7 @@ public class CameraScanActivity extends BaseFragment implements Camera.PreviewCa
         currentType = type;
         if (currentType == TYPE_QR) {
             qrReader = new QRCodeReader();
-            visionQrReader = new BarcodeDetector.Builder(ApplicationLoader.applicationContext).setBarcodeFormats(Barcode.QR_CODE).build();
+            //visionQrReader = new BarcodeDetector.Builder(ApplicationLoader.applicationContext).setBarcodeFormats(Barcode.QR_CODE).build();
         }
     }
 
@@ -185,9 +182,9 @@ public class CameraScanActivity extends BaseFragment implements Camera.PreviewCa
         if (getParentActivity() != null) {
             getParentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
-        if (visionQrReader != null) {
+        /*if (visionQrReader != null) {
             visionQrReader.release();
-        }
+        }*/
     }
 
     @Override
@@ -618,7 +615,7 @@ public class CameraScanActivity extends BaseFragment implements Camera.PreviewCa
     private String tryReadQr(byte[] data, Size size, int x, int y, int side, Bitmap bitmap) {
         try {
             String text;
-            if (visionQrReader.isOperational()) {
+            /*if (visionQrReader.isOperational()) {
                 Frame frame;
                 if (bitmap != null) {
                     frame = new Frame.Builder().setBitmap(bitmap).build();
@@ -631,7 +628,7 @@ public class CameraScanActivity extends BaseFragment implements Camera.PreviewCa
                 } else {
                     text = null;
                 }
-            } else {
+            } else {*/
                 LuminanceSource source;
                 if (bitmap != null) {
                     int[] intArray = new int[bitmap.getWidth() * bitmap.getHeight()];
@@ -647,7 +644,7 @@ public class CameraScanActivity extends BaseFragment implements Camera.PreviewCa
                     return null;
                 }
                 text = result.getText();
-            }
+            //}
             if (TextUtils.isEmpty(text)) {
                 onNoQrFound(bitmap != null);
                 return null;
