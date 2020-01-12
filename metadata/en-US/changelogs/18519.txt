@@ -1,0 +1,8 @@
+* Fix for push (fingers crossed).
+* Create three new kinds of polls.
+* See who voted for what in polls with visible votes.
+* Vote for several options in polls that allow multiple answers.
+* Try to guess the correct answer in quiz-style polls.
+* Use bots like @QuizBot to create quizzes with multiple questions.
+* See exact progress counters for files as they upload or download.
+* Change the appearance of message bubbles.
