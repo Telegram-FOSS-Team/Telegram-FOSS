@@ -1,0 +1,11 @@
+'''Aðvörun:''' Þrátt fyrir að þessi byggingarúgáfa sé kvísluð frá hreinni FOSS-útgáfu, þá eru þeir sem sjá um upprunalegu 'upstream' greinina ekki alltaf fljótir að gefa út grunnkóðann fyrir nýlegar útgáfur.
+
+Samskiptaforrit fyrir Telegram skilaboðakerfið. Spjallaðu við vini þína, settu í gang umræðuhópa og deildu allskyns efni. Öll skilaboð og umræður eru geymd í Telegram-skýinu.
+
+Skilaboðakerfið miðast við farsíma og smátölvur, en einnig er til hugbúnaður fyrir borðtölvur og eins er til vefviðmót fyrir það.
+
+Nokkrir séreignarhlutar hafa verið fjarlægðir úr upprunalega Telegram-forritinu, þar með taldar Google Play staðsetningarþjónustur, HockeySDK fyrir sjálfuppfærslur og ýti-tilkynningar í gegnum Google Cloud Messaging. Deilingu staðsetninga hefur verið skipt út fyrir OpenStreetMap.
+
+Neikvæðir eiginleikar: Ófrjálst netkerfi, því vefþjónarnir keyra séreignarhugbúnað.
+
+Opinber grunnkóði forritsins inniheldur tvíundarkóðaða stúfa (binary blobs), þannig að þessi útgáfa fylgir grein sem byggir þetta beint úr grunnkóðanum. Þar af leiðandi gætu nýjar útgáfur komið nokkuð síðar en annars væri.
