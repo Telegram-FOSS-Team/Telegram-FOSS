@@ -1,0 +1,7 @@
+* new upstream release:
+* delete anytime
+* new icons and menus
+* swipe to archive
+* see who's online
+* TalkBack support
+* ...

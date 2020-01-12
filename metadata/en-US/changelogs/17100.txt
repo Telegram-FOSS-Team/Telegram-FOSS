@@ -1,0 +1,5 @@
+* Choose who can find you on Telegram by your phone number
+* Hold the 'Send' button to schedule messages
+* Create new themes based on your color choices
+* Share your themes via links and update them for all users
+* And more!
