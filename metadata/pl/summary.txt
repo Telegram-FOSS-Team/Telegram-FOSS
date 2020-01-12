@@ -1,0 +1,1 @@
+Aplikacja do obsługi wiadomości, z naciskiem na szybkość i bezpieczeństwo.
