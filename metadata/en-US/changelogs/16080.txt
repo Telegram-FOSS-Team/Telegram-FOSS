@@ -1,0 +1,5 @@
+* Choose who can see your phone number.
+* Add groups to "Always/Never Share" exceptions.
+* Enjoy improved design.
+* Connect a discussion group to your channel.
+* Seamlessly integrate bots with web services.
