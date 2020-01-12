@@ -1,0 +1,5 @@
+* New “Exceptions” section in Notification settings
+* Improved password hashing algorithm to better protect Telegram Passport data
+* Export your chats on Telegram Desktop
+* Telegram-FOSS:
+  * sync boringSSL
