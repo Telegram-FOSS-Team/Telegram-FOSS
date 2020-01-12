@@ -1,0 +1,11 @@
+'''Uyarı:''' Bu yapı pure-floss fork dayalıyken, orijinal upstream her zaman güncel sürümlerin kaynak kodunu yayınlamakta hızlı değildir.
+
+Telegram mesajlaşma platformu için istemci. Arkadaşlarınızla sohbet edin, grup sohbetleri başlatın ve her türlü içeriği paylaşın. Tüm mesajlarınız ve konuşmalarınız Telegram'ın bulutunda saklanır.
+
+Mesajlaşma platformu mobil cihazları hedefler ama masaüstü ve web istemcileri de vardır.
+
+Orijinal Telegram istemcisinden, konum servisleri için Google Play Hizmetleri, Google Cloud Messaging aracılığıyla kendiliğinden güncellemeler ve push bildirimleri için HockeySDK dahil olmak üzere birkaç özel parça kaldırıldı. Konum paylaşımı işlevi OpenStreetMap kullanılarak geri yüklenir.
+
+Karşıt-Özellik: Özgür Olmayan Ağ, sunucu özel bir yazılımla çalıştığı için.
+
+Uygulamanın resmi kaynak kodu ikili bloblar içerir, bu yüzden bu kaynakları kaynaktan oluşturan bir çatal izler. Bu nedenle, sürümler belirli bir gecikmeyle kullanılabilir hale gelebilir.

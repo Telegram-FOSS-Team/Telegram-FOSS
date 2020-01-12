@@ -1,0 +1,11 @@
+<b>Uwaga</b>: ta kompilacja jest w pełni otwartoźródłową odnogą, a programiści oryginalnej wersji z opóźnieniem publikują kod źródłowy najnowszych wydań, więc nowe wersje mogą być wydawane z pewnym opuźnieniem.
+
+Klient platformy komunikacyjnej Telegram. Rozmawiaj z przyjaciółmi, uczestnicz w czatach grupowych i dziel się dowolnym rodzajem treści. Wszystkie Twoje wiadomości i rozmowy są przechowywane w chmurze Telegram.
+
+Ta platforma komunikacji jest skoncentrowana głównie na urządzeniach mobilnych, ale są także dostępne klienty na komputer i przeglądarkę.
+
+Kilka własnościowych modułów zostało usuniętych z oryginalnego klienta Telegram, włączając Usługi Google Play (dla lokalizacji), HockeySDK (dla automatycznych aktualizacji) i powiadomienia «push» przez Google Cloud Messaging. Funkcja udostępniania lokalizacji została przywrócona używając OpenStreetMap.
+
+Niepożądana funkcja: niewolna sieć, serwery używają własnościowego oprogramowania.
+
+Oryginalny kod źródłowy zawiera binarki, ta wersja zawiera je skompilowane z kodu źródłowego.

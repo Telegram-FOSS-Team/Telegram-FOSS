@@ -1,0 +1,11 @@
+'''Advarsel:''' Selv om denne versjonen er basert på en friprog-avgreining, er ikke det opprinnelige opphavet alltid like raske med å offentliggjøre kildekoden for nylige versjoner.
+
+Klient for Telegrams meldingsplattform. Sludre med venner, start gruppesludringer og del alle slags innhold. Alle dine meldinger og samtaler blir lagret i Telegrams sky.
+
+Meldingsplattformen er rettet mot mobile enheter, men skrivebord og vev-klienter finnes også.
+
+Flere proprietære deler ble fjernet fra den originale Telegram-klienten, inkludert Google Play-tjenester for plasseringstjenester, HockeySDK for selv-oppdateringer og push-merknader gjennom Google Cloud Messaging. Plasseringsdeling er gjenintrodusert ved bruk av OpenStreetMap.
+
+Anti-funksjon: Ufritt nettverk, siden tjenerne kjører proprietær programvare.
+
+Den offisielle kildekoden for dette programmet omfatter binære "blobber", så denne versjonen av programmet er bygd direkte fra kildekoden. I så måte kan det ta litt tid før versjoner blir tilgjengelige her.
