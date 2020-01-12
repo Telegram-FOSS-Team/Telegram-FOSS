@@ -1,0 +1,8 @@
+* Hold the Send button to send silent messages.
+* Enable Slow Mode in Group Permissions.
+* Set custom titles for admins.
+* Redesigned attachment menu.
+* Toggle looped playback for animated stickers.
+* See video preview thumbnails when scrubbing.
+* Send animated emoji.
+* A lot more!
