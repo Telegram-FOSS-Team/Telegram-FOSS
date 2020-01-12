@@ -1,0 +1,1 @@
+Telegram, hız ve güvenlik odaklı bir mesajlaşma uygulamasıdır.
