@@ -1,0 +1,6 @@
+New Profiles, Fast Media Viewer and People Nearby 2.0
+* Access shared media directly from profile pages.
+* Pull down to enlarge profile pictures.
+* Flip through photos by tapping on their left or right edge.
+* Tap on your chat partner's profile picture to immediately expand it.
+* Make your profile visible to others in your area from 'Contacts' > 'Add People Nearby' and make new friends.
