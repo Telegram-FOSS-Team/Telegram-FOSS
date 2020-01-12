@@ -74,6 +74,8 @@ android {
 
     dexOptions {
         jumboMode = true
+        // Telegram-FOSS
+        javaMaxHeapSize "2g"
     }
 
     compileOptions {
@@ -81,27 +83,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    signingConfigs {
-        debug {
-            storeFile file("config/release.keystore")
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
-        }
-
-        release {
-            storeFile file("config/release.keystore")
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
-        }
-    }
-
     buildTypes {
         debug {
             debuggable true
             jniDebuggable true
-            signingConfig signingConfigs.debug
             applicationIdSuffix ".beta"
             minifyEnabled true
             multiDexEnabled true
@@ -140,7 +125,6 @@ android {
         HA {
             debuggable false
             jniDebuggable false
-            signingConfig signingConfigs.debug
             applicationIdSuffix ".beta"
             minifyEnabled true
             multiDexEnabled true
@@ -150,7 +134,6 @@ android {
         release {
             debuggable false
             jniDebuggable false
-            signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources false
             multiDexEnabled true
@@ -297,7 +280,6 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            outputFileName = "app.apk"
             output.getProcessManifestProvider().get().doLast {
                 def abiVersion = variant.productFlavors.get(0).abiVersionCode
 
