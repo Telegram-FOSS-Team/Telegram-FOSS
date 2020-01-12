@@ -1,0 +1,11 @@
+'''Achtung:''' Während dieser Build auf einem reinen FLOSS-Fork beruht, ist das zugrundeliegende Repo bei der Veröffentlichung des Quellcodes für neuere Versionen nicht immer schnell.
+
+Client für das Messaging mit Telegram. Mit Feunden chatten, Gruppen-Chats beginnen und alle möglichen Inhalte teilen. Alle Nachrichten und Unterhaltungen werden in der Cloud von Telegram gespeichert.
+
+Die Messaging-Plattform ist auf Mobilgeräte ausgerichtet, es bestehen aber auch Desktop- und Web-Lösungen.
+
+Einige proprietäre Teile wurden aus dem Original-Client von Telegram entfernt, darunter die Google Play Services zur Standortbestimmung und das HockeySDK für selbsttätige Aktualisierungen und Push-Benachrichtigungen über Google Cloud Messaging. Die Funktion zur Standortübermittlung wird über OpenStreetMap wiederhergestellt.
+
+Unerwünschtes Merkmal: Nicht freies Netzwerk, da auf den Servern proprietäre Software läuft.
+
+Der offizielle Quellcode der App enthält Binär-Blobs, also verfolgt diese App einen Fork, der diese aus der Quelle herstellt. Somit kann es bis zum Erscheinen neuer Versionen zu gewissen Verzögerungen kommen.

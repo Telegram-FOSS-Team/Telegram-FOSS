@@ -1,0 +1,5 @@
+* Telegram Passport
+* Telegram FOSS:
+  * suggested locations and search are back
+  * location sharing fixes and https for map tiles
+  * everything from Telegram 4.7 and 4.8

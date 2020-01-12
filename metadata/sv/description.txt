@@ -1,0 +1,11 @@
+'''Varning:''' Även om detta bygge är baserat på en ren-floss-fork så är den ursprungliga uppströms inte alltid snabb med att publicera källkoden för de senaste versionerna.
+
+Klient för meddelandeplattformen Telegram. Chatta med kompisar, start gruppchattar och dela alla möjliga sorters innehåll. Alla dina meddelanden och konversationer sparas i Telegrams moln.
+
+Meddelandeplattformen riktar sig mot mobila enheter men skrivbords- och webbklienter finns också.
+
+Flera kommersiella delar togs bort från den ursprungliga Telegram-klienten inklusive Google Play Services för platsbestämningstjänster, HockeySDK för självuppdateringar och push-aviseringar via Google Cloud Messaging. Platsdelningsfunktionen har återställts genom OpenStreetMap.
+
+Mot-funktion: Icke-fritt nätverk, då servrarna kör kommersiell programvara.
+
+Den officiella källkoden för appen innehåller binärkod så denna spårar en fork som bygger dessa från källkod. Därför kan versioner komma att bli tillgängliga med en viss fördröjning.
