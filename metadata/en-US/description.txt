@@ -1,0 +1,11 @@
+Client for the Telegram messaging platform. 
+
+Chat with friends, start group chats and share all kinds of content. All of your messages and conversations are stored in Telegram's cloud.
+
+The messaging platform is aimed at mobile devices, but desktop and web clients exist as well.
+
+Several proprietary parts were removed from the original Telegram client, including Google Play Services for the location services, HockeySDK for self-updates and push notifications through Google Cloud Messaging. Location sharing functionality is restored using OpenStreetMap.
+
+Anti-Feature: Non-Free Network, since the servers run proprietary software.
+
+The official source code of the app contains binary blobs, so this tracks a fork which builds those from source. Hence, versions might become available with a certain lag.

@@ -1,0 +1,5 @@
+* new upstream release:
+* Apply blur and motion effects to chat backgrounds
+* and other changes around backgrounds
+* TFOSS:
+* allow installing APKs
