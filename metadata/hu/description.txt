@@ -1,0 +1,1 @@
+Az alkalmazás hivatalos forráskódja bináris blobokat tartalmaz, így ez egy olyan fork, amely azokat forrásból állítja össze. Ezért a verziók némi késéssel lehetnek elérhetőek.

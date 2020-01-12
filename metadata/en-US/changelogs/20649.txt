@@ -1,0 +1,2 @@
+* Video Calls!
+* Fix for FFmpeg eating CPU, thanks to kdrag0n
