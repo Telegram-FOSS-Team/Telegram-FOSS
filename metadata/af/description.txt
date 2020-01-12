@@ -1,0 +1,11 @@
+'''Waarskuwing:''' terwyl hierdie bou gebaseer is op 'n suiwer-floss vurk, is die oorspronklike stroom-op is nie altyd vinnig met die publisering van die bronkode vir onlangse weergawes.
+
+Kliënt vir die telegram Boodskapdiens platform. Gesels met vriende, begin groep geselsies en deel alle vorme van inhoud. Al jou boodskappe en gesprekke in telegram se wolk gestoor is.
+
+Die Boodskapdiens platform is gemik op mobiele toestelle, maar werkskerm en web kliënte bestaan ook.
+
+Verskeie eiendomsregtelike dele van die oorspronklike telegram kliënt is verwyder, insluitend Google Play Services vir die geogafiese posisie dienste, HockeySDK vir self dateering en om kennisgewings deur Google Cloud Messaging te versprei. geogafiese posisie deel funksionaliteit word nou gedoen met behulp van OpenStreetMap.
+
+Anti-kenmerk: Nie - vrye netwerk, aangesien die bedieners eiendomsregtelike sagteware uitvoer.
+
+Die amptelike bronkode van die program bevat Binêre datablokke, dit hou trend van 'n vurk wat bou diegene uit bronkode. Weergawes se beskikbaarheid het dus gewoonlik 'n sekere agterstand.
