@@ -535,8 +535,8 @@ public class MessagesController extends BaseController implements NotificationCe
         canRevokePmInbox = mainPreferences.getBoolean("canRevokePmInbox", canRevokePmInbox);
         preloadFeaturedStickers = mainPreferences.getBoolean("preloadFeaturedStickers", false);
         youtubePipType = mainPreferences.getString("youtubePipType", "disabled");
-        keepAliveService = mainPreferences.getBoolean("keepAliveService", false);
-        backgroundConnection = mainPreferences.getBoolean("keepAliveService", false);
+        keepAliveService = mainPreferences.getBoolean("keepAliveService", true);
+        backgroundConnection = mainPreferences.getBoolean("keepAliveService", true);
         proxyDialogId = mainPreferences.getLong("proxy_dialog", 0);
         proxyDialogAddress = mainPreferences.getString("proxyDialogAddress", null);
         nextTosCheckTime = notificationsPreferences.getInt("nextTosCheckTime", 0);
