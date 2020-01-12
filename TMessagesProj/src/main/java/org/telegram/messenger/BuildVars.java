@@ -13,7 +13,7 @@ import android.content.SharedPreferences;
 
 public class BuildVars {
 
-    public static boolean DEBUG_VERSION = false;
+    public static boolean DEBUG_VERSION = BuildConfig.DEBUG;
     public static boolean DEBUG_PRIVATE_VERSION = false;
     public static boolean LOGS_ENABLED = false;
     public static boolean USE_CLOUD_STRINGS = true;
