@@ -1,0 +1,13 @@
+<b>Averto:</b> tiu ĉi kompilaĵo estas plene libera ido, programistoj de la oficiala kliento ofte malfrue publikigas la fontkodon de la plej novaj versioj, do la novaj versioj estas eldonataj kun ioma prokrasto.
+
+Kliento por la mesaĝ‑sistemo Telegramo. Babili kun amikoj, ekigi grupajn babilejojn kaj kunhavigi ian ajn specon de enhavo. Ĉiuj viaj mesaĝoj kaj interparoladoj estas konservataj en la Telegram-nubon.
+
+La mesaĝ‑sistemo estas projektita por poŝtelefonoj, tamen komputilaj kaj enretaj klientoj ankaŭ disponeblas.
+
+Kelkaj fermkodaj partoj estis forigitaj el la originala kliento Telegramo, inkluzive servojn Google Play (por trovi pozicion), HockeySDK (por mem-ĝisdatigoj) kaj Google Cloud Messaging (por puŝsciigoj). Eblo por kunhavigi pozicion funkcias per OpenStreetMap.
+
+Fieblo: nelibera reto, ĉar serviloj funkcias per fermkoda programaro.
+
+La oficiala fontkodo enhavas binaraĵojn, en tiu ĉi ido oni kompilis ilin el fontkodoj.
+
+Neoficiala esperantigo: <a href="https://t.me/setlanguage/eo-beta">https://t.me/setlanguage/eo-beta</a>.
