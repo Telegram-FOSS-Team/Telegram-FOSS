@@ -126,12 +126,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LaunchActivity extends Activity implements ActionBarLayout.ActionBarLayoutDelegate, NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate {
 
     private static final String EXTRA_ACTION_TOKEN = "actions.fulfillment.extra.ACTION_TOKEN";
 
     private boolean finished;
+    final private Pattern locationRegex = Pattern.compile("geo: ?(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)(,|\\?z=)(-?\\d+)");
+    private Location sendingLocation;
     private String videoPath;
     private String sendingText;
     private ArrayList<SendMessagesHelper.SendingMediaInfo> photoPathsArray;
@@ -1147,6 +1151,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         photoPathsArray = null;
         videoPath = null;
         sendingText = null;
+        sendingLocation = null;
         documentsPathsArray = null;
         documentsOriginalPathsArray = null;
         documentsMimeType = null;
@@ -1219,7 +1224,28 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                         String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
 
                         if (!TextUtils.isEmpty(text)) {
-                            if ((text.startsWith("http://") || text.startsWith("https://")) && !TextUtils.isEmpty(subject)) {
+                                Matcher m = locationRegex.matcher(text);
+                                if (m.find()) {
+                                    String lines[] = text.split("\\n");
+                                    String venueTitle = null;
+                                    String venueAddress = null;
+                                    if (lines[0].equals("My Position")){
+                                        // Use normal GeoPoint message (user position)
+                                    }
+                                    else if(!lines[0].contains("geo:")){
+                                        venueTitle = lines[0];
+                                        if(!lines[1].contains("geo:")){
+                                            venueAddress = lines[1];
+                                        }
+                                    }
+                                    sendingLocation = new Location("");
+                                    sendingLocation.setLatitude(Double.parseDouble(m.group(1)));
+                                    sendingLocation.setLongitude(Double.parseDouble(m.group(2)));
+                                    Bundle bundle = new Bundle();
+                                    bundle.putCharSequence("venueTitle", venueTitle);
+                                    bundle.putCharSequence("venueAddress", venueAddress);
+                                    sendingLocation.setExtras(bundle);
+                                } else if ((text.startsWith("http://") || text.startsWith("https://")) && !TextUtils.isEmpty(subject)) {
                                 text = subject + "\n" + text;
                             }
                             sendingText = text;
@@ -1272,7 +1298,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                     }
                                 }
                             }
-                        } else if (sendingText == null) {
+                        } else if (sendingText == null && sendingLocation == null) {
                             error = true;
                         }
                     }
@@ -1991,7 +2017,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     }));
                 }
                 pushOpened = false;
-            } else if (videoPath != null || photoPathsArray != null || sendingText != null || documentsPathsArray != null || contactsToSend != null || documentsUrisArray != null) {
+            } else if (videoPath != null || photoPathsArray != null || sendingText != null || sendingLocation != null || documentsPathsArray != null || contactsToSend != null || documentsUrisArray != null) {
                 if (!AndroidUtilities.isTablet()) {
                     NotificationCenter.getInstance(intentAccount[0]).postNotificationName(NotificationCenter.closeChats);
                 }
@@ -3225,6 +3251,10 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     }
                     SendMessagesHelper.prepareSendingDocuments(accountInstance, documentsPathsArray, documentsOriginalPathsArray, documentsUrisArray, captionToSend, documentsMimeType, did, null, null, null, null, true, 0);
                 }
+                if (sendingLocation != null) {
+                    SendMessagesHelper.prepareSendingLocation(accountInstance, sendingLocation, did);
+                    sendingText = null;
+                }
                 if (sendingText != null) {
                     SendMessagesHelper.prepareSendingText(accountInstance, sendingText, did, true, 0);
                 }
@@ -3246,6 +3276,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         photoPathsArray = null;
         videoPath = null;
         sendingText = null;
+        sendingLocation = null;
         documentsPathsArray = null;
         documentsOriginalPathsArray = null;
         contactsToSend = null;
