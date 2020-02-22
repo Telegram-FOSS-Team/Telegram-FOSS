@@ -26,6 +26,7 @@ import android.graphics.Point;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -49,8 +50,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import com.google.android.gms.common.api.Status;
 
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -174,8 +173,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
     private AlertDialog loadingThemeProgressDialog;
 
     private Runnable lockRunnable;
-
-    private static final int PLAY_SERVICES_REQUEST_CHECK_SETTINGS = 140;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -2719,26 +2716,22 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             UserConfig.getInstance(currentAccount).saveConfig(false);
         }
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PLAY_SERVICES_REQUEST_CHECK_SETTINGS) {
-            LocationController.getInstance(currentAccount).startFusedLocationRequest(resultCode == Activity.RESULT_OK);
-        } else {
-            ThemeEditorView editorView = ThemeEditorView.getInstance();
-            if (editorView != null) {
-                editorView.onActivityResult(requestCode, resultCode, data);
-            }
-            if (actionBarLayout.fragmentsStack.size() != 0) {
-                BaseFragment fragment = actionBarLayout.fragmentsStack.get(actionBarLayout.fragmentsStack.size() - 1);
+        ThemeEditorView editorView = ThemeEditorView.getInstance();
+        if (editorView != null) {
+            editorView.onActivityResult(requestCode, resultCode, data);
+        }
+        if (actionBarLayout.fragmentsStack.size() != 0) {
+            BaseFragment fragment = actionBarLayout.fragmentsStack.get(actionBarLayout.fragmentsStack.size() - 1);
+            fragment.onActivityResultFragment(requestCode, resultCode, data);
+        }
+        if (AndroidUtilities.isTablet()) {
+            if (rightActionBarLayout.fragmentsStack.size() != 0) {
+                BaseFragment fragment = rightActionBarLayout.fragmentsStack.get(rightActionBarLayout.fragmentsStack.size() - 1);
                 fragment.onActivityResultFragment(requestCode, resultCode, data);
             }
-            if (AndroidUtilities.isTablet()) {
-                if (rightActionBarLayout.fragmentsStack.size() != 0) {
-                    BaseFragment fragment = rightActionBarLayout.fragmentsStack.get(rightActionBarLayout.fragmentsStack.size() - 1);
-                    fragment.onActivityResultFragment(requestCode, resultCode, data);
-                }
-                if (layersActionBarLayout.fragmentsStack.size() != 0) {
-                    BaseFragment fragment = layersActionBarLayout.fragmentsStack.get(layersActionBarLayout.fragmentsStack.size() - 1);
-                    fragment.onActivityResultFragment(requestCode, resultCode, data);
-                }
+            if (layersActionBarLayout.fragmentsStack.size() != 0) {
+                BaseFragment fragment = layersActionBarLayout.fragmentsStack.get(layersActionBarLayout.fragmentsStack.size() - 1);
+                fragment.onActivityResultFragment(requestCode, resultCode, data);
             }
         }
     }
@@ -3213,13 +3206,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                         }
                     }
                 }
-            }
-        } else if (id == NotificationCenter.needShowPlayServicesAlert) {
-            try {
-                final Status status = (Status) args[0];
-                status.startResolutionForResult(this, PLAY_SERVICES_REQUEST_CHECK_SETTINGS);
-            } catch (Throwable ignore) {
-
             }
         } else if (id == NotificationCenter.fileDidLoad) {
             if (loadingThemeFileName != null) {
