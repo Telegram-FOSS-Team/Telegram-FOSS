@@ -22,10 +22,9 @@ dependencies {
 
     compileOnly 'org.checkerframework:checker-qual:2.5.2'
     compileOnly 'org.checkerframework:checker-compat-qual:2.5.0'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
     implementation 'com.googlecode.mp4parser:isoparser:1.0.6'
     implementation 'com.stripe:stripe-android:2.0.2'
+    implementation 'org.osmdroid:osmdroid-android:6.1.6'
 }
 
 //return an api key from a properties file.
@@ -405,5 +404,3 @@ private static File findJavac() {
         return null
     }
 }
-
-apply plugin: 'com.google.gms.google-services'
