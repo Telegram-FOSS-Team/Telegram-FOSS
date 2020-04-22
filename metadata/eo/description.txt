@@ -8,6 +8,6 @@ Kelkaj fermkodaj partoj estis forigitaj el la originala kliento Telegramo, inklu
 
 Fieblo: nelibera reto, ĉar serviloj funkcias per fermkoda programaro.
 
-La oficiala fontkodo enhavas binaraĵojn, do en tiu ĉi ido oni kompilis ilin el fontkodoj.
+La oficiala fontkodo enhavas binaraĵojn, en tiu ĉi ido oni kompilis ilin el fontkodoj.
 
 Neoficiala esperantigo: <a href="https://t.me/setlanguage/eo-beta">https://t.me/setlanguage/eo-beta</a>
