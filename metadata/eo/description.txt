@@ -4,7 +4,7 @@ Kliento por la mesaĝ‑sistemo Telegramo. Babili kun amikoj, ekigi grupajn babi
 
 La mesaĝ‑sistemo estas projektita por poŝtelefonoj, tamen komputilaj kaj enretaj klientoj ankaŭ disponeblas.
 
-Kelkaj fermkodaj partoj estis forigitaj el la originala kliento Telegramo, inkluzive servojn Google Play (por trovi pozicion), HockeySDK (por mem-ĝisdatigoj) kaj puŝsciigojn per Google Cloud Messaging. Eblo por kunhavigi pozicion funkcias per OpenStreetMap.
+Kelkaj fermkodaj partoj estis forigitaj el la originala kliento Telegramo, inkluzive servojn Google Play (por trovi pozicion), HockeySDK (por mem-ĝisdatigoj) kaj Google Cloud Messaging (por puŝsciigoj). Eblo por kunhavigi pozicion funkcias per OpenStreetMap.
 
 Fieblo: nelibera reto, ĉar serviloj funkcias per fermkoda programaro.
 
