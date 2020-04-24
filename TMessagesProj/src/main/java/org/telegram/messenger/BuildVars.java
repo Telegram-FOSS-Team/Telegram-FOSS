@@ -19,7 +19,7 @@ public class BuildVars {
     public static boolean USE_CLOUD_STRINGS = true;
     public static boolean CHECK_UPDATES = true;
     public static boolean TON_WALLET_STANDALONE = false;
-    public static int BUILD_VERSION = 1938;
+    public static int BUILD_VERSION = 1940;
     public static String BUILD_VERSION_STRING = "6.1.0";
     public static int APP_ID = BuildConfig.APP_ID; //obtain your own APP_ID at https://core.telegram.org/api/obtaining_api_id
     public static String APP_HASH = BuildConfig.APP_HASH; //obtain your own APP_HASH at https://core.telegram.org/api/obtaining_api_id

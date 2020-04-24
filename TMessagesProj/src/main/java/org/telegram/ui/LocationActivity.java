@@ -409,6 +409,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
     public LocationActivity(int type) {
         super();
         locationType = type;
+        AndroidUtilities.fixGoogleMapsBug();
     }
 
     @Override
