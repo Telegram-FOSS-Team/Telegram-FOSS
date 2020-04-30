@@ -979,9 +979,6 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
 
         frameLayout.addView(mapViewClip, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP));
 
-        // SET TFOSS USERAGENT FOR OSM SERVERS
-        Configuration.getInstance().setUserAgentValue("Telegram-FOSS(F-Droid) "+BuildConfig.VERSION_NAME);
-
         mapView = new MapView(context) {
 
             @Override
