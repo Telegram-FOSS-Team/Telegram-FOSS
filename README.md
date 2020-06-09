@@ -88,7 +88,7 @@ Consider using a Linux VM or dual booting.**
 
 **Important:**
 
-1. You need the Android NDK, Go(Golang) and [Ninja](https://ninja-build.org/) to build the apk.
+1. You need the Android SDK([section Command line tools only](https://developer.android.com/studio)), Android NDK, Go(Golang) and [Ninja](https://ninja-build.org/) to build the apk. Install `openjdk-devel` in accord with your distribution (Debian, Ubuntu, Fedora..)
 
 2. Don't forget to include the submodules when you clone:
       - `git clone --recursive https://github.com/Telegram-FOSS-Team/Telegram-FOSS.git`
@@ -97,6 +97,7 @@ Consider using a Linux VM or dual booting.**
       - Go to the `TMessagesProj/jni` folder and execute the following (define the paths to your NDK and Ninja):
 
       ```
+      export ANDROID_HOME=[PATH_TO_SDK] #if you haven't already
       export NDK=[PATH_TO_NDK]
       export NINJA_PATH=[PATH_TO_NINJA]
       ./build_ffmpeg_clang.sh
@@ -105,20 +106,26 @@ Consider using a Linux VM or dual booting.**
       ./build_boringssl.sh
       ```
 
-4. If you want to publish a modified version of Telegram:
-      - You should get **your own API key** here: https://core.telegram.org/api/obtaining_api_id and create a file called `API_KEYS` in the source root directory.
-        The contents should look like this:
-        ```
+4. You get **your own API key** here: https://core.telegram.org/api/obtaining_api_id and create a file called `API_KEYS` in the source root directory.The contents should look like this:
+        
         APP_ID = 12345
         APP_HASH = aaaaaaaabbbbbbccccccfffffff001122
-        ```
-      - Do not use the name Telegram and the standard logo (white paper plane in a blue circle) for your app — or make sure your users understand that it is unofficial
-      - Take good care of your users' data and privacy
-      - **Please remember to publish your code too in order to comply with the licenses**
+        
+      - If you want to publish a modified version of Telegram:
+      
+        1. Do not use the name Telegram and the standard logo (white paper plane in a blue circle) for your app — or make sure your users understand that it is unofficial
+        2. Take good care of your users' data and privacy
+        3. **Please remember to publish your code too in order to comply with the licenses**
 
-The project can be built with Android Studio or from the command line with gradle:
+5. The project can be built with Android Studio or from the command line with gradle: `./gradlew assembleAfatRelease`. The apk will be found in `TMessagesProj/build/outputs/apk` folder.
 
-`./gradlew assembleAfatRelease`
+   - If you want built specific version in accord your cpu architecture:
+
+     1. `./gradlew <sdk specific for your CPU architecture>`
+
+     for example, if you want built for **arm64-v8a**: `./gradlew assembleArm64_SDK23Release`
+
+6. Sign your [apk](https://stackoverflow.com/a/55271559/4624106)
 
 # DIGITAL RESISTANCE
 
