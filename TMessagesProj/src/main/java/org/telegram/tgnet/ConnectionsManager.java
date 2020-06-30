@@ -1005,7 +1005,7 @@ public class ConnectionsManager extends BaseController {
         }
 
         protected NativeByteBuffer doInBackground(Void... voids) {
-            /*
+            
 	    ByteArrayOutputStream outbuf = null;
             InputStream httpConnectionStream = null;
             try {
@@ -1017,7 +1017,7 @@ public class ConnectionsManager extends BaseController {
                 for (int a = 0; a < len; a++) {
                     padding.append(characters.charAt(Utilities.random.nextInt(characters.length())));
                 }
-                URL downloadUrl = new URL("https://dns.google.com/resolve?name=" + domain + "&type=ANY&random_padding=" + padding);
+                URL downloadUrl = new URL("https://doh.libredns.gr/dns-query?name=" + domain + "&type=TXT&random_padding=" + padding);
                 URLConnection httpConnection = downloadUrl.openConnection();
                 httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1");
                 httpConnection.setConnectTimeout(5000);
@@ -1090,7 +1090,7 @@ public class ConnectionsManager extends BaseController {
                 } catch (Exception ignore) {
 
                 }
-            }*/
+            }
             return null;
         }
 
