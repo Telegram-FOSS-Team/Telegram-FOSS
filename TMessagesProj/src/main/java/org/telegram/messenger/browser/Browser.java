@@ -233,7 +233,7 @@ public class Browser {
             if (allowCustom && SharedConfig.customTabs && !internalUri && !scheme.equals("tel")) {
                 String[] browserPackageNames = null;
                 try {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://qwant.com"));
                     List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(browserIntent, 0);
                     if (list != null && !list.isEmpty()) {
                         browserPackageNames = new String[list.size()];

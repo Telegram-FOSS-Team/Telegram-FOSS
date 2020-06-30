@@ -876,7 +876,7 @@ public class ConnectionsManager extends BaseController {
         }
 
         protected NativeByteBuffer doInBackground(Void... voids) {
-            ByteArrayOutputStream outbuf = null;
+            /*ByteArrayOutputStream outbuf = null;
             InputStream httpConnectionStream = null;
             for (int i = 0; i < 3; i++) {
                 try {
@@ -971,7 +971,7 @@ public class ConnectionsManager extends BaseController {
 
                     }
                 }
-            }
+            }*/
             return null;
         }
 
@@ -1005,7 +1005,8 @@ public class ConnectionsManager extends BaseController {
         }
 
         protected NativeByteBuffer doInBackground(Void... voids) {
-            ByteArrayOutputStream outbuf = null;
+            /*
+	    ByteArrayOutputStream outbuf = null;
             InputStream httpConnectionStream = null;
             try {
                 String domain = native_isTestBackend(currentAccount) != 0 ? "tapv3.stel.com" : AccountInstance.getInstance(currentAccount).getMessagesController().dcDomainName;
@@ -1089,7 +1090,7 @@ public class ConnectionsManager extends BaseController {
                 } catch (Exception ignore) {
 
                 }
-            }
+            }*/
             return null;
         }
 
@@ -1134,7 +1135,7 @@ public class ConnectionsManager extends BaseController {
                 for (int a = 0; a < len; a++) {
                     padding.append(characters.charAt(Utilities.random.nextInt(characters.length())));
                 }
-                URL downloadUrl = new URL("https://mozilla.cloudflare-dns.com/dns-query?name=" + domain + "&type=TXT&random_padding=" + padding);
+                URL downloadUrl = new URL("https://fi.doh.dns.snopyta.org/dns-query?name=" + domain + "&type=TXT&random_padding=" + padding);
                 URLConnection httpConnection = downloadUrl.openConnection();
                 httpConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.38 (KHTML, like Gecko) Version/10.0 Mobile/14A5297c Safari/602.1");
                 httpConnection.addRequestProperty("accept", "application/dns-json");
