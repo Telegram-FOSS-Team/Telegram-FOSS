@@ -776,11 +776,12 @@ int readCallback(void *opaque, uint8_t *buf, int buf_size) {
                 if (attached) {
                     javaVm->DetachCurrentThread();
                 }
-                return (int) read(info->fd, buf, (size_t) buf_size);
+                int ret = (int) read(info->fd, buf, (size_t) buf_size);
+                return ret ? ret : AVERROR_EOF;
             }
         }
     }
-    return 0;
+    return AVERROR_EOF;
 }
 
 int64_t seekCallback(void *opaque, int64_t offset, int whence) {
