@@ -1,3 +1,6 @@
+MY_LOCAL_PATH := $(call my-dir)
+LOCAL_PATH := $(MY_LOCAL_PATH)
+
 ifeq ($(TARGET_ARCH_ABI),$(filter $(TARGET_ARCH_ABI),x86 x86_64))
 
 include $(CLEAR_VARS)
@@ -5,9 +8,9 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := libvpx_yasm
 
 ifeq ($(TARGET_ARCH_ABI),x86)
-    LOCAL_SRC_FILES := ./third_party/libvpx/source/libvpx/vpx_dsp/x86/libvpx_x86_yasm.a
+    LOCAL_SRC_FILES := $(LOCAL_PATH)/third_party/libvpx/source/libvpx/vpx_dsp/x86/libvpx_x86_yasm.a
 else ifeq ($(TARGET_ARCH_ABI),x86_64)
-    LOCAL_SRC_FILES := ./third_party/libvpx/source/libvpx/vpx_dsp/x86/libvpx_x86_64_yasm.a
+    LOCAL_SRC_FILES := $(LOCAL_PATH)/third_party/libvpx/source/libvpx/vpx_dsp/x86/libvpx_x86_64_yasm.a
 endif
 
 include $(PREBUILT_STATIC_LIBRARY)
