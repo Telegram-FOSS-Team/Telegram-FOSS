@@ -45,8 +45,6 @@ public class VideoCameraCapturer {
         if (Build.VERSION.SDK_INT < 18) {
             return;
         }
-        Logging.enableLogToDebugOutput(Logging.Severity.LS_INFO);
-        Logging.d("VideoCameraCapturer", "device model = " + Build.MANUFACTURER + Build.MODEL);
         AndroidUtilities.runOnUIThread(() -> {
             instance = this;
             thread = new HandlerThread("CallThread");
