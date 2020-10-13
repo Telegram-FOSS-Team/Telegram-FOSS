@@ -67,11 +67,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.common.api.Status;
-import com.google.firebase.appindexing.Action;
-import com.google.firebase.appindexing.FirebaseUserActions;
-import com.google.firebase.appindexing.builders.AssistActionBuilder;
-
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -233,9 +228,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
 
     private Runnable lockRunnable;
 
-    private static final int PLAY_SERVICES_REQUEST_CHECK_SETTINGS = 140;
     public static final int SCREEN_CAPTURE_REQUEST_CODE = 520;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ApplicationLoader.postInitApplication();
@@ -2115,11 +2108,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                         }
                         if (intent.hasExtra(EXTRA_ACTION_TOKEN)) {
                             final boolean success = UserConfig.getInstance(currentAccount).isClientActivated() && "tg".equals(scheme) && unsupportedUrl == null;
-                            final Action assistAction = new AssistActionBuilder()
-                                    .setActionToken(intent.getStringExtra(EXTRA_ACTION_TOKEN))
-                                    .setActionStatus(success ? Action.Builder.STATUS_TYPE_COMPLETED : Action.Builder.STATUS_TYPE_FAILED)
-                                    .build();
-                            FirebaseUserActions.getInstance(this).end(assistAction);
                             intent.removeExtra(EXTRA_ACTION_TOKEN);
                         }
                         if (code != null || UserConfig.getInstance(currentAccount).isClientActivated()) {
@@ -3989,8 +3977,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     service.createCaptureDevice(true);
                 }
             }
-        } else if (requestCode == PLAY_SERVICES_REQUEST_CHECK_SETTINGS) {
-            LocationController.getInstance(currentAccount).startFusedLocationRequest(resultCode == Activity.RESULT_OK);
         } else {
             ThemeEditorView editorView = ThemeEditorView.getInstance();
             if (editorView != null) {
@@ -4567,13 +4553,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                         }
                     }
                 }
-            }
-        } else if (id == NotificationCenter.needShowPlayServicesAlert) {
-            try {
-                final Status status = (Status) args[0];
-                status.startResolutionForResult(this, PLAY_SERVICES_REQUEST_CHECK_SETTINGS);
-            } catch (Throwable ignore) {
-
             }
         } else if (id == NotificationCenter.fileLoaded) {
             String path = (String) args[0];
