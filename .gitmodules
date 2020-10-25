@@ -1,9 +1,11 @@
 [submodule "TMessagesProj/jni/ffmpeg"]
 	path = TMessagesProj/jni/ffmpeg
 	url = https://github.com/FFmpeg/FFmpeg
+	ignore = all
 [submodule "TMessagesProj/jni/boringssl"]
 	path = TMessagesProj/jni/boringssl
 	url = https://github.com/google/boringssl
+	ignore = all
 [submodule "TMessagesProj/jni/libwebp"]
 	path = TMessagesProj/jni/libwebp
 	url = ../../webmproject/libwebp
