@@ -9,8 +9,8 @@
 #include <string>
 #include <mozjpeg/java/org_libjpegturbo_turbojpeg_TJ.h>
 #include <mozjpeg/jpeglib.h>
-#include "libwebp/webp/decode.h"
-#include "libwebp/webp/encode.h"
+#include "webp/decode.h"
+#include "webp/encode.h"
 #include "mozjpeg/turbojpeg.h"
 #include "c_utils.h"
 
