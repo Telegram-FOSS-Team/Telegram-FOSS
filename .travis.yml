@@ -1,0 +1,40 @@
+language: android
+dist: trusty
+jdk:
+  - openjdk8
+android:
+  components:
+    - build-tools-28.0.3
+    - android-28
+addons:
+  apt_packages:
+    - ninja-build
+
+install:
+  - set -e
+  - echo y | sdkmanager "ndk;21.1.6352462"
+  - echo y | sdkmanager "cmake;3.6.4111459"
+  - echo y | sdkmanager "cmake;3.10.2.4988404"
+before_script:
+  - export NDK=$ANDROID_HOME/ndk/21.1.6352462
+  - export NINJA_PATH=/usr/bin/ninja
+  - export PATH=`echo $ANDROID_HOME/cmake/3.10.2.4988404/bin`:$PATH
+  - echo -e "APP_ID = ${APP_ID}\nAPP_HASH = ${APP_HASH}" > API_KEYS
+script:
+  # If some stage fails, exit inmediatly
+  - set -e
+  # Prebuild
+  - "cd TMessagesProj/jni"
+  - "./build_ffmpeg_clang.sh"
+  - "./patch_ffmpeg.sh"
+  - "./patch_boringssl.sh"
+  - "./build_boringssl.sh"
+  - "cd ../.."
+  # Build
+  - "./gradlew assembleX64_SDK23Release"
+
+after_success:
+  - "./gradlew test"
+
+after_script:
+  - "rm API_KEYS"
