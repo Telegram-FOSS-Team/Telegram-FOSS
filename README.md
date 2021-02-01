@@ -1,3 +1,6 @@
+# Uncensored version of [Telegram-FOSS](https://github.com/Telegram-FOSS-Team/Telegram-FOSS)
+Restriction stubs removed for channels
+
 [![Releases](https://img.shields.io/github/release/Telegram-FOSS-Team/Telegram-FOSS.svg)](https://github.com/Telegram-FOSS-Team/Telegram-FOSS/releases/latest)
 [![Discussions](https://img.shields.io/badge/Offtopics-Telegram-blue.svg)](https://t.me/tfossofftop)
 
