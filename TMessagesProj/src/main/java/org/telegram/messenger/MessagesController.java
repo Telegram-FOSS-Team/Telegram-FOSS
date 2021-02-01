@@ -13604,16 +13604,6 @@ public class MessagesController extends BaseController implements NotificationCe
         if (user == null && chat == null) {
             return true;
         }
-        String reason;
-        if (chat != null) {
-            reason = getRestrictionReason(chat.restriction_reason);
-        } else {
-            reason = getRestrictionReason(user.restriction_reason);
-        }
-        if (reason != null) {
-            showCantOpenAlert(fragment, reason);
-            return false;
-        }
         if (messageId != 0 && originalMessage != null && chat != null && chat.access_hash == 0) {
             int did = (int) originalMessage.getDialogId();
             if (did != 0) {

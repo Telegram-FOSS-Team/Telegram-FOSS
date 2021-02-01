@@ -2718,11 +2718,7 @@ public class MessageObject {
             }
         } else {
             isRestrictedMessage = false;
-            String restrictionReason = MessagesController.getRestrictionReason(messageOwner.restriction_reason);
-            if (!TextUtils.isEmpty(restrictionReason)) {
-                messageText = restrictionReason;
-                isRestrictedMessage = true;
-            } else if (!isMediaEmpty()) {
+            if (!isMediaEmpty()) {
                 if (messageOwner.media instanceof TLRPC.TL_messageMediaDice) {
                     messageText = getDiceEmoji();
                 } else if (messageOwner.media instanceof TLRPC.TL_messageMediaPoll) {
