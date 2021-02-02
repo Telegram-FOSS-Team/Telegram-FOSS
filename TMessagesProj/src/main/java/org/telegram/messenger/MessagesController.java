@@ -13655,32 +13655,25 @@ public class MessagesController extends BaseController implements NotificationCe
         if (user == null && chat == null || fragment == null) {
             return;
         }
-        String reason;
-        if (chat != null) {
-            reason = getRestrictionReason(chat.restriction_reason);
-        } else {
-            reason = getRestrictionReason(user.restriction_reason);
+        if (chat == null) {
             if (type != 3 && user.bot) {
                 type = 1;
                 closeLast = true;
             }
         }
-        if (reason != null) {
-            showCantOpenAlert(fragment, reason);
+
+        Bundle args = new Bundle();
+        if (chat != null) {
+            args.putInt("chat_id", chat.id);
         } else {
-            Bundle args = new Bundle();
-            if (chat != null) {
-                args.putInt("chat_id", chat.id);
-            } else {
-                args.putInt("user_id", user.id);
-            }
-            if (type == 0) {
-                fragment.presentFragment(new ProfileActivity(args));
-            } else if (type == 2) {
-                fragment.presentFragment(new ChatActivity(args), true, true);
-            } else {
-                fragment.presentFragment(new ChatActivity(args), closeLast);
-            }
+            args.putInt("user_id", user.id);
+        }
+        if (type == 0) {
+            fragment.presentFragment(new ProfileActivity(args));
+        } else if (type == 2) {
+            fragment.presentFragment(new ChatActivity(args), true, true);
+        } else {
+            fragment.presentFragment(new ChatActivity(args), closeLast);
         }
     }
 
