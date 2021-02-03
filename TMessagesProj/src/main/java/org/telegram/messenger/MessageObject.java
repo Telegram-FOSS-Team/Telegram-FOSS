@@ -2205,9 +2205,11 @@ public class MessageObject {
     }
 
     public void measureInlineBotButtons() {
+        /*
         if (isRestrictedMessage) {
             return;
         }
+        */
         wantedBotKeyboardWidth = 0;
         if (messageOwner.reply_markup instanceof TLRPC.TL_replyInlineMarkup || messageOwner.reactions != null && !messageOwner.reactions.results.isEmpty()) {
             Theme.createChatResources(null, true);
@@ -2719,10 +2721,10 @@ public class MessageObject {
         } else {
             isRestrictedMessage = false;
             String restrictionReason = MessagesController.getRestrictionReason(messageOwner.restriction_reason);
-            if (!TextUtils.isEmpty(restrictionReason)) {
+            /*if (!TextUtils.isEmpty(restrictionReason)) {
                 messageText = restrictionReason;
                 isRestrictedMessage = true;
-            } else if (!isMediaEmpty()) {
+            } else*/ if (!isMediaEmpty()) {
                 if (messageOwner.media instanceof TLRPC.TL_messageMediaDice) {
                     messageText = getDiceEmoji();
                 } else if (messageOwner.media instanceof TLRPC.TL_messageMediaPoll) {
@@ -2798,9 +2800,9 @@ public class MessageObject {
         type = 1000;
         isRoundVideoCached = 0;
         if (messageOwner instanceof TLRPC.TL_message || messageOwner instanceof TLRPC.TL_messageForwarded_old2) {
-            if (isRestrictedMessage) {
+            /*if (isRestrictedMessage) {
                 type = 0;
-            } else if (emojiAnimatedSticker != null) {
+            } else */if (emojiAnimatedSticker != null) {
                 if (isSticker()) {
                     type = TYPE_STICKER;
                 } else {
