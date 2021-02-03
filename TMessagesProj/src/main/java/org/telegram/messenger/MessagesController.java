@@ -13883,6 +13883,7 @@ public class MessagesController extends BaseController implements NotificationCe
         if (user == null && chat == null) {
             return true;
         }
+        /*
         String reason;
         if (chat != null) {
             reason = getRestrictionReason(chat.restriction_reason);
@@ -13892,7 +13893,7 @@ public class MessagesController extends BaseController implements NotificationCe
         if (reason != null) {
             showCantOpenAlert(fragment, reason);
             return false;
-        }
+        }*/
         if (messageId != 0 && originalMessage != null && chat != null && chat.access_hash == 0) {
             int did = (int) originalMessage.getDialogId();
             if (did != 0) {
@@ -13954,9 +13955,9 @@ public class MessagesController extends BaseController implements NotificationCe
                 closeLast = true;
             }
         }
-        if (reason != null) {
+        /*if (reason != null) {
             showCantOpenAlert(fragment, reason);
-        } else {
+        } else {*/
             Bundle args = new Bundle();
             if (chat != null) {
                 args.putInt("chat_id", chat.id);
@@ -13970,7 +13971,7 @@ public class MessagesController extends BaseController implements NotificationCe
             } else {
                 fragment.presentFragment(new ChatActivity(args), closeLast);
             }
-        }
+        //}
     }
 
     public void openByUserName(String username, final BaseFragment fragment, final int type) {
