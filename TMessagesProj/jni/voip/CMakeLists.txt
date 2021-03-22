@@ -2152,7 +2152,7 @@ target_include_directories(tgcalls PUBLIC
         third_party/usrsctplib
         third_party
         voip/libtgvoip
-        ffmpeg/include)
+        ffmpeg/build/${ANDROID_ABI}/include)
 
 if (${ANDROID_ABI} STREQUAL "armeabi-v7a")
     target_sources(tgcalls PRIVATE
