@@ -1,3 +1,7 @@
 [submodule "TMessagesProj/jni/libwebp"]
 	path = TMessagesProj/jni/libwebp
 	url = https://github.com/webmproject/libwebp
+[submodule "TMessagesProj/jni/ffmpeg"]
+	path = TMessagesProj/jni/ffmpeg
+	url = https://github.com/FFmpeg/FFmpeg
+	ignore = all
