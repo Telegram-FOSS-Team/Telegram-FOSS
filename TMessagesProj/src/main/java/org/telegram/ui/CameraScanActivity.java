@@ -35,6 +35,7 @@ import android.widget.TextView;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.LuminanceSource;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Result;
@@ -607,21 +608,29 @@ public class CameraScanActivity extends BaseFragment implements Camera.PreviewCa
                     text = null;
                 }
             } else {*/
-                LuminanceSource source;
-                if (bitmap != null) {
-                    int[] intArray = new int[bitmap.getWidth() * bitmap.getHeight()];
-                    bitmap.getPixels(intArray, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-                    source = new RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), intArray);
-                } else {
-                    source = new PlanarYUVLuminanceSource(data, size.getWidth(), size.getHeight(), x, y, side, side, false);
-                }
+            LuminanceSource source;
+            if (bitmap != null) {
+                int[] intArray = new int[bitmap.getWidth() * bitmap.getHeight()];
+                bitmap.getPixels(intArray, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+                source = new RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), intArray);
+            } else {
+                source = new PlanarYUVLuminanceSource(data, size.getWidth(), size.getHeight(), x, y, side, side, false);
+            }
 
-                Result result = qrReader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(source)));
-                if (result == null) {
-                    onNoQrFound();
-                    return null;
+            Result result = null;
+            try {
+                result = qrReader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(source)));
+            } catch (NotFoundException e) {
+                try {
+                    result = qrReader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(source.invert())));
+                } catch (NotFoundException ignore) {
                 }
-                text = result.getText();
+            }
+            if (result == null) {
+                onNoQrFound();
+                return null;
+            }
+            text = result.getText();
             //}
             if (TextUtils.isEmpty(text)) {
                 onNoQrFound();
