@@ -14,7 +14,7 @@ import android.os.Build;
 
 public class BuildVars {
 
-    public static boolean DEBUG_VERSION = false;
+    public static boolean DEBUG_VERSION = BuildConfig.DEBUG;
     public static boolean LOGS_ENABLED = false;
     public static boolean USE_CLOUD_STRINGS = true;
     public static boolean CHECK_UPDATES = true;
