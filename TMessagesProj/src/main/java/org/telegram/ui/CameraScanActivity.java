@@ -50,6 +50,7 @@ import androidx.dynamicanimation.animation.SpringForce;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.LuminanceSource;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Result;
@@ -1066,7 +1067,15 @@ public class CameraScanActivity extends BaseFragment {
                     height = size.getHeight();
                 }
 
-                Result result = qrReader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(source)));
+                Result result = null;
+                try {
+                    result = qrReader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(source)));
+                } catch (NotFoundException e) {
+                    try {
+                        result = qrReader.decode(new BinaryBitmap(new GlobalHistogramBinarizer(source.invert())));
+                    } catch (NotFoundException ignore) {
+                    }
+                }
                 if (result == null) {
                     onNoQrFound();
                     return null;
