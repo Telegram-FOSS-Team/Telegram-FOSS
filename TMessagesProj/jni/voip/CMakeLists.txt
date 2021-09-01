@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.6.0)
 
 #libvpx_yasm
-if (${ANDROID_ABI} STREQUAL "x86" OR ${ANDROID_ABI} STREQUAL "x86_64")
-add_library(libvpx_yasm STATIC IMPORTED)
-set_target_properties(libvpx_yasm PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/third_party/libvpx/source/libvpx/vpx_dsp/x86/libvpx_${ANDROID_ABI}_yasm.a)
-endif()
+#if (${ANDROID_ABI} STREQUAL "x86" OR ${ANDROID_ABI} STREQUAL "x86_64")
+#add_library(libvpx_yasm STATIC IMPORTED)
+#set_target_properties(libvpx_yasm PROPERTIES IMPORTED_LOCATION ${CMAKE_HOME_DIRECTORY}/third_party/libvpx/source/libvpx/vpx_dsp/x86/libvpx_${ANDROID_ABI}_yasm.a)
+#endif()
 
 #tgvoip
 add_library(tgvoip STATIC
