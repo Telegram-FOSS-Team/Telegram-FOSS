@@ -90,24 +90,24 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
 Consider using a Linux VM or dual booting.**
 ![WindowsSupport](/tgfoss-build-under-win.gif?raw=true)
 
-**Important:**
-
-1. You need the Android NDK, Go(Golang) and [Ninja](https://ninja-build.org/) to build the apk.
+1. Install the Android NDK, [Go](https://golang.org) and [Ninja](https://ninja-build.org) to build an apk.
 
 2. Don't forget to include the submodules when you clone:
-      - `git clone --recursive https://github.com/Telegram-FOSS-Team/Telegram-FOSS.git`
+   `git clone --recursive https://github.com/Telegram-FOSS-Team/Telegram-FOSS.git`
 
 3. Build native FFmpeg and BoringSSL dependencies:
-      - Go to the `TMessagesProj/jni` folder and execute the following (define the paths to your NDK and Ninja):
+   Go to the `TMessagesProj/jni` folder and execute the following (substituting the respective paths to NDK and Ninja):
 
-      ```
-      export NDK=[PATH_TO_NDK]
-      export NINJA_PATH=[PATH_TO_NINJA]
-      ./build_ffmpeg_clang.sh
-      ./patch_ffmpeg.sh
-      ./patch_boringssl.sh
-      ./build_boringssl.sh
-      ```
+   ```sh
+   export NDK=[PATH_TO_NDK]
+   export NINJA_PATH=[PATH_TO_NINJA]
+   ./build_ffmpeg_clang.sh
+   ./patch_ffmpeg.sh
+   ./patch_boringssl.sh
+   ./build_boringssl.sh
+   ```
+
+   You can also use the `build.sh` script which uses simple heuristics to find these paths automatically.
 
 4. If you want to publish a modified version of Telegram:
       - You should get **your own API key** here: https://core.telegram.org/api/obtaining_api_id and create a file called `API_KEYS` in the source root directory.
