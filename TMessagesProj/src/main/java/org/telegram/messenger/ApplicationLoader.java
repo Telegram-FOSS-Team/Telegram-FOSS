@@ -239,7 +239,7 @@ public class ApplicationLoader extends Application {
             Log.d("TFOSS", "Trying to start push service every 10 minutes");
             // Telegram-FOSS: unconditionally enable push service
             AlarmManager am = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
-            Intent i = new Intent(applicationContext, NotificationService.class);
+            Intent i = new Intent(applicationContext, NotificationsService.class);
             pendingIntent = PendingIntent.getBroadcast(applicationContext, 0, i, 0);
 
             am.cancel(pendingIntent);
