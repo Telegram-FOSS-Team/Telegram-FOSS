@@ -7,7 +7,7 @@ function build_one {
 	cd ${CPU}
 
 	echo "Configuring..."
-	cmake -DANDROID_NATIVE_API_LEVEL=${API} -DANDROID_ABI=${CPU} -DCMAKE_BUILD_TYPE=Release -DANDROID_NDK=${NDK} -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=16 -GNinja -DCMAKE_MAKE_PROGRAM=${NINJA_PATH} ../..
+	cmake -DANDROID_NATIVE_API_LEVEL=${API} -DANDROID_ABI=${CPU} -DCMAKE_BUILD_TYPE=Release -DANDROID_NDK=${NDK} -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_MAKE_PROGRAM=${NINJA_PATH} ../..
 	
 	echo "Building..."
 	cmake --build .
