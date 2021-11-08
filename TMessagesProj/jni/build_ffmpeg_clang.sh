@@ -75,6 +75,7 @@ function build_one {
 	--enable-avresample \
 	--enable-swscale \
 	--enable-protocol=file \
+	--enable-decoder=opus \
 	--enable-decoder=h264 \
 	--enable-decoder=mpeg4 \
 	--enable-decoder=mjpeg \
