@@ -15,6 +15,7 @@
     <string name="AccountAlreadyLoggedIn">This account is already logged in from this app.</string>
     <string name="AccountSwitch">Switch</string>
     <string name="SyncContacts">Sync Contacts</string>
+    <string name="ShowAds">Show sponsored messages</string>
     <string name="SyncContactsOn">Contacts from this device will be added to this account.</string>
     <string name="SyncContactsOff">Contacts from this device will not be added to this account.</string>
     <string name="SyncContactsInfoOn">Contacts from this device will be added to your account.</string>

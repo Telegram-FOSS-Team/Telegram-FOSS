@@ -56,6 +56,7 @@ public class UserConfig extends BaseController {
     public boolean notificationsSignUpSettingsLoaded;
     public boolean syncContacts = true;
     public boolean suggestContacts = true;
+    public boolean showAds = false;
     public boolean hasSecureData;
     public int loginTime;
     public TLRPC.TL_help_termsOfService unacceptedTermsOfService;
@@ -124,6 +125,7 @@ public class UserConfig extends BaseController {
                     editor.putInt("loginTime", loginTime);
                     editor.putBoolean("syncContacts", syncContacts);
                     editor.putBoolean("suggestContacts", suggestContacts);
+                    editor.putBoolean("showAds", showAds);
                     editor.putBoolean("hasSecureData", hasSecureData);
                     editor.putBoolean("notificationsSettingsLoaded3", notificationsSettingsLoaded);
                     editor.putBoolean("notificationsSignUpSettingsLoaded", notificationsSignUpSettingsLoaded);
@@ -245,6 +247,7 @@ public class UserConfig extends BaseController {
             loginTime = preferences.getInt("loginTime", currentAccount);
             syncContacts = preferences.getBoolean("syncContacts", true);
             suggestContacts = preferences.getBoolean("suggestContacts", true);
+            showAds = preferences.getBoolean("showAds", false);
             hasSecureData = preferences.getBoolean("hasSecureData", false);
             notificationsSettingsLoaded = preferences.getBoolean("notificationsSettingsLoaded3", false);
             notificationsSignUpSettingsLoaded = preferences.getBoolean("notificationsSignUpSettingsLoaded", false);
@@ -365,6 +368,7 @@ public class UserConfig extends BaseController {
         contactsReimported = true;
         syncContacts = true;
         suggestContacts = true;
+        showAds = false;
         unreadDialogsLoaded = true;
         hasValidDialogLoadIds = true;
         unacceptedTermsOfService = null;
