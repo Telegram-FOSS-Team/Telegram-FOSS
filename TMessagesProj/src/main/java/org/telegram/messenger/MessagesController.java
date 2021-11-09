@@ -319,7 +319,6 @@ public class MessagesController extends BaseController implements NotificationCe
     public HashMap<String, DiceFrameSuccess> diceSuccess = new HashMap<>();
     public HashMap<String, EmojiSound> emojiSounds = new HashMap<>();
     public HashMap<Long, ArrayList<TLRPC.TL_sendMessageEmojiInteraction>> emojiInteractions = new HashMap<>();
-    public boolean showAds;
 
     private SharedPreferences notificationsPreferences;
     private SharedPreferences mainPreferences;
@@ -778,7 +777,6 @@ public class MessagesController extends BaseController implements NotificationCe
         roundVideoBitrate = mainPreferences.getInt("roundVideoBitrate", 1000);
         roundAudioBitrate = mainPreferences.getInt("roundAudioBitrate", 64);
         pendingSuggestions = mainPreferences.getStringSet("pendingSuggestions", null);
-        showAds = mainPreferences.getBoolean("showAds", false);
         if (pendingSuggestions != null) {
             pendingSuggestions = new HashSet<>(pendingSuggestions);
         } else {
@@ -13758,7 +13756,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public ArrayList<MessageObject> getSponsoredMessages(long dialogId) {
-        if (!showAds) {
+        if (!getUserConfig().showAds) {
             return null;
         }
         SponsoredMessagesInfo info = sponsoredMessages.get(dialogId);
