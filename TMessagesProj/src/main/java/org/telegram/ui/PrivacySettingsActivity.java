@@ -94,6 +94,7 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
     private int secretMapRow;
     private int secretWebpageRow;
     private int secretDetailRow;
+    private int showAds;
     private int rowCount;
 
     private boolean currentSync;
@@ -101,6 +102,8 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
     private boolean currentSuggest;
     private boolean newSuggest;
     private boolean archiveChats;
+    private boolean currentShowAds;
+    private boolean newShowAds;
 
     private boolean[] clear = new boolean[2];
 
@@ -112,6 +115,7 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
         getMessagesController().getBlockedPeers(true);
         currentSync = newSync = getUserConfig().syncContacts;
         currentSuggest = newSuggest = getUserConfig().suggestContacts;
+        currentShowAds = newShowAds = getUserConfig().showAds;
         TLRPC.TL_globalPrivacySettings privacySettings = getContactsController().getGlobalPrivacySettings();
         if (privacySettings != null) {
             archiveChats = privacySettings.archive_and_mute_new_noncontact_peers;
@@ -155,6 +159,10 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
             getConnectionsManager().sendRequest(req, (response, error) -> {
 
             });
+        }
+        if (newShowAds != currentShowAds) {
+            getUserConfig().showAds = newShowAds;
+            save = true;
         }
         TLRPC.TL_globalPrivacySettings globalPrivacySettings = getContactsController().getGlobalPrivacySettings();
         if (globalPrivacySettings != null && globalPrivacySettings.archive_and_mute_new_noncontact_peers != archiveChats) {
@@ -394,6 +402,11 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(newSync);
                 }
+            } else if (position == showAds) {
+                newShowAds = !newShowAds;
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(newShowAds);
+                }
             } else if (position == secretMapRow) {
                 AlertsCreator.showSecretLocationAlert(getParentActivity(), currentAccount, () -> listAdapter.notifyDataSetChanged(), false, null);
             } else if (position == paymentsClearRow) {
@@ -522,6 +535,7 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
         callsRow = rowCount++;
         groupsRow = rowCount++;
         groupsDetailRow = rowCount++;
+        showAds = rowCount++;
         securitySectionRow = rowCount++;
         passcodeRow = rowCount++;
         passwordRow = rowCount++;
@@ -718,7 +732,7 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
                     position == phoneNumberRow && !getContactsController().getLoadingPrivicyInfo(ContactsController.PRIVACY_RULES_TYPE_PHONE) ||
                     position == deleteAccountRow && !getContactsController().getLoadingDeleteInfo() ||
                     position == newChatsRow && !getContactsController().getLoadingGlobalSettings() ||
-                    position == paymentsClearRow || position == secretMapRow || position == contactsSyncRow || position == passportRow || position == contactsDeleteRow || position == contactsSuggestRow;
+                    position == paymentsClearRow || position == secretMapRow || position == contactsSyncRow || position == passportRow || position == contactsDeleteRow || position == contactsSuggestRow || position == showAds;
         }
 
         @Override
@@ -931,6 +945,8 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
                         textCheckCell.setTextAndCheck(LocaleController.getString("SuggestContacts", R.string.SuggestContacts), newSuggest, false);
                     } else if (position == newChatsRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ArchiveAndMute", R.string.ArchiveAndMute), archiveChats, false);
+                    } else if (position == showAds) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("ShowAds", R.string.ShowAds), newShowAds, false);;
                     }
                     break;
             }
@@ -944,7 +960,7 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
                 return 1;
             } else if (position == securitySectionRow || position == advancedSectionRow || position == privacySectionRow || position == secretSectionRow || position == botsSectionRow || position == contactsSectionRow || position == newChatsHeaderRow) {
                 return 2;
-            } else if (position == secretWebpageRow || position == contactsSyncRow || position == contactsSuggestRow || position == newChatsRow) {
+            } else if (position == secretWebpageRow || position == contactsSyncRow || position == contactsSuggestRow || position == newChatsRow || position == showAds) {
                 return 3;
             }
             return 0;
