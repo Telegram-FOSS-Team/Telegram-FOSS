@@ -125,6 +125,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
     private int settingsRow;
     private int customTabsRow;
     private int directShareRow;
+    private int hideSponsoredRow;
     private int raiseToSpeakRow;
     private int sendByEnterRow;
     private int saveToGalleryRow;
@@ -483,6 +484,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
         settingsRow = -1;
         customTabsRow = -1;
         directShareRow = -1;
+		hideSponsoredRow = -1;
         enableAnimationsRow = -1;
         raiseToSpeakRow = -1;
         sendByEnterRow = -1;
@@ -545,6 +547,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             nightThemeRow = rowCount++;
             customTabsRow = rowCount++;
             directShareRow = rowCount++;
+			hideSponsoredRow = rowCount++;
             enableAnimationsRow = rowCount++;
             emojiRow = rowCount++;
             raiseToSpeakRow = rowCount++;
@@ -922,6 +925,11 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                 SharedConfig.toggleDirectShare();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(SharedConfig.directShare);
+                }
+            } else if (position == hideSponsoredRow) {
+                SharedConfig.toggleHideSponsored();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(SharedConfig.hideSponsored);
                 }
             } else if (position == contactsReimportRow) {
                 //not implemented
@@ -1992,6 +2000,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("ChromeCustomTabs", R.string.ChromeCustomTabs), LocaleController.getString("ChromeCustomTabsInfo", R.string.ChromeCustomTabsInfo), SharedConfig.customTabs, false, true);
                     } else if (position == directShareRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("DirectShare", R.string.DirectShare), LocaleController.getString("DirectShareInfo", R.string.DirectShareInfo), SharedConfig.directShare, false, true);
+                    } else if (position == hideSponsoredRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("HideSponsored", R.string.HideSponsored), LocaleController.getString("HideSponsoredInfo", R.string.HideSponsoredInfo), SharedConfig.hideSponsored, false, true);
                     } else if (position == emojiRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("LargeEmoji", R.string.LargeEmoji), SharedConfig.allowBigEmoji, true);
                     }
@@ -2081,7 +2091,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                 return 6;
             } else if (position == scheduleLocationRow || position == enableAnimationsRow || position == sendByEnterRow ||
                     position == saveToGalleryRow || position == raiseToSpeakRow || position == customTabsRow ||
-                    position == directShareRow || position == emojiRow) {
+                    position == directShareRow || position == hideSponsoredRow || position == emojiRow) {
                 return 7;
             } else if (position == textSizeRow) {
                 return 8;

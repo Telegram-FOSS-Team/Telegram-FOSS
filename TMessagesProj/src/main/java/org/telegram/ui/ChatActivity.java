@@ -15713,7 +15713,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             return;
         }
         sponsoredMessagesAdded = true;
-        processNewMessages(arrayList);
+        if (!SharedConfig.hideSponsored) {
+			processNewMessages(arrayList);
+		}
     }
 
     private void checkGroupCallJoin(boolean fromServer) {

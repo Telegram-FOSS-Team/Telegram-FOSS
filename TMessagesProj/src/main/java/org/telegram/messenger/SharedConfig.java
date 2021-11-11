@@ -93,6 +93,7 @@ public class SharedConfig {
     public static boolean raiseToSpeak = true;
     public static boolean customTabs = true;
     public static boolean directShare = true;
+    public static boolean hideSponsored = false;
     public static boolean inappCamera = true;
     public static boolean roundCamera16to9 = true;
     public static boolean noSoundHintShowed = false;
@@ -326,6 +327,7 @@ public class SharedConfig {
             raiseToSpeak = preferences.getBoolean("raise_to_speak", true);
             customTabs = preferences.getBoolean("custom_tabs", true);
             directShare = preferences.getBoolean("direct_share", true);
+            hideSponsored = preferences.getBoolean("hide_sponsored", false);
             shuffleMusic = preferences.getBoolean("shuffleMusic", false);
             playOrderReversed = !shuffleMusic && preferences.getBoolean("playOrderReversed", false);
             inappCamera = preferences.getBoolean("inappCamera", true);
@@ -854,6 +856,14 @@ public class SharedConfig {
         editor.commit();
         ShortcutManagerCompat.removeAllDynamicShortcuts(ApplicationLoader.applicationContext);
         MediaDataController.getInstance(UserConfig.selectedAccount).buildShortcuts();
+    }
+
+     public static void toggleHideSponsored() {
+        hideSponsored = !hideSponsored;
+        SharedPreferences preferences = MessagesController.getGlobalMainSettings();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("hide_sponsored", hideSponsored);
+        editor.commit();
     }
 
     public static void toggleStreamMedia() {

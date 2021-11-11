@@ -2055,7 +2055,9 @@
     <string name="ChromeCustomTabs">In-App Browser</string>
     <string name="ChromeCustomTabsInfo">Open external links within the app</string>
     <string name="DirectShare">Direct Share</string>
+    <string name="HideSponsored">Hide sponsored</string>
     <string name="DirectShareInfo">Show recent chats in Android share menu</string>
+    <string name="HideSponsoredInfo">Hide sponsored messages</string>
     <string name="Emoji">Emoji</string>
     <string name="LargeEmoji">Large Emoji</string>
     <string name="EmojiUseDefault">Use system default emoji</string>
