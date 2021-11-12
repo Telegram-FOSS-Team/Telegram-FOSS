@@ -1,27 +1,19 @@
-[![Releases](https://img.shields.io/github/release/Telegram-FOSS-Team/Telegram-FOSS.svg)](https://github.com/Telegram-FOSS-Team/Telegram-FOSS/releases/latest)
-[![Discussions](https://img.shields.io/badge/Offtopics-Telegram-blue.svg)](https://t.me/tfossofftop)
 
-[![Donate](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/Telegram-FOSS/) or <img src="https://en.bitcoin.it/w/images/en/c/cb/BC_Logotype.png" alt="Bitcoin" height="25px" /> `1McafEgMvqAVujNLtcJumZHxp2UfaNByqs`
+[![Donate original's fork authors disregard their unwillingness to remove sponsored ads from the client](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/Telegram-FOSS/) or <img src="https://en.bitcoin.it/w/images/en/c/cb/BC_Logotype.png" alt="Bitcoin" height="25px" /> `1McafEgMvqAVujNLtcJumZHxp2UfaNByqs`
 
-# Telegram-FOSS
+# Telegram-FOSS-unchained
 
-[Telegram](https://telegram.org) is a messaging app with a focus on speed and security. It’s superfast, simple and free.
+[Telegram](https://telegram.org) is a messaging app with a focus on speed and security. It’s superfast, simple and free (doubtful).
 
-This is an unofficial, FOSS-friendly fork of the original [Telegram App for Android](https://github.com/DrKLO/Telegram).
+This is an unofficial, FOSS-friendly fork of the unofficial, FOSS-friendly fork [Telegram FOSS App for Android](https://github.com/Telegram-FOSS-Team/Telegram-FOSS).
 
-This version of Telegram is available on FDroid:
-
-[<img src="https://f-droid.org/badge/get-it-on.png"
-      alt="Get it on F-Droid"
-      height="80">](https://f-droid.org/app/org.telegram.messenger)
-
-## Current Maintainers
+## Upstream maintainers
 
 - [thermatk](https://github.com/thermatk)
 - [Bubu](https://github.com/Bubu)
 - you? :)
 
-## Contributors
+## Upstream contributors
 
 - [slp](https://github.com/slp)
 - [Sudokamikaze](https://github.com/Sudokamikaze)
@@ -39,13 +31,7 @@ This version of Telegram is available on FDroid:
 - [terachad](https://github.com/terachad)
 - [ppnplus](https://github.com/ppnplus)
 
-## Discussion
-
-Join the [Telegram-FOSS Offtopics group](https://t.me/tfossofftop)
-
-You can also join `#telegram-foss:matrix.org` via [matrix](https://matrix.to/#/#telegram-foss:matrix.org) or `#telegram-foss` on freenode.
-
-## Changes:
+## Upstream changes:
 
 *Replacement of non-FOSS, untrustworthy or suspicious binaries or source code:*
 - Do location sharing with OpenStreetMap(osmdroid) instead of Google Maps
@@ -126,4 +112,4 @@ The project can be built with Android Studio or from the command line with gradl
 
 # DIGITAL RESISTANCE
 
-![DIGITALRESISTANCE](/DigitalResistance.jpg?raw=true "DIGITALRESISTANCE")
+![DIGITALRESISTANCE](/DigitalResistance.png?raw=true "DIGITALRESISTANCE")
