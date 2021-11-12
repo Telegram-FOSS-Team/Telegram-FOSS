@@ -86,7 +86,7 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
 
 ## Building
 
-**NOTE: Building on Windows is, supported under msys2**
+**NOTE: Building on Windows is supported under msys2**
 
 Ensure that necessary development packeges are installed, at least these are needed:
 
