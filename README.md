@@ -86,9 +86,13 @@ MTproto protocol manuals: https://core.telegram.org/mtproto
 
 ## Building
 
-**NOTE: Building on Windows is, unfortunately, not supported.
-Consider using a Linux VM or dual booting.**
-![WindowsSupport](/tgfoss-build-under-win.gif?raw=true)
+**NOTE: Building on Windows is, supported under msys2**
+
+Ensure that necessary development packeges are installed, at least these are needed:
+
+`pacman -S base-devel cmake git mingw-w64-x86_64-clang mingw-w64-x86_64-go mingw-w64-ninja`
+
+Use 'MSYS2 MinGW 64-bit' shell to run 'sh' scripts.
 
 **Important:**
 
@@ -98,6 +102,8 @@ Consider using a Linux VM or dual booting.**
       - `git clone --recursive https://github.com/Telegram-FOSS-Team/Telegram-FOSS.git`
 
 3. Build native FFmpeg and BoringSSL dependencies:
+      - When compiling with GCC install gas-preprocessor.pl (https://github.com/libav/gas-preprocessor) into path i.e. /usr/bin; othrwise you can get the wierd 
+        error "GNU assembler not found, install/update gas-preprocessor"
       - Go to the `TMessagesProj/jni` folder and execute the following (define the paths to your NDK and Ninja):
 
       ```
