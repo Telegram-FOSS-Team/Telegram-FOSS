@@ -2077,6 +2077,7 @@
     <string name="DirectShareInfo">Show recent chats in Android share menu</string>
     <string name="Emoji">Emoji</string>
     <string name="LargeEmoji">Large Emoji</string>
+    <string name="PullToNextChat">Pull down to switch to a new channel</string>
     <string name="EmojiUseDefault">Use system default emoji</string>
     <string name="TelegramVersion">Telegram for Android %1$s</string>
     <string name="DebugMenu">Debug Menu</string>

@@ -117,6 +117,7 @@ public class SharedConfig {
     public static boolean showNotificationsForAllAccounts = true;
     public static int repeatMode;
     public static boolean allowBigEmoji;
+    public static boolean pullToNextChat;
     public static boolean useSystemEmoji;
     public static int fontSize = 16;
     public static int bubbleRadius = 10;
@@ -344,6 +345,7 @@ public class SharedConfig {
             bubbleRadius = preferences.getInt("bubbleRadius", 10);
             ivFontSize = preferences.getInt("iv_font_size", fontSize);
             allowBigEmoji = preferences.getBoolean("allowBigEmoji", true);
+            pullToNextChat = preferences.getBoolean("pullToNextChat", false);
             useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);
             streamMedia = preferences.getBoolean("streamMedia", true);
             saveStreamMedia = preferences.getBoolean("saveStreamMedia", true);
@@ -744,6 +746,14 @@ public class SharedConfig {
         SharedPreferences preferences = MessagesController.getGlobalMainSettings();
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("allowBigEmoji", allowBigEmoji);
+        editor.commit();
+    }
+
+    public static void togglePullToNextChat() {
+        pullToNextChat = !pullToNextChat;
+        SharedPreferences preferences = MessagesController.getGlobalMainSettings();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("pullToNextChat", pullToNextChat);
         editor.commit();
     }
 
