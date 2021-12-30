@@ -1,0 +1,11 @@
+'''Advertencia:''' Mientras que este paquete está basado en una versión totalmente FLOSS, las desarrolladoras de la versión original no liberan tan a menudo el código fuente de las versiones más recientes.
+
+Cliente para la plataforma de mensajería Telegram. Conversa con amigas, crea conversaciones grupales y comparte todo tipo de contenido. Todos tus mensajes y conversaciones serán guardados en la nube de Telegram.
+
+Esta plataforma de mensajería está apuntada a dispositivos móviles, pero también existen clientes para escritorio y web.
+
+Varias partes de código privativo fueron removidas del cliente original de Telegram, incluyendo Google Play Services para servicios de localización, HockeySDK para auto-actualizaciones, y notificaciones push a través de Google Cloud Messaging. La funcionalidad para compartir ubicación es reimplementada mediante OpenStreetMap.
+
+Antifuncionalidad: Red no libre, debido a que los servidores ejecutan programa privativo.
+
+El código fuente oficial de la aplicación contiene archivos binarios, por lo que este repositorio rastrea un repositorio derivado que los compila de fuente. Por ello, las versiones podrían estar disponibles con cierto retraso.

@@ -1,0 +1,9 @@
+* Create themes with color gradients and patterns.
+* Schedule messages to be sent when your recipient comes online.
+* Switch to Night Mode and back directly from the left menu.
+* Choose video quality in a more intuitive way.
+* Listen to podcasts and audio tracks longer than 20 minutes at 2x speed.
+* Resume playback from where you left off.
+* Tap and hold on chats when sharing from other apps to send to several recipients.
+* Hold on the Archive folder to mark all archived chats as read.
+* And more!

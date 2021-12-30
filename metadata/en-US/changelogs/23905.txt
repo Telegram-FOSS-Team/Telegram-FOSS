@@ -1,0 +1,5 @@
+* Group Video Calls support up to 1000 video viewers.
+* 0.5x, 1.5x and 2x playback speeds are available for videos in the media player.
+* Video Messages record in higher quality and you can tap to expand them. Music keeps playing while you record, and you can pinch to zoom when using the rear camera.
+* Screen sharing includes device audio and is now available in 1-on-1 video calls.
+* Auto-delete timer now has a '1 month' option.
