@@ -67,8 +67,6 @@ import androidx.annotation.NonNull;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.widget.NestedScrollView;
 
-import com.google.android.gms.vision.Frame;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;

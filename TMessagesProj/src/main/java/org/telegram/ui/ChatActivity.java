@@ -121,7 +121,6 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ForwardingMessagesParams;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.ImageReceiver;
-import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MediaDataController;
@@ -20974,7 +20973,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     TranslateAlert.OnLinkPress onLinkPress = (link) -> {
                         didPressMessageUrl(link, false, selectedObject, v instanceof ChatMessageCell ? (ChatMessageCell) v : null);
                     };
-                    if (LanguageDetector.hasSupport()) {
+                    /*if (LanguageDetector.hasSupport()) {
                         final String[] fromLang = { null };
                         cell.setVisibility(View.GONE);
                         waitForLangDetection.set(true);
@@ -21021,7 +21020,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 onLangDetectionDone.set(null);
                             }
                         }, 250);
-                    } else {
+                    } else {*/
                         cell.setOnClickListener(e -> {
                             if (selectedObject == null || i >= options.size() || getParentActivity() == null) {
                                 return;
@@ -21035,7 +21034,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 scrimPopupWindow.dismiss();
                             }
                         });
-                    }
+                    //}
                 }
             }
 
