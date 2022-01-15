@@ -1,0 +1,6 @@
+* Share unlimited files of any type, now up to 2 GB each.
+* Set a Profile Video instead of a static picture.
+* Tap ‘Set as Main’ to change back to a previous profile photo or video.
+* Get greeting sticker suggestions and see distance to chat partner in People Nearby.
+* Crop and rotate videos in the media editor.
+* Enjoy a fully revamped music player.
