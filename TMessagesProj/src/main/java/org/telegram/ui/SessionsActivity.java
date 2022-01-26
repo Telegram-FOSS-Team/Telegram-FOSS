@@ -647,7 +647,7 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
         ttlDivideRow = -1;
 
         boolean hasQr = currentType == 0 && getMessagesController().qrLoginCamera;
-        if (hasQr) {
+        if (true) {
             qrCodeRow = rowCount++;
             qrCodeDividerRow = rowCount++;
         }
