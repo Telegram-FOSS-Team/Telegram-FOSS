@@ -10,6 +10,8 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.telegram.messenger.AccountInstance;
@@ -880,14 +882,14 @@ public class ConnectionsManager extends BaseController {
                 }
                 done = true;
             } catch (Throwable e) {
-                FileLog.e(e);
+                FileLog.e(e, false);
             } finally {
                 try {
                     if (httpConnectionStream != null) {
                         httpConnectionStream.close();
                     }
                 } catch (Throwable e) {
-                    FileLog.e(e);
+                    FileLog.e(e, false);
                 }
                 try {
                     if (outbuf != null) {
@@ -904,7 +906,7 @@ public class ConnectionsManager extends BaseController {
                     addresses.add(address.getHostAddress());
                     return new ResolvedDomain(addresses, SystemClock.elapsedRealtime());
                 } catch (Exception e) {
-                    FileLog.e(e);
+                    FileLog.e(e, false);
                 }
             }
             return null;
@@ -1015,14 +1017,14 @@ public class ConnectionsManager extends BaseController {
                     buffer.writeBytes(bytes);
                     return buffer;
                 } catch (Throwable e) {
-                    FileLog.e(e);
+                    FileLog.e(e, false);
                 } finally {
                     try {
                         if (httpConnectionStream != null) {
                             httpConnectionStream.close();
                         }
                     } catch (Throwable e) {
-                        FileLog.e(e);
+                        FileLog.e(e, false);
                     }
                     try {
                         if (outbuf != null) {
@@ -1291,6 +1293,7 @@ public class ConnectionsManager extends BaseController {
     private static class FirebaseTask extends AsyncTask<Void, Void, NativeByteBuffer> {
 
         private int currentAccount;
+        private FirebaseRemoteConfig firebaseRemoteConfig;
 
         public FirebaseTask(int instance) {
             super();

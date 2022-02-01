@@ -27,9 +27,6 @@ import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.Keep;
-
 import android.os.SystemClock;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
@@ -48,6 +45,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.Keep;
 
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -89,6 +88,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     private AudioPlayerAlert.ClippingTextViewSwitcher subtitleTextView;
     private AnimatorSet animatorSet;
     private BaseFragment fragment;
+    private ChatActivity chatActivity;
     private View applyingView;
     private FrameLayout frameLayout;
     private View shadow;
@@ -215,6 +215,9 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         this.resourcesProvider = resourcesProvider;
 
         fragment = parentFragment;
+        if (fragment instanceof ChatActivity) {
+            chatActivity = (ChatActivity) fragment;
+        }
         applyingView = paddingView;
         visible = true;
         isLocation = location;
@@ -223,7 +226,8 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         }
 
         setTag(1);
-        frameLayout = new FrameLayout(context) {
+        frameLayout = new ChatBlurredFrameLayout(context, chatActivity) {
+
             @Override
             public void invalidate() {
                 super.invalidate();
@@ -594,7 +598,9 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 MessageObject messageObject = MediaController.getInstance().getPlayingMessageObject();
                 if (fragment != null && messageObject != null) {
                     if (messageObject.isMusic()) {
-                        fragment.showDialog(new AudioPlayerAlert(getContext(), resourcesProvider));
+                        if (getContext() instanceof LaunchActivity) {
+                            fragment.showDialog(new AudioPlayerAlert(getContext(), resourcesProvider));
+                        }
                     } else {
                         long dialogId = 0;
                         if (fragment instanceof ChatActivity) {
@@ -1858,7 +1864,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                     frameLayout.invalidate();
                 }
 
-                updateAvatars(avatars.wasDraw && updateAnimated);
+                updateAvatars(avatars.avatarsDarawable.wasDraw && updateAnimated);
             } else {
                 if (voIPService != null && voIPService.groupCall != null) {
                     updateAvatars(currentStyle == 3);
@@ -1917,14 +1923,14 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
 
     private void updateAvatars(boolean animated) {
         if (!animated) {
-            if (avatars.transitionProgressAnimator != null) {
-                avatars.transitionProgressAnimator.cancel();
-                avatars.transitionProgressAnimator = null;
+            if (avatars.avatarsDarawable.transitionProgressAnimator != null) {
+                avatars.avatarsDarawable.transitionProgressAnimator.cancel();
+                avatars.avatarsDarawable.transitionProgressAnimator = null;
             }
         }
         ChatObject.Call call;
         TLRPC.User userCall;
-        if (avatars.transitionProgressAnimator == null) {
+        if (avatars.avatarsDarawable.transitionProgressAnimator == null) {
             int currentAccount;
             if (currentStyle == 4) {
                 if (fragment instanceof ChatActivity) {

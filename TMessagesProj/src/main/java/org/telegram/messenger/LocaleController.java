@@ -33,10 +33,12 @@ import java.io.FileWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Currency;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class LocaleController {
@@ -411,6 +413,13 @@ public class LocaleController {
             return null;
         }
         return languagesDict.get(key.toLowerCase().replace("-", "_"));
+    }
+    public LocaleInfo getBuiltinLanguageByPlural(String plural) {
+        Collection<LocaleInfo> values = languagesDict.values();
+        for (LocaleInfo l : values)
+            if (l.pathToFile != null && l.pathToFile.equals("remote") && l.pluralLangCode != null && l.pluralLangCode.equals(plural))
+                return l;
+        return null;
     }
 
     private void addRules(String[] languages, PluralRules rules) {
@@ -1711,6 +1720,11 @@ public class LocaleController {
     }
 
     public static String formatSectionDate(long date) {
+        return formatYearMont(date, false);
+    }
+
+
+    public static String formatYearMont(long date, boolean alwaysShowYear) {
         try {
             date *= 1000;
             Calendar rightNow = Calendar.getInstance();
@@ -1733,7 +1747,7 @@ public class LocaleController {
                     LocaleController.getString("November", R.string.November),
                     LocaleController.getString("December", R.string.December)
             };
-            if (year == dateYear) {
+            if (year == dateYear && !alwaysShowYear) {
                 return months[month];
             } else {
                 return months[month] + " " + dateYear;

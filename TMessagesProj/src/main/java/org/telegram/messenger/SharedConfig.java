@@ -20,19 +20,23 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.SparseArray;
 
+import androidx.annotation.IntDef;
+import androidx.core.content.pm.ShortcutManagerCompat;
+
 import org.json.JSONObject;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.SerializedData;
-import org.telegram.ui.Components.SwipeGestureSettingsView;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.Components.SwipeGestureSettingsView;
 
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import androidx.core.content.pm.ShortcutManagerCompat;
+import java.util.Locale;
 
 public class SharedConfig {
 
@@ -102,6 +106,7 @@ public class SharedConfig {
     public static boolean saveStreamMedia = true;
     public static boolean smoothKeyboard = true;
     public static boolean pauseMusicOnRecord = true;
+    public static boolean chatBlur = false;
     public static boolean noiseSupression;
     public static boolean noStatusBar;
     public static boolean sortContactsByName;
@@ -133,6 +138,9 @@ public class SharedConfig {
     private static int chatSwipeAction;
 
     public static int distanceSystemType;
+    public static int mediaColumnsCount = 3;
+    public static int fastScrollHintCount = 3;
+    public static boolean dontAskManageStorage;
 
     static {
         loadConfig();
@@ -341,6 +349,7 @@ public class SharedConfig {
             saveStreamMedia = preferences.getBoolean("saveStreamMedia", true);
             smoothKeyboard = preferences.getBoolean("smoothKeyboard2", true);
             pauseMusicOnRecord = preferences.getBoolean("pauseMusicOnRecord", false);
+            chatBlur = preferences.getBoolean("chatBlur", false);
             streamAllVideo = preferences.getBoolean("streamAllVideo", BuildVars.DEBUG_VERSION);
             streamMkv = preferences.getBoolean("streamMkv", false);
             suggestStickers = preferences.getInt("suggestStickers", 0);
@@ -370,6 +379,10 @@ public class SharedConfig {
             messageSeenHintCount = preferences.getInt("messageSeenCount", 3);
             emojiInteractionsHintCount = preferences.getInt("emojiInteractionsHintCount", 3);
             dayNightThemeSwitchHintCount = preferences.getInt("dayNightThemeSwitchHintCount", 3);
+            mediaColumnsCount = preferences.getInt("mediaColumnsCount", 3);
+            fastScrollHintCount = preferences.getInt("fastScrollHintCount", 3);
+            dontAskManageStorage = preferences.getBoolean("dontAskManageStorage", false);
+
             preferences = ApplicationLoader.applicationContext.getSharedPreferences("Notifications", Activity.MODE_PRIVATE);
             showNotificationsForAllAccounts = preferences.getBoolean("AllAccounts", true);
 
@@ -920,6 +933,14 @@ public class SharedConfig {
         editor.commit();
     }
 
+    public static void toggleDebugChatBlur() {
+        chatBlur = !chatBlur;
+        SharedPreferences preferences = MessagesController.getGlobalMainSettings();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("chatBlur", chatBlur);
+        editor.commit();
+    }
+
     public static void toggleInappCamera() {
         inappCamera = !inappCamera;
         SharedPreferences preferences = MessagesController.getGlobalMainSettings();
@@ -1111,25 +1132,38 @@ public class SharedConfig {
     public final static int PERFORMANCE_CLASS_AVERAGE = 1;
     public final static int PERFORMANCE_CLASS_HIGH = 2;
 
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({
+            PERFORMANCE_CLASS_LOW,
+            PERFORMANCE_CLASS_AVERAGE,
+            PERFORMANCE_CLASS_HIGH
+    })
+    public @interface PerformanceClass {}
+
+    @PerformanceClass
     public static int getDevicePerformanceClass() {
         if (devicePerformanceClass == -1) {
-            int maxCpuFreq = -1;
-            try {
-                RandomAccessFile reader = new RandomAccessFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", "r");
-                String line = reader.readLine();
-                if (line != null) {
-                    maxCpuFreq = Utilities.parseInt(line) / 1000;
-                }
-                reader.close();
-            } catch (Throwable ignore) {
-
-            }
             int androidVersion = Build.VERSION.SDK_INT;
             int cpuCount = ConnectionsManager.CPU_COUNT;
             int memoryClass = ((ActivityManager) ApplicationLoader.applicationContext.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
+            int totalCpuFreq = 0;
+            int freqResolved = 0;
+            for (int i = 0; i < cpuCount; i++) {
+                try {
+                    RandomAccessFile reader = new RandomAccessFile(String.format(Locale.ENGLISH, "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq", i), "r");
+                    String line = reader.readLine();
+                    if (line != null) {
+                        totalCpuFreq += Utilities.parseInt(line) / 1000;
+                        freqResolved++;
+                    }
+                    reader.close();
+                } catch (Throwable ignore) {}
+            }
+            int maxCpuFreq = freqResolved == 0 ? -1 : (int) Math.ceil(totalCpuFreq / (float) freqResolved);
+
             if (androidVersion < 21 || cpuCount <= 2 || memoryClass <= 100 || cpuCount <= 4 && maxCpuFreq != -1 && maxCpuFreq <= 1250 || cpuCount <= 4 && maxCpuFreq <= 1600 && memoryClass <= 128 && androidVersion <= 21 || cpuCount <= 4 && maxCpuFreq <= 1300 && memoryClass <= 128 && androidVersion <= 24) {
                 devicePerformanceClass = PERFORMANCE_CLASS_LOW;
-            } else if (cpuCount < 8 || memoryClass <= 160 || maxCpuFreq != -1 && maxCpuFreq <= 1650 || maxCpuFreq == -1 && cpuCount == 8 && androidVersion <= 23) {
+            } else if (cpuCount < 8 || memoryClass <= 160 || maxCpuFreq != -1 && maxCpuFreq <= 2050 || maxCpuFreq == -1 && cpuCount == 8 && androidVersion <= 23) {
                 devicePerformanceClass = PERFORMANCE_CLASS_AVERAGE;
             } else {
                 devicePerformanceClass = PERFORMANCE_CLASS_HIGH;
@@ -1140,5 +1174,31 @@ public class SharedConfig {
         }
 
         return devicePerformanceClass;
+    }
+
+    public static void setMediaColumnsCount(int count) {
+        if (mediaColumnsCount != count) {
+            mediaColumnsCount = count;
+            ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE).edit().putInt("mediaColumnsCount", mediaColumnsCount).apply();
+        }
+    }
+
+    public static void setFastScrollHintCount(int count) {
+        if (fastScrollHintCount != count) {
+            fastScrollHintCount = count;
+            ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE).edit().putInt("fastScrollHintCount", fastScrollHintCount).apply();
+        }
+    }
+
+    public static void setDontAskManageStorage(boolean b) {
+        dontAskManageStorage = b;
+        ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE).edit().putBoolean("dontAskManageStorage", dontAskManageStorage).apply();
+    }
+
+    public static boolean canBlurChat() {
+        return BuildVars.DEBUG_VERSION && getDevicePerformanceClass() == PERFORMANCE_CLASS_HIGH;
+    }
+    public static boolean chatBlurEnabled() {
+        return canBlurChat() && chatBlur;
     }
 }

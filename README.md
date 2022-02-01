@@ -93,6 +93,7 @@ Consider using a Linux VM or dual booting.**
       ./patch_ffmpeg.sh
       ./patch_boringssl.sh
       ./build_boringssl.sh
+      ./build_libvpx_clang.sh
       ```
 
 4. If you want to publish a modified version of Telegram:

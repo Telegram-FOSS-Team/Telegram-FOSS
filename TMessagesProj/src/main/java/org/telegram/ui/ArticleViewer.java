@@ -8,6 +8,11 @@
 
 package org.telegram.ui;
 
+import static org.telegram.messenger.MessageObject.POSITION_FLAG_BOTTOM;
+import static org.telegram.messenger.MessageObject.POSITION_FLAG_LEFT;
+import static org.telegram.messenger.MessageObject.POSITION_FLAG_RIGHT;
+import static org.telegram.messenger.MessageObject.POSITION_FLAG_TOP;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -168,11 +173,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import static org.telegram.messenger.MessageObject.POSITION_FLAG_BOTTOM;
-import static org.telegram.messenger.MessageObject.POSITION_FLAG_LEFT;
-import static org.telegram.messenger.MessageObject.POSITION_FLAG_RIGHT;
-import static org.telegram.messenger.MessageObject.POSITION_FLAG_TOP;
 
 public class ArticleViewer implements NotificationCenter.NotificationCenterDelegate {
 
@@ -3664,7 +3664,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         });
         containerView.addView(textSelectionHelper.getOverlayView(activity));
 
-        pinchToZoomHelper = new PinchToZoomHelper(containerView);
+        pinchToZoomHelper = new PinchToZoomHelper(containerView, windowView);
         pinchToZoomHelper.setClipBoundsListener(new PinchToZoomHelper.ClipBoundsListener() {
             @Override
             public void getClipTopBottom(float[] topBottom) {
@@ -5954,7 +5954,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             currentBlock = block;
             parentBlock = null;
             currentDocument = parentAdapter.getDocumentWithId(currentBlock.video_id);
-            isGif = MessageObject.isGifDocument(currentDocument)/* && currentBlock.autoplay*/;
+            isGif = MessageObject.isVideoDocument(currentDocument) || MessageObject.isGifDocument(currentDocument)/* && currentBlock.autoplay*/;
             isFirst = first;
             channelCell.setVisibility(INVISIBLE);
             updateButtonState(false);

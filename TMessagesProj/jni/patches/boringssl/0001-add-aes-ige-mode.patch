@@ -16,7 +16,7 @@ index 30823755..b349572c 100644
 +++ b/crypto/fipsmodule/CMakeLists.txt
 @@ -198,6 +198,8 @@ else()
      bcm.c
-     is_fips.c
+     fips_shared_support.c
  
 +    aes/aes_ige.c
 +

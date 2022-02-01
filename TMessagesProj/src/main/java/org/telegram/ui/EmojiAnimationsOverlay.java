@@ -1,7 +1,7 @@
 package org.telegram.ui;
 
 import android.graphics.Canvas;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.Emoji;
 import org.telegram.messenger.EmojiData;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLocation;
@@ -21,11 +20,11 @@ import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
+import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Cells.ChatMessageCell;
 import org.telegram.ui.Components.Bulletin;
-import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.StickerSetBulletinLayout;
 
@@ -264,7 +263,7 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
     }
 
     public void onTapItem(ChatMessageCell view, ChatActivity chatActivity) {
-        if (chatActivity.currentUser == null || chatActivity.isSecretChat()) {
+        if (chatActivity.currentUser == null || chatActivity.isSecretChat() || view.getMessageObject() == null || view.getMessageObject().getId() < 0) {
             return;
         }
         boolean show = showAnimationForCell(view, -1, true, false);
@@ -277,7 +276,7 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
         if (printingType != null && printingType == 5) {
             canShowHint = false;
         }
-        if (canShowHint && hintRunnable == null && show && (Bulletin.getVisibleBulletin() == null || !Bulletin.getVisibleBulletin().isShowing()) && SharedConfig.emojiInteractionsHintCount > 0) {
+        if (canShowHint && hintRunnable == null && show && (Bulletin.getVisibleBulletin() == null || !Bulletin.getVisibleBulletin().isShowing()) && SharedConfig.emojiInteractionsHintCount > 0 && UserConfig.getInstance(currentAccount).getClientUserId() != chatActivity.currentUser.id) {
             SharedConfig.updateEmojiInteractionsHintCount(SharedConfig.emojiInteractionsHintCount - 1);
             TLRPC.Document document = MediaDataController.getInstance(currentAccount).getEmojiAnimatedSticker(view.getMessageObject().getStickerEmoji());
             StickerSetBulletinLayout layout = new StickerSetBulletinLayout(chatActivity.getParentActivity(), null, StickerSetBulletinLayout.TYPE_EMPTY, document, chatActivity.getResourceProvider());
@@ -321,8 +320,10 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
             return false;
         }
 
+        emoji = unwrapEmoji(emoji);
+
         if (supportedEmoji.contains(emoji)) {
-            ArrayList<TLRPC.Document> arrayList = emojiInteractionsStickersMap.get(view.getMessageObject().getStickerEmoji());
+            ArrayList<TLRPC.Document> arrayList = emojiInteractionsStickersMap.get(emoji);
             if (arrayList != null && !arrayList.isEmpty()) {
                 int sameAnimationsCount = 0;
                 for (int i = 0; i < drawingObjects.size(); i++) {
@@ -404,6 +405,23 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
             }
         }
         return false;
+    }
+
+    private String unwrapEmoji(String emoji) {
+        CharSequence fixedEmoji = emoji;
+        int length = emoji.length();
+        for (int a = 0; a < length; a++) {
+            if (a < length - 1 && (fixedEmoji.charAt(a) == 0xD83C && fixedEmoji.charAt(a + 1) >= 0xDFFB && fixedEmoji.charAt(a + 1) <= 0xDFFF || fixedEmoji.charAt(a) == 0x200D && (fixedEmoji.charAt(a + 1) == 0x2640 || fixedEmoji.charAt(a + 1) == 0x2642))) {
+                fixedEmoji = TextUtils.concat(fixedEmoji.subSequence(0, a), fixedEmoji.subSequence(a + 2, fixedEmoji.length()));
+                length -= 2;
+                a--;
+            } else if (fixedEmoji.charAt(a) == 0xfe0f) {
+                fixedEmoji = TextUtils.concat(fixedEmoji.subSequence(0, a), fixedEmoji.subSequence(a + 1, fixedEmoji.length()));
+                length--;
+                a--;
+            }
+        }
+        return fixedEmoji.toString();
     }
 
     private void sendCurrentTaps() {
