@@ -204,7 +204,7 @@ function build {
 				BIN_MIDDLE=android
 				CPU=i686
 				OPTIMIZE_CFLAGS="-march=$CPU"
-				PREFIX=./build/$CPU
+				PREFIX=./build/$ARCH
 				ADDITIONAL_CONFIGURE_FLAG="--disable-x86asm --disable-inline-asm --disable-asm"
 				build_one
 			;;

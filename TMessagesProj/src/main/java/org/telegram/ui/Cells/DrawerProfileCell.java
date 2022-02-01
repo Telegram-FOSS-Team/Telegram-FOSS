@@ -109,7 +109,7 @@ public class DrawerProfileCell extends FrameLayout {
         setArrowState(false);
 
         sunDrawable = new RLottieDrawable(R.raw.sun, "" + R.raw.sun, AndroidUtilities.dp(28), AndroidUtilities.dp(28), true, null);
-        if (isCurrentThemeDay()) {
+        if (Theme.isCurrentThemeDay()) {
             sunDrawable.setCustomEndFrame(36);
         } else {
             sunDrawable.setCustomEndFrame(0);
@@ -147,11 +147,11 @@ public class DrawerProfileCell extends FrameLayout {
             switchingTheme = true;
             SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("themeconfig", Activity.MODE_PRIVATE);
             String dayThemeName = preferences.getString("lastDayTheme", "Blue");
-            if (Theme.getTheme(dayThemeName) == null) {
+            if (Theme.getTheme(dayThemeName) == null || Theme.getTheme(dayThemeName).isDark()) {
                 dayThemeName = "Blue";
             }
             String nightThemeName = preferences.getString("lastDarkTheme", "Dark Blue");
-            if (Theme.getTheme(nightThemeName) == null) {
+            if (Theme.getTheme(nightThemeName) == null || !Theme.getTheme(nightThemeName).isDark()) {
                 nightThemeName = "Dark Blue";
             }
             Theme.ThemeInfo themeInfo = Theme.getActiveTheme();
@@ -183,7 +183,7 @@ public class DrawerProfileCell extends FrameLayout {
         addView(darkThemeView, LayoutHelper.createFrame(48, 48, Gravity.RIGHT | Gravity.BOTTOM, 0, 0, 6, 90));
 
         if (Theme.getEventType() == 0) {
-            snowflakesEffect = new SnowflakesEffect();
+            snowflakesEffect = new SnowflakesEffect(0);
             snowflakesEffect.setColorKey(Theme.key_chats_menuName);
         }
     }
@@ -194,23 +194,6 @@ public class DrawerProfileCell extends FrameLayout {
         pos[0] += darkThemeView.getMeasuredWidth() / 2;
         pos[1] += darkThemeView.getMeasuredHeight() / 2;
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.needSetDayNightTheme, themeInfo, false, pos, -1, toDark, darkThemeView);
-    }
-
-    private boolean isCurrentThemeDay() {
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("themeconfig", Activity.MODE_PRIVATE);
-        String dayThemeName = preferences.getString("lastDayTheme", "Blue");
-        if (Theme.getTheme(dayThemeName) == null) {
-            dayThemeName = "Blue";
-        }
-        String nightThemeName = preferences.getString("lastDarkTheme", "Dark Blue");
-        if (Theme.getTheme(nightThemeName) == null) {
-            nightThemeName = "Dark Blue";
-        }
-        Theme.ThemeInfo themeInfo = Theme.getActiveTheme();
-        if (dayThemeName.equals(nightThemeName) && themeInfo.isDark()) {
-            dayThemeName = "Blue";
-        }
-        return dayThemeName.equals(themeInfo.getKey());
     }
 
     @Override
@@ -381,4 +364,5 @@ public class DrawerProfileCell extends FrameLayout {
         }
         arrowView.setContentDescription(accountsShown ? LocaleController.getString("AccDescrHideAccounts", R.string.AccDescrHideAccounts) : LocaleController.getString("AccDescrShowAccounts", R.string.AccDescrShowAccounts));
     }
+
 }

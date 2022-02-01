@@ -1,3 +1,35 @@
+### v.8.4.4
+- Bugfix release
+
+### v.8.4.3
+- Bugfix release
+
+### v.8.4.2
+- Double tap a message to send a quick :thumbsup: reaction.
+- Tap on the message for more reactions.
+- Turn on Translation in Settings > Languages, then tap a message to translate it.
+- Add 'Spoiler' formatting to hide some or all of the contents of a message.
+- Generate custom QR Codes for any public t.me link – works for profiles, groups, bots and channels.
+- View the complete list of changes in-app or on our blog.
+- **Telegram FOSS:**
+  - Bringing back x86 support, recompiling libvpx from source
+  - Cutting out Google MLKit used for translation service
+
+#### v.8.3.2 (not released as FOSS version)
+- Protected content. Authors can limit the ability to save media, take screenshots and forward messages from their groups and channels.
+- Delete by date. Tap the date header in 1-on-1 chats and select a date range to clear chat history from that period.
+- Device management. Quickly connect desktop and web versions via QR codes. Control which devices may accept Calls or new Secret Chats.
+- Comment as one of your channels in public groups.
+- View the complete list of changes in-app or on our blog.
+
+
+### v.8.2.7
+- Hyper-Speed Scrolling for Shared Media
+- Calendar View for Shared Media
+- Join Requests for Groups and Channels
+- Unique Names for Invite Links
+- More Interactive Emoji
+
 ### v.8.1.2
 Chat Themes, Interactive Emoji, Group Read Receipts and Live Stream Recording
 - Choose one of 8 new colorful themes for any individual private chat.

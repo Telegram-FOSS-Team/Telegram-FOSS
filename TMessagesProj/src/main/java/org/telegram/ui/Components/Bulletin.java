@@ -1,5 +1,7 @@
 package org.telegram.ui.Components;
 
+import static java.lang.annotation.RetentionPolicy.SOURCE;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -51,9 +53,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static java.lang.annotation.RetentionPolicy.SOURCE;
-
-public final class Bulletin {
+public class Bulletin {
 
     public static final int DURATION_SHORT = 1500;
     public static final int DURATION_LONG = 2750;
@@ -116,6 +116,12 @@ public final class Bulletin {
     public int currentBottomOffset;
     private Delegate currentDelegate;
     private Layout.Transition layoutTransition;
+
+    private Bulletin() {
+        layout = null;
+        parentLayout = null;
+        containerLayout = null;
+    }
 
     private Bulletin(@NonNull FrameLayout containerLayout, @NonNull Layout layout, int duration) {
         this.layout = layout;
@@ -214,7 +220,7 @@ public final class Bulletin {
     }
 
     private void setCanHide(boolean canHide) {
-        if (this.canHide != canHide) {
+        if (this.canHide != canHide && layout != null) {
             this.canHide = canHide;
             if (canHide) {
                 layout.postDelayed(hideRunnable, duration);
@@ -225,7 +231,7 @@ public final class Bulletin {
     }
 
     private void ensureLayoutTransitionCreated() {
-        if (layoutTransition == null) {
+        if (layout != null && layoutTransition == null) {
             layoutTransition = layout.createTransition();
         }
     }
@@ -239,6 +245,9 @@ public final class Bulletin {
     }
 
     public void hide(boolean animated, long duration) {
+        if (layout == null) {
+            return;
+        }
         if (showing) {
             showing = false;
 
@@ -924,6 +933,25 @@ public final class Bulletin {
     }
 
     @SuppressLint("ViewConstructor")
+    public static class MultiLineLayout extends ButtonLayout {
+
+        public final BackupImageView imageView = new BackupImageView(getContext());
+        public final TextView textView = new TextView(getContext());
+
+        public MultiLineLayout(@NonNull Context context, Theme.ResourcesProvider resourcesProvider) {
+            super(context, resourcesProvider);
+            addView(imageView, LayoutHelper.createFrameRelatively(30, 30, Gravity.START | Gravity.CENTER_VERTICAL, 12, 8, 12, 8));
+
+            textView.setGravity(Gravity.START);
+            textView.setPadding(0, AndroidUtilities.dp(8), 0, AndroidUtilities.dp(8));
+            textView.setTextColor(getThemedColor(Theme.key_undo_infoColor));
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+            textView.setTypeface(Typeface.SANS_SERIF);
+            addView(textView, LayoutHelper.createFrameRelatively(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.START | Gravity.CENTER_VERTICAL, 56, 0, 16, 0));
+        }
+    }
+
+    @SuppressLint("ViewConstructor")
     public static class TwoLineLayout extends ButtonLayout {
 
         public final BackupImageView imageView;
@@ -1197,4 +1225,16 @@ public final class Bulletin {
         }
     }
     //endregion
+
+    public static class EmptyBulletin extends Bulletin {
+
+        public EmptyBulletin() {
+            super();
+        }
+
+        @Override
+        public Bulletin show() {
+            return this;
+        }
+    }
 }

@@ -143,6 +143,7 @@ index e940f7d5f..f5221d70d 100644
 -  cipher_extra/cipher_test.cc
 -  cmac/cmac_test.cc
 -  compiler_test.cc
+-  conf/conf_test.cc
 -  constant_time_test.cc
 -  cpu-arm-linux_test.cc
 -  crypto_test.cc
@@ -193,7 +194,6 @@ index e940f7d5f..f5221d70d 100644
 -  x509/x509_test.cc
 -  x509/x509_time_test.cc
 -  x509v3/tab_test.cc
--  x509v3/v3name_test.cc
 -
 -  $<TARGET_OBJECTS:crypto_test_data>
 -  $<TARGET_OBJECTS:boringssl_gtest_main>

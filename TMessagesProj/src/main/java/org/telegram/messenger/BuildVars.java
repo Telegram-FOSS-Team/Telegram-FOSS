@@ -10,19 +10,20 @@ package org.telegram.messenger;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 
 public class BuildVars {
 
     public static boolean DEBUG_VERSION = BuildConfig.DEBUG;
-    public static boolean DEBUG_PRIVATE_VERSION = false;
     public static boolean LOGS_ENABLED = false;
+    public static boolean DEBUG_PRIVATE_VERSION = false;
     public static boolean USE_CLOUD_STRINGS = true;
     public static boolean CHECK_UPDATES = true;
-    public static boolean NO_SCOPED_STORAGE = true/* || Build.VERSION.SDK_INT <= 28*/;
-    public static int BUILD_VERSION = 2432;
-    public static String BUILD_VERSION_STRING = "8.1.2";
-    public static int APP_ID = BuildConfig.APP_ID; //obtain your own APP_ID at https://core.telegram.org/api/obtaining_api_id
-    public static String APP_HASH = BuildConfig.APP_HASH; //obtain your own APP_HASH at https://core.telegram.org/api/obtaining_api_id
+    public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
+    public static int BUILD_VERSION = 2538;
+    public static String BUILD_VERSION_STRING = "8.4.4";
+    public static int APP_ID = 4;
+    public static String APP_HASH = "014b35b6184100b085b0d0572f9b5103";
     public static String SMS_HASH = isStandaloneApp() ? "w0lkcmTZkKh" : (DEBUG_VERSION ? "O2P2z+/jBpJ" : "oLeq9AcOZkT");
     public static String PLAYSTORE_APP_URL = "https://f-droid.org/en/packages/org.telegram.messenger/";
 
