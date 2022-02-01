@@ -1293,7 +1293,6 @@ public class ConnectionsManager extends BaseController {
     private static class FirebaseTask extends AsyncTask<Void, Void, NativeByteBuffer> {
 
         private int currentAccount;
-        private FirebaseRemoteConfig firebaseRemoteConfig;
 
         public FirebaseTask(int instance) {
             super();
