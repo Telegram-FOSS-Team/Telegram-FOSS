@@ -1,0 +1,8 @@
+* new upstream release:
+* Autoplaying videos
+* New settings for automatic media download
+* Logout alternatives
+* TFOSS:
+* Fixed OpenStreetMaps
+* Added other tile servers
+* Other great fixes
