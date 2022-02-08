@@ -1,0 +1,5 @@
+* Live Stream to an unlimited number of viewers in groups and channels.
+* Preview messages before forwarding, remove captions or sender names.
+* Scroll through channels you follow without going back to the chat list.
+* See larger thumbnails when scrolling the sticker set bar in the panel.
+* Trending Stickers are now shown above 'Recently Used'.
