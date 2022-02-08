@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
-import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
@@ -440,8 +439,8 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                 presentFragment(new RestrictedLanguagesSelectActivity());
                 update();
             });
-            doNotTranslateCell.setClickable(value && LanguageDetector.hasSupport());
-            doNotTranslateCell.setAlpha(value && LanguageDetector.hasSupport() ? 1f : 0f);
+            doNotTranslateCell.setClickable(value && false);
+            doNotTranslateCell.setAlpha(value && false ? 1f : 0f);
             addView(doNotTranslateCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
             info = new TextInfoPrivacyCell(context);
@@ -453,7 +452,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             info2 = new TextInfoPrivacyCell(context);
             info2.setTopPadding(0);
             info2.setBottomPadding(16);
-            info2.setText(LocaleController.getString("TranslateMessagesInfo2", R.string.TranslateMessagesInfo2));
+            info2.setText("Telegram-FOSS does not support automatic detection of message language via Google MLKit. Google may have access to the messages you translate.");
             info2.setAlpha(value ? 0f : 1f);
             addView(info2, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
@@ -480,7 +479,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
         }
 
         public void update() {
-            boolean value = getValue() && LanguageDetector.hasSupport();
+            boolean value = getValue() && false;
 
             showButtonCheck.setChecked(getValue());
 
