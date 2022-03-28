@@ -1,0 +1,11 @@
+'''Aviso:''' Apesar de esta versão ser inteiramente livre (FLOSS), a versão original nem sempre é rápida a disponibilizar o código fonte das versões mais recentes.
+
+Aplicação para aceder à plataforma Telegram. Converse com os seus amigos, inicie salas de chat e partilhe os seus conteúdos. Todas as mensagens e conversas serão armazenas na cloud Telegram.
+
+A plataforma de mensagens destina-se a dispositivos móveis mas também existem aplicações para o computador e para a web.
+
+Diversas partes foram retiradas da aplicações original Telegram, tais como Google Play Services para o serviço de localização, HockeySDK para as atualizações automáticas e notificações 'push' através do Google Cloud Messaging. A funcionalidade de partilha de localização será restaurada se utilizar o OpenStreetMap.
+
+Anti-funcionalidade: rede não livre porque os servidores são executados em software proprietário.
+
+O código fonte oficial da aplicação contém 'blobs' binários o que origina a criação desta versão. Assim, as versões criadas poderão sers disponibilizadas com algum atraso.
