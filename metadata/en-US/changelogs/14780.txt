@@ -1,0 +1,6 @@
+* new upstream release:
+* Global permissions for groups
+* Unified group settings
+* Undo deleting chats and clearing chat history within 5 seconds
+* New sorting options in Contacts
+* New animations when uploading and downloading media
