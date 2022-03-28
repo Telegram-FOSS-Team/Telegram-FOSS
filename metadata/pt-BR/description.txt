@@ -1,0 +1,11 @@
+'''Atenção:''' Enquanto esta compilação é baseada em uma fork de puramente FLOSS, o upstream original nem sempre é rápido com a publicação do código-fonte para versões recentes.
+
+Cliente para a plataforma de mensagens do Telegram. Converse com amigos, inicie chats em grupo e compartilhe todos os tipos de conteúdo. Todas as suas mensagens e conversas são armazenadas na nuvem do Telegram.
+
+A plataforma de mensagens destina-se a dispositivos móveis, mas também existem clientes desktop e web.
+
+Diversas partes proprietárias foram removidas do cliente Telegram original, incluindo o Google Play Services para os serviços de localização, o HockeySDK para atualizações automáticas e notificações por push através do Google Cloud Messaging. A funcionalidade de compartilhamento de localização é restaurada usando o OpenStreetMap.
+
+Características indesejadas: Rede Não Livre, uma vez que os servidores executam software proprietário.
+
+O código-fonte oficial do aplicativo contém blobs binários, então isso rastreia um fork que compila os do fonte. Portanto, as versões podem ficar disponíveis com um certo atraso.

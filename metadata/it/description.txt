@@ -1,0 +1,11 @@
+'''Attenzione:''' Nonostante questa build sia basata su un fork pure-floss, la fonte originale non è sempre veloce nel pubblicare il codice sorgente delle versioni più recenti.
+
+Client per la piattaforma messaggistica di Telegram. Chatta con gli amici, crea chat di gruppo e condividi qualsiasi tipo di contenuto. Tutti i tuoi messaggi e le tue conversazioni sono salvate sul cloud di Telegram.
+
+La piattaforma messaggistica è mirata ai dispositivi mobili, anche se client desktop e web esistono già.
+
+Molte parti proprietarie sono state rimosse dal client originale di Telegram. Incluso il Google Play Service per la localizzazione, il HockeySDK per l'auto aggiornamento e le notifiche push tramite il Google Cloud Messaging. La funzionalità della condivisione dei dati sulla geolocazione sono ricavati usando OpenStreetMap.
+
+Anti-Feature: Network Non-Libero, dal momento che il server funziona con software proprietario.
+
+Il codice sorgente ufficiale dell'app contiene binary blob, così questa utilizza un fork che li compila dal sorgente. Di conseuenza, le versioni potrebbero essere disponibili con un po' di ritardo.

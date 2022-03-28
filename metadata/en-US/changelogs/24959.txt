@@ -1,0 +1,5 @@
+* Protected content. Authors can limit the ability to save media, take screenshots and forward messages from their groups and channels.
+* Delete by date. Tap the date header in 1-on-1 chats and select a date range to clear chat history from that period.
+* Device management. Quickly connect desktop and web versions via QR codes. Control which devices may accept Calls or new Secret Chats.
+* Comment as one of your channels in public groups.
+* And more
