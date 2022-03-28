@@ -48,9 +48,6 @@ import androidx.dynamicanimation.animation.FloatValueHolder;
 import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
 
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.barcode.Barcode;
-import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.LuminanceSource;
 import com.google.zxing.PlanarYUVLuminanceSource;
@@ -130,7 +127,7 @@ public class CameraScanActivity extends BaseFragment {
     private boolean qrLoaded = false;
 
     private QRCodeReader qrReader = null;
-    private BarcodeDetector visionQrReader = null;
+    //private BarcodeDetector visionQrReader = null;
 
     private boolean needGalleryButton;
 
@@ -221,7 +218,7 @@ public class CameraScanActivity extends BaseFragment {
         if (isQr()) {
             Utilities.globalQueue.postRunnable(() -> {
                 qrReader = new QRCodeReader();
-                visionQrReader = new BarcodeDetector.Builder(ApplicationLoader.applicationContext).setBarcodeFormats(Barcode.QR_CODE).build();
+                //visionQrReader = new BarcodeDetector.Builder(ApplicationLoader.applicationContext).setBarcodeFormats(Barcode.QR_CODE).build();
             });
         }
 
@@ -245,9 +242,9 @@ public class CameraScanActivity extends BaseFragment {
         if (getParentActivity() != null) {
             getParentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
-        if (visionQrReader != null) {
+        /*if (visionQrReader != null) {
             visionQrReader.release();
-        }
+        }*/
     }
 
     @Override
@@ -1021,7 +1018,7 @@ public class CameraScanActivity extends BaseFragment {
             String text;
             RectF bounds = new RectF();
             int width = 1, height = 1;
-            if (visionQrReader != null && visionQrReader.isOperational()) {
+            /*if (visionQrReader != null && visionQrReader.isOperational()) {
                 Frame frame;
                 if (bitmap != null) {
                     frame = new Frame.Builder().setBitmap(bitmap).build();
@@ -1055,7 +1052,7 @@ public class CameraScanActivity extends BaseFragment {
                 } else {
                     text = null;
                 }
-            } else if (qrReader != null) {
+            } else if (qrReader != null) {*/
                 LuminanceSource source;
                 if (bitmap != null) {
                     int[] intArray = new int[bitmap.getWidth() * bitmap.getHeight()];
@@ -1090,9 +1087,9 @@ public class CameraScanActivity extends BaseFragment {
                     }
                     bounds.set(minX, minY, maxX, maxY);
                 }
-            } else {
+            /*} else {
                 text = null;
-            }
+            }*/
             if (TextUtils.isEmpty(text)) {
                 onNoQrFound();
                 return null;
