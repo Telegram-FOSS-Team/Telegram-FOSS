@@ -1,0 +1,8 @@
+* TFOSS: limited support for the Google Translation service
+* TFOSS: x86 builds are back
+* Double tap a message to send a quick :thumbsup: reaction.
+* Tap on the message for more reactions.
+* Turn on Translation in Settings > Languages, then tap a message to translate it.
+* Add 'Spoiler' formatting to hide some or all of the contents of a message.
+* Generate custom QR Codes for any public t.me link – works for profiles, groups, bots and channels.
+* And more

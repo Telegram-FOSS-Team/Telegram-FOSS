@@ -1,0 +1,3 @@
+Platforma pro textovou komunikaci cílená na mobilní zařízení – ale klienti pro osobní počítače a weboví klienti také.
+
+Anti vlastnosti: Nesvobodná síť, protože servery provozují proprietární software.
