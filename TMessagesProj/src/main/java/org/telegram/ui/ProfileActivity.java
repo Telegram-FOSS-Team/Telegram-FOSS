@@ -108,7 +108,6 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLoader;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.ImageReceiver;
-import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MediaDataController;
@@ -4865,7 +4864,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 popupWindow.dimBehind();
             };
             if (withTranslate[0]) {
-                if (LanguageDetector.hasSupport()) {
+                /*if (LanguageDetector.hasSupport()) {
                     LanguageDetector.detectLanguage(finalText, (fromLang) -> {
                         fromLanguage[0] = fromLang;
                         withTranslate[0] = fromLang != null && (!fromLang.equals(toLang) || fromLang.equals("und")) && (
@@ -4876,9 +4875,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         FileLog.e("mlkit: failed to detect language in selection", error);
                         showMenu.run();
                     });
-                } else {
+                } else {*/
                     showMenu.run();
-                }
+                //}
             } else {
                 showMenu.run();
             }
