@@ -176,7 +176,7 @@ public class ApplicationLoader extends Application {
             DownloadController.getInstance(a);
         }
         ChatThemeController.init();
-        BillingController.getInstance().startConnection();
+//        BillingController.getInstance().startConnection();
     }
 
     public ApplicationLoader() {
