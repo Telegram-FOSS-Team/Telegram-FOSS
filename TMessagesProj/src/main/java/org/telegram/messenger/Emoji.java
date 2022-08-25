@@ -273,7 +273,6 @@ public class Emoji {
 
             if (!canvas.quickReject(b.left, b.top, b.right, b.bottom, Canvas.EdgeType.AA)) {
                 if(SharedConfig.useSystemEmoji){
-                    paint.setColor(Color.WHITE);
                     paint.setTextSize(b.width()*0.95f);
                     canvas.drawText((String)(info.code), b.left-b.width()*0.1f,b.bottom-b.height()*0.15f, paint);
                 }else {

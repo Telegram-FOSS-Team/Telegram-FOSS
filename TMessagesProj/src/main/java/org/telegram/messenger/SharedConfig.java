@@ -802,6 +802,14 @@ public class SharedConfig {
         editor.commit();
     }
 
+    public static void toggleSystemEmoji() {
+        useSystemEmoji ^=true;
+        SharedPreferences preferences = MessagesController.getGlobalMainSettings();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("useSystemEmoji", useSystemEmoji);
+        editor.commit();
+    }
+    
     public static void setPlaybackOrderType(int type) {
         if (type == 2) {
             shuffleMusic = true;
