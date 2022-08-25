@@ -370,7 +370,7 @@ public class SharedConfig {
             bubbleRadius = preferences.getInt("bubbleRadius", 17);
             ivFontSize = preferences.getInt("iv_font_size", fontSize);
             allowBigEmoji = preferences.getBoolean("allowBigEmoji", true);
-            useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);
+            useSystemEmoji = preferences.getBoolean("useSystemEmoji", true);
             streamMedia = preferences.getBoolean("streamMedia", true);
             saveStreamMedia = preferences.getBoolean("saveStreamMedia", true);
             smoothKeyboard = preferences.getBoolean("smoothKeyboard2", true);
@@ -802,6 +802,14 @@ public class SharedConfig {
         editor.commit();
     }
 
+    public static void toggleSystemEmoji() {
+        useSystemEmoji ^=true;
+        SharedPreferences preferences = MessagesController.getGlobalMainSettings();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("useSystemEmoji", useSystemEmoji);
+        editor.commit();
+    }
+    
     public static void setPlaybackOrderType(int type) {
         if (type == 2) {
             shuffleMusic = true;

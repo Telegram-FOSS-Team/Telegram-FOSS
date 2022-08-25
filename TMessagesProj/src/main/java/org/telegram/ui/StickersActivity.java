@@ -108,6 +108,7 @@ public class StickersActivity extends BaseFragment implements NotificationCenter
     private int loopRow;
     private int loopInfoRow;
     private int largeEmojiRow;
+    private int systemEmojiRow;
     private int reactionsDoubleTapRow;
     private int stickersBotInfo;
     private int masksRow;
@@ -352,6 +353,9 @@ public class StickersActivity extends BaseFragment implements NotificationCenter
             } else if (position == largeEmojiRow) {
                 SharedConfig.toggleBigEmoji();
                 ((TextCheckCell) view).setChecked(SharedConfig.allowBigEmoji);
+            }else if (position == systemEmojiRow) {
+                SharedConfig.toggleSystemEmoji();
+                ((TextCheckCell) view).setChecked(SharedConfig.useSystemEmoji);
             } else if (position == reactionsDoubleTapRow) {
                 presentFragment(new ReactionsDoubleTapManageActivity());
             }
@@ -491,11 +495,13 @@ public class StickersActivity extends BaseFragment implements NotificationCenter
         if (currentType == MediaDataController.TYPE_IMAGE) {
             suggestRow = rowCount++;
             largeEmojiRow = rowCount++;
+            systemEmojiRow = rowCount++;
             loopRow = rowCount++;
             loopInfoRow = rowCount++;
         } else {
             suggestRow = -1;
             largeEmojiRow = -1;
+            systemEmojiRow = -1;
             loopRow = -1;
             loopInfoRow = -1;
         }
@@ -938,6 +944,8 @@ public class StickersActivity extends BaseFragment implements NotificationCenter
                         cell.setTextAndCheck(LocaleController.getString(R.string.LoopAnimatedStickers), SharedConfig.loopStickers, true);
                     } else if (position == largeEmojiRow) {
                         cell.setTextAndCheck(LocaleController.getString(R.string.LargeEmoji), SharedConfig.allowBigEmoji, true);
+                    } else if (position == systemEmojiRow) {
+                        cell.setTextAndCheck(LocaleController.getString(R.string.SystemEmoji), SharedConfig.useSystemEmoji, true);
                     }
                     break;
                 case TYPE_DOUBLE_TAP_REACTIONS: {
@@ -1101,7 +1109,7 @@ public class StickersActivity extends BaseFragment implements NotificationCenter
                 return TYPE_TEXT_AND_VALUE;
             } else if (i == stickersShadowRow || i == featuredStickersShadowRow) {
                 return TYPE_SHADOW;
-            } else if (i == loopRow || i == largeEmojiRow) {
+            } else if (i == loopRow || i == largeEmojiRow || i == systemEmojiRow) {
                 return TYPE_SWITCH;
             } else if (i == reactionsDoubleTapRow) {
                 return TYPE_DOUBLE_TAP_REACTIONS;
