@@ -77,7 +77,7 @@ public class Emoji {
         for (int j = 0; j < EmojiData.data.length; j++) {
             int position;
             for (int i = 0; i < EmojiData.data[j].length; i++) {
-                rects.put(EmojiData.data[j][i], new DrawableInfo((byte) j, (short) i, i));
+                rects.put(EmojiData.data[j][i], new DrawableInfo((byte) j, (short) i, i,EmojiData.data[j][i]));
             }
         }
         placeholderPaint = new Paint();
@@ -272,7 +272,13 @@ public class Emoji {
             }
 
             if (!canvas.quickReject(b.left, b.top, b.right, b.bottom, Canvas.EdgeType.AA)) {
-                canvas.drawBitmap(emojiBmp[info.page][info.page2], null, b, paint);
+                if(SharedConfig.useSystemEmoji){
+                    paint.setColor(Color.WHITE);
+                    paint.setTextSize(b.width()*0.95f);
+                    canvas.drawText((String)(info.code), b.left-b.width()*0.1f,b.bottom-b.height()*0.15f, paint);
+                }else {
+                    canvas.drawBitmap(emojiBmp[info.page][info.page2], null, b, paint);
+                }
             }
         }
 
@@ -303,14 +309,16 @@ public class Emoji {
     }
 
     private static class DrawableInfo {
+        public CharSequence code;
         public byte page;
         public short page2;
         public int emojiIndex;
 
-        public DrawableInfo(byte p, short p2, int index) {
+        public DrawableInfo(byte p, short p2, int index, CharSequence code) {
             page = p;
             page2 = p2;
             emojiIndex = index;
+            this.code = code;
         }
     }
 

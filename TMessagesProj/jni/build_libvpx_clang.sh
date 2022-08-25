@@ -114,7 +114,7 @@ checkPreRequisites
 cd libvpx
 
 ## common
-LLVM_PREFIX="${NDK}/toolchains/llvm/prebuilt/linux-x86_64"
+LLVM_PREFIX="${NDK}/toolchains/llvm/prebuilt/$BUILD_PLATFORM"
 LLVM_BIN="${LLVM_PREFIX}/bin"
 VERSION="4.9"
 ANDROID_API=21

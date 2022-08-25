@@ -4483,4 +4483,5 @@
     <string name="RemindDayAt">\'Am\' d MMM \'um\' HH:mm \'erinnern\'</string>
     <string name="RemindDayYearAt">\'Am\' d MMM yyyy \'um\' HH:mm \'erinnern\'</string>
     <string name="BotsMenuTitle">Menu</string>
+    <string name="SystemEmoji">System Emoji</string>
 </resources>

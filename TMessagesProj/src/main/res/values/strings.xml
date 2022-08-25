@@ -5449,4 +5449,5 @@
     <string name="TelegramPremiumUserDialogSubtitle">Owners of **Telegram Premium** accounts have exclusive acces to multiple additional features.</string>
     <string name="PremiumPreviewNoAdsDescription2">Remove ads such as this one by subscribing to Telegram Premium.</string>
     <string name="FeaturedStickersPremium">Trending Premium Stickers</string>
+    <string name="SystemEmoji">System Emoji</string>
 </resources>

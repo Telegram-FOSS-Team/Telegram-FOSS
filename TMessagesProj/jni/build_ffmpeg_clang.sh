@@ -92,6 +92,7 @@ function build_one {
 	--enable-demuxer=ogg \
 	--enable-demuxer=matroska \
 	--enable-hwaccels \
+	--pkg-config=pkg-config\
 	$ADDITIONAL_CONFIGURE_FLAG
 
 	#echo "continue?"

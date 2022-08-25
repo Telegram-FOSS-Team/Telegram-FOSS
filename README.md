@@ -99,6 +99,8 @@ Consider using a Linux VM or dual booting.**
 **Important:**
 
 1. You need the Android NDK, Go(Golang) and [Ninja](https://ninja-build.org/) to build the apk.
+      
+      Also make sure you have `yarn` and invoking `sed` uses gnu-sed (not the one builtin to macos)
 
 2. Don't forget to include the submodules when you clone:
       - `git clone --recursive https://github.com/Telegram-FOSS-Team/Telegram-FOSS.git`
@@ -107,7 +109,7 @@ Consider using a Linux VM or dual booting.**
       - Go to the `TMessagesProj/jni` folder and execute the following (define the paths to your NDK and Ninja):
 
       ```
-      export NDK=[PATH_TO_NDK]
+      export NDK=[PATH_TO_NDK] # This should be version 21.4.7075529 newer or older might not work
       export NINJA_PATH=[PATH_TO_NINJA]
       ./build_libvpx_clang.sh
       ./build_ffmpeg_clang.sh
