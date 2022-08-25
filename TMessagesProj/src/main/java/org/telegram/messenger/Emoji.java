@@ -507,7 +507,7 @@ public class Emoji {
 
     public static CharSequence replaceEmoji(CharSequence cs, Paint.FontMetricsInt fontMetrics, int size, boolean createNew, int[] emojiOnly, boolean allowAnimated, AtomicReference<WeakReference<View>> viewRef) {
         allowAnimated = false;
-        if (SharedConfig.useSystemEmoji || cs == null || cs.length() == 0) {
+        if (cs == null || cs.length() == 0) {
             return cs;
         }
         Spannable s;
