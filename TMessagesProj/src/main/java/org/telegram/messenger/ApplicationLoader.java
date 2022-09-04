@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -255,6 +256,17 @@ public class ApplicationLoader extends Application {
         AndroidUtilities.runOnUIThread(ApplicationLoader::startPushService);
 
         LauncherIconController.tryFixLauncherIconIfNeeded();
+        // SET TFOSS USERAGENT FOR OSM SERVERS
+        PackageInfo pInfo;
+        String VERSIONNAME="";
+        try {
+            pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
+            VERSIONNAME = pInfo.versionName;
+        } catch (Exception e) {
+            FileLog.e(e);
+        }
+        org.osmdroid.config.Configuration.getInstance().setUserAgentValue("Telegram-FOSS(F-Droid) "+VERSIONNAME);
+        org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(new File(getCacheDir(),"osmdroid"));
     }
 
     public static void startPushService() {
