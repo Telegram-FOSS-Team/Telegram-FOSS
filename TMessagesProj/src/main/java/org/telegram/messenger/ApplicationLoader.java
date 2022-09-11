@@ -96,7 +96,7 @@ public class ApplicationLoader extends Application {
     }
 
     protected String onGetApplicationId() {
-        return null;
+        return getPackageName();
     }
 
     public static boolean isHuaweiStoreBuild() {
