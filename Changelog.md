@@ -1,3 +1,7 @@
+### v8.9.2a
+- **Telegram FOSS:**
+  - Fix handling of files
+
 ### v.8.9.2
 Custom Animated Emoji
 - Include animated emoji in messages and captions.
