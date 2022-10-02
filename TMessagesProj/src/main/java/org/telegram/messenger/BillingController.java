@@ -10,18 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
 
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.ConsumeParams;
-import com.android.billingclient.api.ProductDetails;
-import com.android.billingclient.api.ProductDetailsResponseListener;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchasesResponseListener;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.QueryProductDetailsParams;
-import com.android.billingclient.api.QueryPurchasesParams;
 import com.google.android.exoplayer2.util.Util;
 
 import org.json.JSONObject;
@@ -40,19 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class BillingController implements PurchasesUpdatedListener, BillingClientStateListener {
+public class BillingController {
     public final static String PREMIUM_PRODUCT_ID = "telegram_premium";
-    public final static QueryProductDetailsParams.Product PREMIUM_PRODUCT = QueryProductDetailsParams.Product.newBuilder()
-            .setProductType(BillingClient.ProductType.SUBS)
-            .setProductId(PREMIUM_PRODUCT_ID)
-            .build();
-
-    @Nullable
-    public static ProductDetails PREMIUM_PRODUCT_DETAILS;
 
     private static BillingController instance;
 
-    private Map<String, Consumer<BillingResult>> resultListeners = new HashMap<>();
     private List<String> requestingTokens = new ArrayList<>();
 
     private Map<String, Integer> currencyExpMap = new HashMap<>();
@@ -64,13 +44,7 @@ public class BillingController implements PurchasesUpdatedListener, BillingClien
         return instance;
     }
 
-    private BillingClient billingClient;
-
     private BillingController(Context ctx) {
-        billingClient = BillingClient.newBuilder(ctx)
-                .enablePendingPurchases()
-                .setListener(this)
-                .build();
     }
 
     public String formatCurrency(long amount, String currency) {
@@ -100,9 +74,6 @@ public class BillingController implements PurchasesUpdatedListener, BillingClien
     }
 
     public void startConnection() {
-        if (isReady()) {
-            return;
-        }
         try {
             Context ctx = ApplicationLoader.applicationContext;
             InputStream in = ctx.getAssets().open("currencies.json");
@@ -111,10 +82,6 @@ public class BillingController implements PurchasesUpdatedListener, BillingClien
             in.close();
         } catch (Exception e) {
             FileLog.e(e);
-        }
-
-        if (!BuildVars.useInvoiceBilling()) {
-            billingClient.startConnection(this);
         }
     }
 
@@ -126,7 +93,7 @@ public class BillingController implements PurchasesUpdatedListener, BillingClien
             currencyExpMap.put(key, currency.optInt("exp"));
         }
     }
-
+	/*
     public boolean isReady() {
         return billingClient.isReady();
     }
@@ -312,4 +279,5 @@ public class BillingController implements PurchasesUpdatedListener, BillingClien
             queryPurchases(BillingClient.ProductType.SUBS, this::onPurchasesUpdated);
         }
     }
+    */
 }
