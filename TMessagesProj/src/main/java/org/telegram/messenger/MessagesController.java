@@ -1260,7 +1260,7 @@ public class MessagesController extends BaseController implements NotificationCe
         giftAttachMenuIcon = mainPreferences.getBoolean("giftAttachMenuIcon", false);
         giftTextFieldIcon = mainPreferences.getBoolean("giftTextFieldIcon", false);
         checkResetLangpack = mainPreferences.getInt("checkResetLangpack", 0);
-        BuildVars.GOOGLE_AUTH_CLIENT_ID = mainPreferences.getString("googleAuthClientId", BuildVars.GOOGLE_AUTH_CLIENT_ID);
+
 
         dcDomainName = mainPreferences.getString("dcDomainName2", ConnectionsManager.native_isTestBackend(currentAccount) != 0 ? "tapv3.stel.com" : "apv3.stel.com");
         webFileDatacenterId = mainPreferences.getInt("webFileDatacenterId", ConnectionsManager.native_isTestBackend(currentAccount) != 0 ? 2 : 4);
@@ -2044,11 +2044,11 @@ public class MessagesController extends BaseController implements NotificationCe
                 case "login_google_oauth_client_id": {
                     if (value.value instanceof TLRPC.TL_jsonString) {
                         String str = ((TLRPC.TL_jsonString) value.value).value;
-                        if (!Objects.equals(BuildVars.GOOGLE_AUTH_CLIENT_ID, str)) {
+                        /*if (!Objects.equals(BuildVars.GOOGLE_AUTH_CLIENT_ID, str)) {
                             BuildVars.GOOGLE_AUTH_CLIENT_ID = str;
                             editor.putString("googleAuthClientId", BuildVars.GOOGLE_AUTH_CLIENT_ID);
                             changed = true;
-                        }
+                        }*/
                     }
                     break;
                 }
