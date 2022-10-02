@@ -1129,7 +1129,6 @@ public class MessagesController extends BaseController implements NotificationCe
         topicsPinnedLimit = mainPreferences.getInt("topicsPinnedLimit", 3);
         telegramAntispamUserId = mainPreferences.getLong("telegramAntispamUserId", -1);
         telegramAntispamGroupSizeMin = mainPreferences.getInt("telegramAntispamGroupSizeMin", 100);
-        BuildVars.GOOGLE_AUTH_CLIENT_ID = mainPreferences.getString("googleAuthClientId", BuildVars.GOOGLE_AUTH_CLIENT_ID);
 
         Set<String> currencySet = mainPreferences.getStringSet("directPaymentsCurrency", null);
         if (currencySet != null) {
@@ -1803,11 +1802,11 @@ public class MessagesController extends BaseController implements NotificationCe
                         case "login_google_oauth_client_id": {
                             if (value.value instanceof TLRPC.TL_jsonString) {
                                 String str = ((TLRPC.TL_jsonString) value.value).value;
-                                if (!Objects.equals(BuildVars.GOOGLE_AUTH_CLIENT_ID, str)) {
+                                /*if (!Objects.equals(BuildVars.GOOGLE_AUTH_CLIENT_ID, str)) {
                                     BuildVars.GOOGLE_AUTH_CLIENT_ID = str;
                                     editor.putString("googleAuthClientId", BuildVars.GOOGLE_AUTH_CLIENT_ID);
                                     changed = true;
-                                }
+                                }*/
                             }
                             break;
                         }
