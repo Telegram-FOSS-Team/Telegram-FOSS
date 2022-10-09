@@ -1,0 +1,6 @@
+* Set messages to auto-delete for everyone 24 hours or 7 days after sending.
+* Create invite links that work for a limited time or a limited number of uses.
+* Access your chats quickly with Home Screen Widgets.
+* Convert groups into Broadcast Groups with unlimited members.
+* Keep the original sending date when moving chat history from other apps.
+* and More

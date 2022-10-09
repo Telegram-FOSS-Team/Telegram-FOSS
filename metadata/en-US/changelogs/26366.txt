@@ -1,0 +1,8 @@
+* Turn any short audio file into a custom notification sound for any chat.
+* Disable notifications from any chat for a custom period of time.
+* Turn off sound without disabling notifications.
+* Quickly set up Auto-Delete and add a custom duration.
+* Watch videos in the redesigned picture-in-picture window.
+* See which forwarded messages are replies.
+* Use powerful web-based interfaces for bots.
+* See the full list of changes in the Telegram app.

@@ -1,0 +1,5 @@
+* Choose one of 8 new colorful themes for any individual private chat.
+* Tap on animated emoji like :fireworks:, :balloon: or :pile_of_poo: to launch fullscreen effects 
+that are synced if both chat partners are watching.
+* See who recently viewed your outgoing messages in small groups.
+* Record video from live broadcasts in groups and channels.
