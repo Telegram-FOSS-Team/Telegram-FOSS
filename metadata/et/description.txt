@@ -1,0 +1,11 @@
+'''Tähelepanu:''' See rakendus põhineb puhtal vabavaral; algsed loojad ei kiirusta uusimate versioonide lähtekoodide avaldamisega.
+
+Klient sõnumivahetusplatvormile Telegram. Suhtle oma sõpradega, algata grupivestluseid ja jaga igasugust sisu. Kõik su sõnumid ja vestlused salvestatakse Telegrami pilves.
+
+Sõnumivahetusplatvorm on suunatud mobiilsetele seadmete, kuid olemas on ka tava- ja veebikliendid.
+
+Algsest Telegrami kliendist on eemaldatud mitmed suletud komponendid; sh. Google Play Services asukohapõhisteks teenusteks, HockeySDK iseenese uuendamiseks ja Google Cloud Messagingi kasutavad push-märguanded. Asukohapõhine jagamine on taastatud OpenStreetMap kaudu.
+
+Ebameeldivused: mitte-vaba võrk, sest serverid töötavad suletud tarkvaraga.
+
+Rakenduse ametlik lähtekood sisadab suletud koodi binaarkujul; järgitakse lähtekoodist kompileeritavat haru. Seega võivad uued versioonid välja tulla mõningase hilinemisega.
