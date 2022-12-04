@@ -1,0 +1,7 @@
+Topics in Groups and More
+* Large groups with 200+ members can sort their discussions into topics.
+* Premium users can convert both video and voice messages to text.
+* Changing text size now affects all text in chats, like reply headers and link previews.
+* Tapping the phone number in a user's profile opens an updated menu with Voice and Video call options.
+* New animation when swiping left on messages to reply.
+* New placeholders when loading messages in groups and channels.

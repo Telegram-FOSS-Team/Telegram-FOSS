@@ -1,0 +1,11 @@
+'''Abisua:''' Konpilazio hau erabat librea den fork batean oinarritzen da, jatorrizko proiektuak ez du beti puntualki kaleratzen azken bertsioen kodea.
+
+Telegram mezularitza plataformarentzako bezeroa. Txateatu lagunekin, hasi talde txatak eta elkarbanatu mota guztietako edukia. Zure mezu eta elkarrizketa guztiak eta Telegram hodeian gordetzen dira.
+
+Mezularitza plataforma mugikorretara zuzenduta dago, baina badaude mahaigaineko eta web bezeroak ere.
+
+Jatorrizko Telegram bezerotik hainbat atal jabedun kendu dira, kokapenerako Google Play Services, eguneraketa automatikoentzako HockeySDK eta jakinarazpenetarako Google Cloud Messaging barne. Kokapena partekatzea OpenStreetMap bidez berreskuratu da.
+
+Ezaugarri zalantzagarriak: Sare ez librea, zerbitzariek software jabeduna erabiltzen dute.
+
+Aplikazioaren iturburu-kode ofizialak blob jabedunak ditu, honek iturburu kodetik eraikitako fork-ak erabiltzen ditu. Beraz, bertsioak atzerapen apur batekin kaleratzea gertatu daiteke.
