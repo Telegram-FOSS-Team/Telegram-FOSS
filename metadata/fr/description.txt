@@ -1,0 +1,11 @@
+'''Attention :''' cette version étant basée sur une variante entièrement FLOSS, le dépôt d'origine ne publie pas toujours rapidement le code source des dernières versions.
+
+Client pour la plateforme de messagerie Telegram. Discutez avec des amis, démarrez des groupes de discussion et partagez toute sorte de contenu. Tous les messages et les conversations sont stockées dans le nuage de Telegram.
+
+La plate-forme de messagerie est destinée aux mobiles, mais des clients pour ordinateurs de bureaux ou des clients web existent également.
+
+Plusieurs composants propriétaires ont été supprimés du client Telegram initial, comme les Services Google Play pour la géolocalisation, HockeySDK pour les mises à jour automatiques ou encore les notifications Push de Google Cloud Messaging. La fonctionnalité de partage de position est maintenant assurée par OpenStreetMap.
+
+Anti-fonctionnalité : Réseau non-libre, puisque les serveurs utilisent un logiciel propriétaire.
+
+Le code source officiel de l'application contient des données binaires de type blob (Binary Large OBject), ce projet s'appuie sur un dépôt parallèle (fork) qui les construit directement à partir code source. Par conséquent, ces versions peuvent parfois être publiées avec un certain retard.

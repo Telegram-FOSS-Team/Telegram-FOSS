@@ -1,0 +1,7 @@
+* Check the status of downloads from the Search button > Downloads.
+* Pause or resume all downloads or specific files.
+* Preview and rearrange media albums before sending.
+* Enjoy semi-transparent effects on headers and panels in Dark Mode.
+* Sign up and log in through a redesigned interface with new animations.
+* Share a direct link to your phone number that opens a chat with you, like t.me/+123456789
+* and more
