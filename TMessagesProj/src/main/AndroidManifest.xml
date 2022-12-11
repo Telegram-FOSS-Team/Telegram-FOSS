@@ -73,7 +73,14 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="replace" />
 
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-
+	
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="ton"/>
+        </intent>
+    </queries>
+	
     <application
         android:name="org.telegram.messenger.ApplicationLoader"
         android:allowBackup="false"
@@ -86,7 +93,7 @@
         android:preserveLegacyExternalStorage="true"
         android:allowAudioPlaybackCapture="true"
         tools:replace="android:supportsRtl">
-
+     
         <activity-alias
             android:enabled="true"
             android:name="org.telegram.messenger.DefaultIcon"
