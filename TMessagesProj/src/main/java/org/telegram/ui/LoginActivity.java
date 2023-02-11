@@ -1647,7 +1647,7 @@ public class LoginActivity extends BaseFragment {
 
     private boolean isRequestingFirebaseSms;
     private void fillNextCodeParams(Bundle params, TLRPC.auth_SentCode res, boolean animate) {
-        if (res.type instanceof TLRPC.TL_auth_sentCodeTypeFirebaseSms && !res.type.verifiedFirebase && !isRequestingFirebaseSms) {
+        /*if (res.type instanceof TLRPC.TL_auth_sentCodeTypeFirebaseSms && !res.type.verifiedFirebase && !isRequestingFirebaseSms) {
             if (PushListenerController.GooglePushListenerServiceProvider.INSTANCE.hasServices()) {
                 needShowProgress(0);
                 isRequestingFirebaseSms = true;
@@ -1709,7 +1709,7 @@ public class LoginActivity extends BaseFragment {
                 resendCodeFromSafetyNet(params, res);
             }
             return;
-        }
+        }*/
 
         params.putString("phoneHash", res.phone_code_hash);
         if (res.next_type instanceof TLRPC.TL_auth_codeTypeCall) {
