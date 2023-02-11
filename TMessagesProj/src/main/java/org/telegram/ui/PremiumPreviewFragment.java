@@ -648,10 +648,10 @@ public class PremiumPreviewFragment extends BaseFragment implements Notification
     }
 
     public static void buyPremium(BaseFragment fragment, SubscriptionTier tier, String source, boolean forcePremium) {
-        buyPremium(fragment, tier, source, forcePremium, null);
+        buyPremium(fragment, tier, source, forcePremium, true);
     }
 
-    public static void buyPremium(BaseFragment fragment, SubscriptionTier tier, String source, boolean forcePremium, BillingFlowParams.SubscriptionUpdateParams updateParams) {
+    public static void buyPremium(BaseFragment fragment, SubscriptionTier tier, String source, boolean forcePremium, boolean updateParams) {
         if (BuildVars.IS_BILLING_UNAVAILABLE) {
             fragment.showDialog(new PremiumNotAvailableBottomSheet(fragment));
             return;
@@ -1468,14 +1468,14 @@ public class PremiumPreviewFragment extends BaseFragment implements Notification
         if (!subscriptionTiers.isEmpty()) {
             premiumButtonView.setButton(getPremiumButtonText(currentAccount, subscriptionTiers.get(selectedTierIndex)), v -> {
                 SubscriptionTier tier = subscriptionTiers.get(selectedTierIndex);
-                BillingFlowParams.SubscriptionUpdateParams updateParams = null;
+                /*BillingFlowParams.SubscriptionUpdateParams updateParams = null;
                 if (currentSubscriptionTier != null && currentSubscriptionTier.subscriptionOption != null && currentSubscriptionTier.subscriptionOption.transaction != null) {
                     updateParams = BillingFlowParams.SubscriptionUpdateParams.newBuilder()
                             .setOldPurchaseToken(BillingController.getInstance().getLastPremiumToken())
                             .setReplaceProrationMode(BillingFlowParams.ProrationMode.IMMEDIATE_AND_CHARGE_FULL_PRICE)
                             .build();
-                }
-                buyPremium(this, tier, "settings", true, updateParams);
+                }*/
+                buyPremium(this, tier, "settings", true, true);
             }, animated);
             premiumButtonView.setFlickerDisabled(false);
         }
