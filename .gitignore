@@ -1,5 +1,6 @@
 .idea/
 .gradle/
+.cxx/
 build/
 obj/
 *.iml
@@ -13,3 +14,9 @@ TMessagesProj_App/afat/
 TMessagesProj_AppHockeyApp/afat/
 TMessagesProj_AppStandalone/afat/
 TMessagesProj_AppHuawei/afat/
+API_KEYS
+*.hprof
+TMessagesProj/.externalNativeBuild/
+TMessagesProj/jni/ffmpeg/android/
+TMessagesProj/jni/ffmpeg/build/
+TMessagesProj/jni/boringssl/build/
