@@ -1,0 +1,7 @@
+Chat Folders and More
+* Organize chats into Chat Folders if you have too many chats.
+* Create custom folders with flexible settings, or use default recommendations.
+* Pin an unlimited number of chats in each folder.
+* Swipe between folders to easily access all of your chats.
+* View detailed statistics about the growth of your channels and the performance of their posts.
+* Send :dice: to any chat to try your luck and get a random number from the animated dice.
