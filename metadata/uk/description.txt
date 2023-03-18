@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''УВАГА:''' Хоча ця побудова базується наpure-floss fork, оригінальний висхідний потік не завжди швидко виходить з публікацією вихідного коду для нових версій.
 
 Клієнт для платформи обміну повідомленнями Telegram. Поговорити з друзями, почати групові чати та ділитися різним вмістом. Всі ваші повідомлення та розмови зберігаються в хмарі Telegram.

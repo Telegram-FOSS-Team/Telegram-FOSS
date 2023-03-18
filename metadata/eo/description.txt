@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 Kliento por la mesaĝ‑sistemo Telegram.
 
 Babili kun amikoj, ekigi grupajn babilejojn kaj kunhavigi ian ajn specon de enhavo. Ĉiuj viaj mesaĝoj kaj interparoladoj estas konservataj en la Telegram-nubon.

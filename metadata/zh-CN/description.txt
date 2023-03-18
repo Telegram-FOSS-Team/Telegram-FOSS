@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''警告：''' 本版本完全基于自由开源分支，但初始上游资源库有时无法及时发布最新版本的源码。
 
 Telegram 通信平台客户端。和好友聊天，加入群组，分享各种内容。所有信息和对话将保持至 Telegram 云端。

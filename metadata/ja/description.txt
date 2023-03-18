@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''警告:''' このビルドは純粋なFLOSSフォークに基づいていますが、オリジナルのアップストリームは必ずしも最速に最新バージョンのソースコードを公開するとは限りません。
 
 このアプリはTelegramのメッセージプラットフォーム用のクライアントです。友達とチャットしたり、グループチャットであらゆる種類のコンテンツを共有することができます。すべてのメッセージと会話は、Telegramのクラウドに格納されます。

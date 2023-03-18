@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''Abisua:''' Konpilazio hau erabat librea den fork batean oinarritzen da, jatorrizko proiektuak ez du beti puntualki kaleratzen azken bertsioen kodea.
 
 Telegram mezularitza plataformarentzako bezeroa. Txateatu lagunekin, hasi talde txatak eta elkarbanatu mota guztietako edukia. Zure mezu eta elkarrizketa guztiak eta Telegram hodeian gordetzen dira.

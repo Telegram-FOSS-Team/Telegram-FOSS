@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''경고:''' 이 빌드가 순수 자유-오픈 소스 소프트웨어 포크를 바탕으로 하는 동안, 원본 업스트림은 항상 최근 버전의 소스코드를 게시하는 것보다 빠르지 않습니다.
 
 텔레그램 메시징 플랫폼을 위한 클라이언트입니다. 친구와 채팅하고, 그룹 채팅을 시작하고 모든 종류의 내용을 공유하세요. 모든 메시지와 대화는 텔레그램의 클라우드에 보관됩니다.

@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''Waarskuwing:''' terwyl hierdie bou gebaseer is op 'n suiwer-floss vurk, is die oorspronklike stroom-op is nie altyd vinnig met die publisering van die bronkode vir onlangse weergawes.
 
 Kliënt vir die telegram Boodskapdiens platform. Gesels met vriende, begin groep geselsies en deel alle vorme van inhoud. Al jou boodskappe en gesprekke in telegram se wolk gestoor is.

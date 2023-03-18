@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''Advarsel:''' Selv om denne versjonen er basert på en friprog-avgreining, er ikke det opprinnelige opphavet alltid like raske med å offentliggjøre kildekoden for nylige versjoner.
 
 Klient for Telegrams meldingsplattform. Sludre med venner, start gruppesludringer og del alle slags innhold. Alle dine meldinger og samtaler blir lagret i Telegrams sky.

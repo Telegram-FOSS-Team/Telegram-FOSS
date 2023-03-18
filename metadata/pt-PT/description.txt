@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''Aviso:''' Apesar de esta versão ser inteiramente livre (FLOSS), a versão original nem sempre é rápida a disponibilizar o código fonte das versões mais recentes.
 
 Aplicação para aceder à plataforma Telegram. Converse com os seus amigos, inicie salas de chat e partilhe os seus conteúdos. Todas as mensagens e conversas serão armazenas na cloud Telegram.

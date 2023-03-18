@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''Aðvörun:''' Þrátt fyrir að þessi byggingarúgáfa sé kvísluð frá hreinni FOSS-útgáfu, þá eru þeir sem sjá um upprunalegu 'upstream' greinina ekki alltaf fljótir að gefa út grunnkóðann fyrir nýlegar útgáfur.
 
 Samskiptaforrit fyrir Telegram skilaboðakerfið. Spjallaðu við vini þína, settu í gang umræðuhópa og deildu allskyns efni. Öll skilaboð og umræður eru geymd í Telegram-skýinu.

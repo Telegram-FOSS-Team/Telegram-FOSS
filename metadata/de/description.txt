@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''Achtung:''' Während dieser Build auf einem reinen FLOSS-Fork beruht, ist das zugrundeliegende Repo bei der Veröffentlichung des Quellcodes für neuere Versionen nicht immer schnell.
 
 Client für das Messaging mit Telegram. Mit Feunden chatten, Gruppen-Chats beginnen und alle möglichen Inhalte teilen. Alle Nachrichten und Unterhaltungen werden in der Cloud von Telegram gespeichert.

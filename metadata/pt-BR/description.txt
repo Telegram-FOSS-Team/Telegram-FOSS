@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''Atenção:''' Enquanto esta compilação é baseada em uma fork de puramente FLOSS, o upstream original nem sempre é rápido com a publicação do código-fonte para versões recentes.
 
 Cliente para a plataforma de mensagens do Telegram. Converse com amigos, inicie chats em grupo e compartilhe todos os tipos de conteúdo. Todas as suas mensagens e conversas são armazenadas na nuvem do Telegram.
