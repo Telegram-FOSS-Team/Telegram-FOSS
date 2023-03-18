@@ -1,0 +1,4 @@
+Telegram has reached 400 million active users!
+* Fully redesigned attachment menu with animated icons.
+* 20,000+ stickers from professional artists now available in the updated sticker panel.
+* Added explanations and timers for quiz questions.

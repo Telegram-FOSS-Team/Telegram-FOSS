@@ -1,0 +1,4 @@
+* Location-based group chats
+* Animated stickers
+* Transfer ownership of groups and channels
+* A lot more!

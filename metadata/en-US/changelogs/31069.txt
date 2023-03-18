@@ -1,0 +1,6 @@
+* PROFILE PHOTO MAKER: create profile photos from animated emoji and stickers.
+* EMOJI CATEGORIES: filter stickers and emoji by categories like "love" or "party".
+* CHAT TRANSLATION (PREMIUM): translate entire chats in real time.
+* AUTO-SAVE MEDIA: based on size, type and source.
+* GRANULAR MEDIA PERMISSIONS: control whether group members can send 9 types of media.
+* ANNUAL SUBSCRIPTIONS: prepay for a year of Premium at a discount.
