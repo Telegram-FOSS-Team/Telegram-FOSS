@@ -617,7 +617,7 @@ public class TranslateController extends BaseController {
 
     private ArrayList<Integer> pendingLanguageChecks = new ArrayList<>();
     private void checkLanguage(MessageObject messageObject) {
-        if (!LanguageDetector.hasSupport()) {
+        if (true) {
             return;
         }
         if (!isTranslatable(messageObject) || messageObject.messageOwner == null || TextUtils.isEmpty(messageObject.messageOwner.message)) {
@@ -640,20 +640,11 @@ public class TranslateController extends BaseController {
         pendingLanguageChecks.add(hash);
 
         Utilities.stageQueue.postRunnable(() -> {
-            LanguageDetector.detectLanguage(messageObject.messageOwner.message, lng -> AndroidUtilities.runOnUIThread(() -> {
-                String detectedLanguage = lng;
-                if (detectedLanguage == null) {
-                    detectedLanguage = UNKNOWN_LANGUAGE;
-                }
-                messageObject.messageOwner.originalLanguage = detectedLanguage;
-                getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
-                pendingLanguageChecks.remove((Integer) hash);
-                checkDialogTranslatable(messageObject);
-            }), err -> AndroidUtilities.runOnUIThread(() -> {
+            AndroidUtilities.runOnUIThread(() -> {
                 messageObject.messageOwner.originalLanguage = UNKNOWN_LANGUAGE;
                 getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
                 pendingLanguageChecks.remove((Integer) hash);
-            }));
+            });
         });
     }
 
