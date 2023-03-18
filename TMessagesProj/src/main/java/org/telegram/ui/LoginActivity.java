@@ -4006,7 +4006,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                     str = AndroidUtilities.replaceTags(LocaleController.formatString("SentFragmentCode", R.string.SentFragmentCode, LocaleController.addNbsp(number)));
                 }
             }
-            confirmTextView.setText(str);
+            confirmTextView.setText(str + "\n The other app should have been used recently. Due to API changes, Telegram-FOSS can't be the app for first time sign up.");
 
             if (currentType != AUTH_TYPE_FRAGMENT_SMS) {
                 if (currentType == AUTH_TYPE_MESSAGE) {

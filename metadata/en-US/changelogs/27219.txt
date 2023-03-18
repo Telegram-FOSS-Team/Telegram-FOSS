@@ -1,0 +1,16 @@
+NOTE: Telegram can't be purchased through Telegram-FOSS
+Introducing Telegram Premium (all existing features remain free):
+* Doubled limits on everything in the app
+* Increased download speed
+* Sending files up to 4GB each
+* Converting voice messages to text
+* Advanced chat management
+* Stickers with full-screen animations
+* Additional reactions
+...and more in Settings > Telegram Premium
+
+Other Improvements
+* Join requests for public groups
+* Chat preview with scrolling and actions
+* Auto-saving of media to gallery
+* Over 100 fixes and optimizations
