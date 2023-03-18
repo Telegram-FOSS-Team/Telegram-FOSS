@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''Uyarı:''' Bu yapı pure-floss fork dayalıyken, orijinal upstream her zaman güncel sürümlerin kaynak kodunu yayınlamakta hızlı değildir.
 
 Telegram mesajlaşma platformu için istemci. Arkadaşlarınızla sohbet edin, grup sohbetleri başlatın ve her türlü içeriği paylaşın. Tüm mesajlarınız ve konuşmalarınız Telegram'ın bulutunda saklanır.

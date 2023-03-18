@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''Varning:''' Även om detta bygge är baserat på en ren-floss-fork så är den ursprungliga uppströms inte alltid snabb med att publicera källkoden för de senaste versionerna.
 
 Klient för meddelandeplattformen Telegram. Chatta med kompisar, start gruppchattar och dela alla möjliga sorters innehåll. Alla dina meddelanden och konversationer sparas i Telegrams moln.

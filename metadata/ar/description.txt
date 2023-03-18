@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '' 'تحذير: ''' بينما يستند هذا البناء على fork حر بالكامل ، المصدر الأصلي ليس سريعا لنشر الكود البرمجي للإصدارات المطروحة مؤخرا.
 
 عميل لمنصة تيليجرام. دردش مع الأصدقاء، و أبدء محادثات جماعية وشارك كل أنواع المحتوى. يتم تخزين جميع رسائل البريد والمحادثات في سحابة تيليجرام.

@@ -1,3 +1,4 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
 '''هشدار:''' این ساخت بر پایه ی یک انشعاب کاملاً آزاد است. پروژهٔ اصلی همیشه در انتشار کد مبدأ برای نگارش‌های اخیر سریع نیست.
 
 یک کلاینت برای پلت فرم پیام‌رسان تلگرام. با دوستان خود گفتگو کنید و یا گروه بسازید و هر چیزی را در آن به اشتراک بگذارید. تمام پیام و گفتگوهای شما در فضای ابری تلگرام نگهداری ‌می‌شود.
