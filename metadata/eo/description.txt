@@ -1,0 +1,14 @@
+*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
+Kliento por la mesaĝ‑sistemo Telegram.
+
+Babili kun amikoj, ekigi grupajn babilejojn kaj kunhavigi ian ajn specon de enhavo. Ĉiuj viaj mesaĝoj kaj interparoladoj estas konservataj en la Telegram-nubon.
+
+La mesaĝ‑sistemo estas projektita por poŝtelefonoj, tamen komputilaj kaj enretaj klientoj ankaŭ estas disponeblaj.
+
+Kelkaj fermkodaj partoj estis forigitaj el la originala kliento Telegram, inkluzive servojn Google Play (por trovi pozicion), HockeySDK (por mem-ĝisdatigoj) kaj Google Cloud Messaging (por puŝsciigoj). Eblo por kunhavigi pozicion funkcias per OpenStreetMap.
+
+Fieblo: nelibera reto, ĉar serviloj funkcias per fermkoda programaro.
+
+La oficiala fontkodo enhavas binaraĵojn, en tiu ĉi projektforko oni kompilis ilin el fontkodoj.
+
+Neoficiala esperantigo: https://t.me/setlanguage/eo-beta
