@@ -136,7 +136,6 @@ import org.telegram.messenger.FlagSecureReason;
 import org.telegram.messenger.ForwardingMessagesParams;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.ImageReceiver;
-import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LiteMode;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
@@ -24568,7 +24567,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                     updateTopPanel(true);
                                 }
                             });
-                        } else if (LanguageDetector.hasSupport()) {
+                        } else /*if (LanguageDetector.hasSupport()) {
                             final String[] fromLang = {null};
                             cell.setVisibility(View.GONE);
                             waitForLangDetection.set(true);
@@ -24619,7 +24618,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                     onLangDetectionDone.getAndSet(null).run();
                                 }
                             }, 250);
-                        } else if (translateEnabled) {
+                        } else */if (translateEnabled) {
                             cell.setOnClickListener(e -> {
                                 if (selectedObject == null || i >= options.size() || getParentActivity() == null) {
                                     return;
@@ -31963,11 +31962,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
     private void updateBotHelpCellClick(BotHelpCell cell) {
         final boolean translateButtonEnabled = MessagesController.getInstance(currentAccount).getTranslateController().isContextTranslateEnabled();
-        if (translateButtonEnabled && LanguageDetector.hasSupport()) {
+        if (translateButtonEnabled && false) {
             final CharSequence text = cell.getText();
-            LanguageDetector.detectLanguage(text == null ? "" : text.toString(), lang -> {
+                String lang ="";
                 String toLang = LocaleController.getInstance().getCurrentLocale().getLanguage();
-                if (lang != null && (!lang.equals(toLang) || lang.equals("und")) && !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(lang)) {
                     cell.setOnClickListener(e -> {
 
                         ActionBarPopupWindow.ActionBarPopupWindowLayout layout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(getContext());
@@ -31996,12 +31994,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         window.setFocusable(true);
                         window.showAsDropDown(cell, cell.getWidth() / 2 - AndroidUtilities.dp(90), AndroidUtilities.dp(-16), Gravity.BOTTOM | Gravity.LEFT);
                     });
-                } else {
-                    cell.setClickable(false);
-                }
-            }, err -> {
-                cell.setClickable(false);
-            });
         } else {
             cell.setClickable(false);
         }
