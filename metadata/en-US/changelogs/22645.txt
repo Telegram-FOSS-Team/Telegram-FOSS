@@ -1,0 +1,8 @@
+* Start voice chats in channels, with no limits on the number of listeners
+* Record voice chats
+* See user bios in the list of participants
+* Raise a hand to show admins you want to speak
+* Create invite links for listeners or speakers
+* Join as a channel to hide your personal account
+* Customize the left swipe action on chats: Pin, Read, Archive, Mute or Delete
+* and More

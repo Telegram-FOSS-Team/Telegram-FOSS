@@ -1,0 +1,7 @@
+* Pin several messages in any chat
+* View pinned messages on a separate page
+* Get alerts when friends sharing their live location are close and see which way they are looking
+* Send several music tracks as a playlist
+* View detailed statistics about the performance of individual posts in your channels
+* Tap the brush button when viewing a photo to edit it and send it back
+* and More
