@@ -1,0 +1,5 @@
+* Hidden media. Send media with spoiler effects.
+* Auto-remove cache. Separate settings for Private Chats, Groups, Channels – with exceptions.
+* Media/Files/Music tabs in Storage Usage. Quickly clear large cached files.
+* Updated media editor. New drawing and text tools, line smoothing, eyedropper, animated emoji.
+* Profile photos 2.0. Change photos of contacts, suggest profile pics, choose a public photo for users who can't see your real one.
