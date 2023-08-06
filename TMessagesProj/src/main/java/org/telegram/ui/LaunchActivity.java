@@ -31,6 +31,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.location.Location;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -212,6 +215,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     public ArrayList<INavigationLayout> sheetFragmentsStack = new ArrayList<>();
 
     private boolean finished;
+    final private Pattern locationRegex = Pattern.compile("geo: ?(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)(,|\\?z=)(-?\\d+)");
+    private Location sendingLocation;
     private String videoPath;
     private String voicePath;
     private String sendingText;
@@ -1720,6 +1725,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         videoPath = null;
         voicePath = null;
         sendingText = null;
+        sendingLocation = null;
         documentsPathsArray = null;
         documentsOriginalPathsArray = null;
         documentsMimeType = null;
@@ -1796,7 +1802,28 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
 
                         if (!TextUtils.isEmpty(text)) {
-                            if ((text.startsWith("http://") || text.startsWith("https://")) && !TextUtils.isEmpty(subject)) {
+                                Matcher m = locationRegex.matcher(text);
+                                if (m.find()) {
+                                    String lines[] = text.split("\\n");
+                                    String venueTitle = null;
+                                    String venueAddress = null;
+                                    if (lines[0].equals("My Position")){
+                                        // Use normal GeoPoint message (user position)
+                                    }
+                                    else if(!lines[0].contains("geo:")){
+                                        venueTitle = lines[0];
+                                        if(!lines[1].contains("geo:")){
+                                            venueAddress = lines[1];
+                                        }
+                                    }
+                                    sendingLocation = new Location("");
+                                    sendingLocation.setLatitude(Double.parseDouble(m.group(1)));
+                                    sendingLocation.setLongitude(Double.parseDouble(m.group(2)));
+                                    Bundle bundle = new Bundle();
+                                    bundle.putCharSequence("venueTitle", venueTitle);
+                                    bundle.putCharSequence("venueAddress", venueAddress);
+                                    sendingLocation.setExtras(bundle);
+                                } else if ((text.startsWith("http://") || text.startsWith("https://")) && !TextUtils.isEmpty(subject)) {
                                 text = subject + "\n" + text;
                             }
                             sendingText = text;
@@ -1880,7 +1907,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                     }
                                 }
                             }
-                        } else if (sendingText == null) {
+                        } else if (sendingText == null && sendingLocation == null) {
                             error = true;
                         }
                     }
@@ -2917,7 +2944,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     }
                 });
                 pushOpened = false;
-            } else if (videoPath != null || voicePath != null || photoPathsArray != null || sendingText != null || documentsPathsArray != null || contactsToSend != null || documentsUrisArray != null) {
+            } else if (videoPath != null || voicePath != null || photoPathsArray != null || sendingText != null || sendingLocation != null || documentsPathsArray != null || contactsToSend != null || documentsUrisArray != null) {
                 if (!AndroidUtilities.isTablet()) {
                     NotificationCenter.getInstance(intentAccount[0]).postNotificationName(NotificationCenter.closeChats);
                 }
@@ -5517,6 +5544,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         }
                         SendMessagesHelper.prepareSendingDocuments(accountInstance, documentsPathsArray, documentsOriginalPathsArray, documentsUrisArray, captionToSend, documentsMimeType, did, replyToMsg, replyToMsg, null, null, null, notify, 0, null);
                     }
+	                if (sendingLocation != null) {
+	                    SendMessagesHelper.prepareSendingLocation(accountInstance, sendingLocation, did);
+	                    sendingText = null;
+	                }
                     if (voicePath != null) {
                         File file = new File(voicePath);
 
@@ -5568,6 +5599,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         videoPath = null;
         voicePath = null;
         sendingText = null;
+        sendingLocation = null;
         documentsPathsArray = null;
         documentsOriginalPathsArray = null;
         contactsToSend = null;
