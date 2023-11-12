@@ -233,11 +233,11 @@ public class BoostViaGiftsBottomSheet extends BottomSheetWithRecyclerListView im
     }
 
     private void loadOptions() {
-        BoostRepository.loadGiftOptions(currentChat, arg -> {
+        /*BoostRepository.loadGiftOptions(currentChat, arg -> {
             giftCodeOptions.clear();
             giftCodeOptions.addAll(arg);
             updateRows(true, true);
-        });
+        });*/
     }
 
     private void updateActionButton(boolean animated) {
