@@ -1751,7 +1751,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
     private boolean isRequestingFirebaseSms;
     private void fillNextCodeParams(Bundle params, TLRPC.auth_SentCode res, boolean animate) {
-        if (res.type instanceof TLRPC.TL_auth_sentCodeTypeFirebaseSms && !res.type.verifiedFirebase && !isRequestingFirebaseSms) {
+        /*if (res.type instanceof TLRPC.TL_auth_sentCodeTypeFirebaseSms && !res.type.verifiedFirebase && !isRequestingFirebaseSms) {
             if (PushListenerController.GooglePushListenerServiceProvider.INSTANCE.hasServices()) {
                 TLRPC.TL_auth_sentCodeTypeFirebaseSms r = (TLRPC.TL_auth_sentCodeTypeFirebaseSms) res.type;
                 needShowProgress(0);
@@ -1865,7 +1865,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 resendCodeFromSafetyNet(params, res, "GOOGLE_PLAY_SERVICES_NOT_AVAILABLE");
             }
             return;
-        }
+        }*/
 
         params.putString("phoneHash", res.phone_code_hash);
         if (res.next_type instanceof TLRPC.TL_auth_codeTypeCall) {
@@ -3009,7 +3009,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             settings.allow_flashcall = simcardAvailable && allowCall && allowCancelCall && allowReadCallLog;
             settings.allow_missed_call = simcardAvailable && allowCall;
             settings.allow_app_hash = settings.allow_firebase = PushListenerController.GooglePushListenerServiceProvider.INSTANCE.hasServices();
-            if (forceDisableSafetyNet || TextUtils.isEmpty(BuildVars.SAFETYNET_KEY)) {
+            if (forceDisableSafetyNet || true) {
                 settings.allow_firebase = false;
             }
 
