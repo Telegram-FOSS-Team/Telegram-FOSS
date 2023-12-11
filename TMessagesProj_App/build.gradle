@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 repositories {
     mavenCentral()
     google()
+    maven { url 'https://www.jitpack.io' }
 }
 
 configurations {

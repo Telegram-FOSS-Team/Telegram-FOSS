@@ -5,6 +5,7 @@ apply plugin: 'com.android.library'
 repositories {
     mavenCentral()
     google()
+    maven { url 'https://www.jitpack.io' }
 }
 
 configurations {
@@ -32,6 +33,8 @@ dependencies {
     implementation 'com.stripe:stripe-android:2.0.2'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.google.guava:guava:31.1-android'
+
+    implementation 'com.github.UnifiedPush:android-connector:2.1.1'
 
     implementation 'org.osmdroid:osmdroid-android:6.1.14'
 
