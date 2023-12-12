@@ -5,7 +5,12 @@ apply plugin: 'com.android.library'
 repositories {
     mavenCentral()
     google()
-    maven { url 'https://www.jitpack.io' }
+    maven {
+        url 'https://www.jitpack.io'
+        content {
+            includeModule 'com.github.UnifiedPush', 'android-connector'
+        }
+    }
 }
 
 configurations {
