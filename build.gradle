@@ -6,6 +6,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.0.3'
+        // This is needed since android-connector:2.2.0 is built with Java 17
+        classpath 'com.android.tools:r8:8.2.33'
     }
 }
 repositories {

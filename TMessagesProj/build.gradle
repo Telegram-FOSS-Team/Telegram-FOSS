@@ -5,6 +5,12 @@ apply plugin: 'com.android.library'
 repositories {
     mavenCentral()
     google()
+    maven {
+        url 'https://www.jitpack.io'
+        content {
+            includeModule 'com.github.UnifiedPush', 'android-connector'
+        }
+    }
 }
 
 configurations {
@@ -32,6 +38,8 @@ dependencies {
     implementation 'com.stripe:stripe-android:2.0.2'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.google.guava:guava:31.1-android'
+
+    implementation 'com.github.UnifiedPush:android-connector:2.2.0'
 
     implementation 'org.osmdroid:osmdroid-android:6.1.14'
 
@@ -76,8 +84,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
 
         coreLibraryDesugaringEnabled true
     }

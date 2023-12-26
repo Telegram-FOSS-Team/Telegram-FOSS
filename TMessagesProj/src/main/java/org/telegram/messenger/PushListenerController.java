@@ -15,20 +15,25 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.TLRPC;
 
+import org.unifiedpush.android.connector.UnifiedPush;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 public class PushListenerController {
     public static final int PUSH_TYPE_FIREBASE = 2,
+        PUSH_TYPE_SIMPLE = 4,
         PUSH_TYPE_HUAWEI = 13;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({
             PUSH_TYPE_FIREBASE,
+            PUSH_TYPE_SIMPLE,
             PUSH_TYPE_HUAWEI
     })
     public @interface PushType {}
@@ -56,7 +61,7 @@ public class PushListenerController {
                 if (userConfig.getClientUserId() != 0) {
                     final int currentAccount = a;
                     if (sendStat) {
-                        String tag = pushType == PUSH_TYPE_FIREBASE ? "fcm" : "hcm";
+                        String tag = pushType == PUSH_TYPE_FIREBASE ? "fcm" : (pushType == PUSH_TYPE_HUAWEI ? "hcm" : "up");
                         TLRPC.TL_help_saveAppLog req = new TLRPC.TL_help_saveAppLog();
                         TLRPC.TL_inputAppEvent event = new TLRPC.TL_inputAppEvent();
                         event.time = SharedConfig.pushStringGetTimeStart;
@@ -84,7 +89,7 @@ public class PushListenerController {
     }
 
     public static void processRemoteMessage(@PushType int pushType, String data, long time) {
-        String tag = pushType == PUSH_TYPE_FIREBASE ? "FCM" : "HCM";
+        String tag = pushType == PUSH_TYPE_FIREBASE ? "FCM" : (pushType == PUSH_TYPE_HUAWEI ? "HCM" : "UP");
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d(tag + " PRE START PROCESSING");
         }
@@ -1470,6 +1475,61 @@ public class PushListenerController {
                 }
             }
             return hasServices;*/
+        }
+    }
+    public final static class UnifiedPushListenerServiceProvider implements IPushListenerServiceProvider {
+        public final static UnifiedPushListenerServiceProvider INSTANCE = new UnifiedPushListenerServiceProvider();
+
+        private UnifiedPushListenerServiceProvider(){};
+
+        @Override
+        public boolean hasServices() {
+            return !UnifiedPush.getDistributors(ApplicationLoader.applicationContext, new ArrayList()).isEmpty();
+        }
+
+        @Override
+        public String getLogTitle() {
+            return "UnifiedPush";
+        }
+
+        @Override
+        public void onRequestPushToken() {
+            String currentPushString = SharedConfig.pushString;
+            if (!TextUtils.isEmpty(currentPushString)) {
+                if (BuildVars.DEBUG_PRIVATE_VERSION && BuildVars.LOGS_ENABLED) {
+                    FileLog.d("UnifiedPush endpoint = " + currentPushString);
+                }
+            } else {
+                if (BuildVars.LOGS_ENABLED) {
+                    FileLog.d("No UnifiedPush string found");
+                }
+            }
+            Utilities.globalQueue.postRunnable(() -> {
+                try {
+                    SharedConfig.pushStringGetTimeStart = SystemClock.elapsedRealtime();
+                    SharedConfig.saveConfig();
+                    if (UnifiedPush.getDistributor(ApplicationLoader.applicationContext).isEmpty()) {
+                        List<String> distributors = UnifiedPush.getDistributors(ApplicationLoader.applicationContext, new ArrayList<>());
+                        if (distributors.size() > 0) {
+                            String distributor =  distributors.get(0);
+                            UnifiedPush.saveDistributor(ApplicationLoader.applicationContext, distributor);
+                        }
+                    }
+                    UnifiedPush.registerApp(
+                            ApplicationLoader.applicationContext,
+                            "default",
+                            new ArrayList<>(),
+                            "Telegram Simple"
+                            );
+                } catch (Throwable e) {
+                    FileLog.e(e);
+                }
+            });
+        }
+
+        @Override
+        public int getPushType() {
+            return PUSH_TYPE_SIMPLE;
         }
     }
 }
