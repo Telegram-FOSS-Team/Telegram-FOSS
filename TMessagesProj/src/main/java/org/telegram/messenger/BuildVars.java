@@ -12,8 +12,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 
-import com.android.billingclient.api.ProductDetails;
-
 import java.util.Objects;
 
 public class BuildVars {
@@ -43,10 +41,10 @@ public class BuildVars {
     }
 
     public static boolean useInvoiceBilling() {
-        return BillingController.billingClientEmpty || DEBUG_VERSION || ApplicationLoader.isStandaloneBuild() || isBetaApp() || isHuaweiStoreApp() || hasDirectCurrency();
+        return true;
     }
 
-    private static boolean hasDirectCurrency() {
+    /*private static boolean hasDirectCurrency() {
         if (!BillingController.getInstance().isReady() || BillingController.PREMIUM_PRODUCT_DETAILS == null) {
             return false;
         }
@@ -60,7 +58,7 @@ public class BuildVars {
             }
         }
         return false;
-    }
+    }*/
 
     private static Boolean betaApp;
     public static boolean isBetaApp() {

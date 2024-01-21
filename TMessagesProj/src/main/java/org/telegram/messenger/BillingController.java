@@ -12,18 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
 import androidx.core.util.Pair;
 
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.ConsumeParams;
-import com.android.billingclient.api.ProductDetails;
-import com.android.billingclient.api.ProductDetailsResponseListener;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchasesResponseListener;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.QueryProductDetailsParams;
-import com.android.billingclient.api.QueryPurchasesParams;
+
+import com.google.android.exoplayer2.util.Util;
 
 import org.telegram.messenger.utils.BillingUtilities;
 import org.telegram.tgnet.ConnectionsManager;
@@ -41,24 +31,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class BillingController implements PurchasesUpdatedListener, BillingClientStateListener {
+public class BillingController {
     public final static String PREMIUM_PRODUCT_ID = "telegram_premium";
-    public final static QueryProductDetailsParams.Product PREMIUM_PRODUCT = QueryProductDetailsParams.Product.newBuilder()
-            .setProductType(BillingClient.ProductType.SUBS)
-            .setProductId(PREMIUM_PRODUCT_ID)
-            .build();
-
-    @Nullable
-    public static ProductDetails PREMIUM_PRODUCT_DETAILS;
 
     private static BillingController instance;
 
     public static boolean billingClientEmpty;
 
-    private final Map<String, Consumer<BillingResult>> resultListeners = new HashMap<>();
     private final List<String> requestingTokens = Collections.synchronizedList(new ArrayList<>());
     private final Map<String, Integer> currencyExpMap = new HashMap<>();
-    private final BillingClient billingClient;
+
     private String lastPremiumTransaction;
     private String lastPremiumToken;
     private boolean isDisconnected;
@@ -72,10 +54,6 @@ public class BillingController implements PurchasesUpdatedListener, BillingClien
     }
 
     private BillingController(Context ctx) {
-        billingClient = BillingClient.newBuilder(ctx)
-                .enablePendingPurchases()
-                .setListener(this)
-                .build();
     }
 
     public void setOnCanceled(Runnable onCanceled) {
@@ -126,15 +104,6 @@ public class BillingController implements PurchasesUpdatedListener, BillingClien
         return currencyExpMap.getOrDefault(currency, 0);
     }
 
-    public void startConnection() {
-        if (isReady()) {
-            return;
-        }
-        BillingUtilities.extractCurrencyExp(currencyExpMap);
-        if (!BuildVars.useInvoiceBilling()) {
-            billingClient.startConnection(this);
-        }
-    }
 
     private void switchToInvoice() {
         if (billingClientEmpty) {
@@ -152,361 +121,6 @@ public class BillingController implements PurchasesUpdatedListener, BillingClien
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.billingProductDetailsUpdated);
     }
 
-    public boolean isReady() {
-        return billingClient.isReady();
-    }
-
-    public void queryProductDetails(List<QueryProductDetailsParams.Product> products, ProductDetailsResponseListener responseListener) {
-        if (!isReady()) {
-            throw new IllegalStateException("Billing: Controller should be ready for this call!");
-        }
-        billingClient.queryProductDetailsAsync(QueryProductDetailsParams.newBuilder().setProductList(products).build(), responseListener);
-    }
-
-    /**
-     * {@link BillingClient#queryPurchasesAsync} returns only active subscriptions and not consumed purchases.
-     */
-    public void queryPurchases(String productType, PurchasesResponseListener responseListener) {
-        billingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductType(productType).build(), responseListener);
-    }
-
-    public boolean startManageSubscription(Context ctx, String productId) {
-        try {
-            ctx.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("https://play.google.com/store/account/subscriptions?sku=%s&package=%s", productId, ctx.getPackageName()))));
-            return true;
-        } catch (ActivityNotFoundException e) {
-            return false;
-        }
-    }
-
-    public void addResultListener(String productId, Consumer<BillingResult> listener) {
-        resultListeners.put(productId, listener);
-    }
-
-    public void launchBillingFlow(Activity activity, AccountInstance accountInstance, TLRPC.InputStorePaymentPurpose paymentPurpose, List<BillingFlowParams.ProductDetailsParams> productDetails) {
-        launchBillingFlow(activity, accountInstance, paymentPurpose, productDetails, null, false);
-    }
-
-    public void launchBillingFlow(Activity activity, AccountInstance accountInstance, TLRPC.InputStorePaymentPurpose paymentPurpose, List<BillingFlowParams.ProductDetailsParams> productDetails, BillingFlowParams.SubscriptionUpdateParams subscriptionUpdateParams, boolean checkedConsume) {
-        if (!isReady() || activity == null) {
-            return;
-        }
-
-        if ((paymentPurpose instanceof TLRPC.TL_inputStorePaymentGiftPremium || paymentPurpose instanceof TLRPC.TL_inputStorePaymentStars) && !checkedConsume) {
-            queryPurchases(BillingClient.ProductType.INAPP, (billingResult, list) -> {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    Runnable callback = () -> launchBillingFlow(activity, accountInstance, paymentPurpose, productDetails, subscriptionUpdateParams, true);
-
-                    AtomicInteger productsToBeConsumed = new AtomicInteger(0);
-                    List<String> productsConsumed = new ArrayList<>();
-                    for (Purchase purchase : list) {
-                        if (purchase.isAcknowledged()) {
-                            for (BillingFlowParams.ProductDetailsParams params : productDetails) {
-                                String productId = params.zza().getProductId();
-                                if (purchase.getProducts().contains(productId)) {
-                                    productsToBeConsumed.incrementAndGet();
-                                    billingClient.consumeAsync(ConsumeParams.newBuilder()
-                                            .setPurchaseToken(purchase.getPurchaseToken())
-                                            .build(), (billingResult1, s) -> {
-                                        if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                            productsConsumed.add(productId);
-
-                                            if (productsToBeConsumed.get() == productsConsumed.size()) {
-                                                callback.run();
-                                            }
-                                        }
-                                    });
-                                    break;
-                                }
-                            }
-                        } else {
-                            onPurchasesUpdated(BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build(), Collections.singletonList(purchase));
-                            return;
-                        }
-                    }
-
-                    if (productsToBeConsumed.get() == 0) {
-                        callback.run();
-                    }
-                }
-            });
-            return;
-        }
-
-        Pair<String, String> payload = BillingUtilities.createDeveloperPayload(paymentPurpose, accountInstance);
-        String obfuscatedAccountId = payload.first;
-        String obfuscatedData = payload.second;
-
-        BillingFlowParams.Builder flowParams = BillingFlowParams.newBuilder()
-                .setObfuscatedAccountId(obfuscatedAccountId)
-                .setObfuscatedProfileId(obfuscatedData)
-                .setProductDetailsParamsList(productDetails);
-        if (subscriptionUpdateParams != null) {
-            flowParams.setSubscriptionUpdateParams(subscriptionUpdateParams);
-        }
-        int responseCode = billingClient.launchBillingFlow(activity, flowParams.build()).getResponseCode();
-        if (responseCode != BillingClient.BillingResponseCode.OK) {
-            FileLog.d("Billing: Launch Error: " + responseCode + ", " + obfuscatedAccountId + ", " + obfuscatedData);
-        }
-    }
-
-    @Override
-    public void onPurchasesUpdated(@NonNull BillingResult billing, @Nullable List<Purchase> list) {
-        FileLog.d("Billing: Purchases updated: " + billing + ", " + list);
-        if (billing.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-            if (billing.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
-                PremiumPreviewFragment.sentPremiumBuyCanceled();
-            }
-            if (onCanceled != null) {
-                onCanceled.run();
-                onCanceled = null;
-            }
-            return;
-        }
-        if (list == null || list.isEmpty()) {
-            return;
-        }
-        lastPremiumTransaction = null;
-        for (Purchase purchase : list) {
-            if (purchase.getProducts().contains(PREMIUM_PRODUCT_ID)) {
-                lastPremiumTransaction = purchase.getOrderId();
-                lastPremiumToken = purchase.getPurchaseToken();
-            }
-
-            if (!requestingTokens.contains(purchase.getPurchaseToken()) && purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
-                Pair<AccountInstance, TLRPC.InputStorePaymentPurpose> opayload = BillingUtilities.extractDeveloperPayload(purchase);
-                if (opayload == null || opayload.first == null) {
-                    continue;
-                }
-                if (!purchase.isAcknowledged()) {
-                    requestingTokens.add(purchase.getPurchaseToken());
-
-                    retrievePurpose(purchase, opayload, payload -> {
-                        TLRPC.TL_payments_assignPlayMarketTransaction req = new TLRPC.TL_payments_assignPlayMarketTransaction();
-                        req.receipt = new TLRPC.TL_dataJSON();
-                        req.receipt.data = purchase.getOriginalJson();
-                        req.purpose = payload.second;
-
-                        final AlertDialog progressDialog = new AlertDialog(ApplicationLoader.applicationContext, AlertDialog.ALERT_TYPE_SPINNER);
-                        AndroidUtilities.runOnUIThread(() -> progressDialog.showDelayed(500));
-
-                        AccountInstance acc = payload.first;
-                        acc.getConnectionsManager().sendRequest(req, (response, error) -> {
-                            AndroidUtilities.runOnUIThread(progressDialog::dismiss);
-
-                            requestingTokens.remove(purchase.getPurchaseToken());
-
-                            if (response instanceof TLRPC.Updates) {
-                                acc.getMessagesController().processUpdates((TLRPC.Updates) response, false);
-
-                                for (String productId : purchase.getProducts()) {
-                                    Consumer<BillingResult> listener = resultListeners.remove(productId);
-                                    if (listener != null) {
-                                        listener.accept(billing);
-                                    }
-                                }
-
-                                consumeGiftPurchase(purchase, req.purpose);
-                            } else if (error != null) {
-                                if (onCanceled != null) {
-                                    onCanceled.run();
-                                    onCanceled = null;
-                                }
-                                NotificationCenter.getGlobalInstance().postNotificationNameOnUIThread(NotificationCenter.billingConfirmPurchaseError, req, error);
-                            }
-                        }, ConnectionsManager.RequestFlagFailOnServerErrors | ConnectionsManager.RequestFlagFailOnServerErrorsExceptFloodWait | ConnectionsManager.RequestFlagInvokeAfter);
-                    });
-                } else {
-                    consumeGiftPurchase(purchase, opayload.second);
-                }
-            }
-        }
-    }
-
-    private boolean retrievePurpose(Purchase purchase, Pair<AccountInstance, TLRPC.InputStorePaymentPurpose> payload, Utilities.Callback<Pair<AccountInstance, TLRPC.InputStorePaymentPurpose>> whenPayload) {
-        if (payload == null || payload.first == null) {
-            FileLog.d("retrievePurpose: payload or account is null");
-            return false;
-        }
-        if (payload.second != null) {
-            FileLog.d("retrievePurpose: already has purpose");
-            whenPayload.run(payload);
-            return true;
-        }
-        if (purchase == null || purchase.getProducts().isEmpty()) {
-            FileLog.d("retrievePurpose: no products found for purpose!");
-            whenPayload.run(payload);
-            return false;
-        } else {
-            final int currentAccount = payload.first.getCurrentAccount();
-            final String productId = purchase.getProducts().get(0);
-
-            if (productId == null) {
-                FileLog.d("retrievePurpose: first product is null!");
-                whenPayload.run(payload);
-                return false;
-            }
-
-            ArrayList<TLRPC.TL_starsTopupOption> options = StarsController.getInstance(currentAccount).getOptionsCached();
-            if (options == null) {
-                ConnectionsManager.getInstance(currentAccount).sendRequest(new TLRPC.TL_payments_getStarsTopupOptions(), (res, err) -> AndroidUtilities.runOnUIThread(() -> {
-                    ArrayList<TLRPC.TL_starsTopupOption> loadedOptions = new ArrayList<>();
-                    if (res instanceof TLRPC.Vector) {
-                        TLRPC.Vector vector = (TLRPC.Vector) res;
-                        for (Object object : vector.objects) {
-                            if (object instanceof TLRPC.TL_starsTopupOption) {
-                                TLRPC.TL_starsTopupOption option = (TLRPC.TL_starsTopupOption) object;
-                                loadedOptions.add(option);
-                            }
-                        }
-                    } else if (err != null) {
-                        FileLog.d("retrievePopup: getStarsTopupOptions gives error! " + err.code + ": " + err.text);
-                    }
-
-                    TLRPC.TL_starsTopupOption foundOption = null;
-                    for (int i = 0; i < loadedOptions.size(); ++i) {
-                        if (productId.equals(loadedOptions.get(i).store_product)) {
-                            foundOption = loadedOptions.get(i);
-                            break;
-                        }
-                    }
-
-                    if (foundOption != null) {
-                        TLRPC.TL_inputStorePaymentStars purpose = new TLRPC.TL_inputStorePaymentStars();
-                        purpose.amount = foundOption.amount;
-                        purpose.currency = foundOption.currency;
-                        purpose.stars = foundOption.stars;
-                        FileLog.d("retrievePurpose: found stars option of " + productId + " from stars loaded options!");
-                        whenPayload.run(new Pair<AccountInstance, TLRPC.InputStorePaymentPurpose>(payload.first, purpose));
-                    } else {
-                        FileLog.d("retrievePurpose: failed to find option of " + productId + " from stars loaded options");
-                        whenPayload.run(payload);
-                    }
-                }));
-                return true;
-            } else {
-                TLRPC.TL_starsTopupOption foundOption = null;
-                for (int i = 0; i < options.size(); ++i) {
-                    if (productId.equals(options.get(i).store_product)) {
-                        foundOption = options.get(i);
-                        break;
-                    }
-                }
-
-                if (foundOption != null) {
-                    TLRPC.TL_inputStorePaymentStars purpose = new TLRPC.TL_inputStorePaymentStars();
-                    purpose.amount = foundOption.amount;
-                    purpose.currency = foundOption.currency;
-                    purpose.stars = foundOption.stars;
-                    FileLog.d("retrievePurpose: found stars option of " + productId + " from stars options!");
-                    whenPayload.run(new Pair<AccountInstance, TLRPC.InputStorePaymentPurpose>(payload.first, purpose));
-                    return true;
-                } else {
-                    FileLog.d("retrievePurpose: failed to find option of " + productId + " from stars options");
-                    whenPayload.run(payload);
-                    return false;
-                }
-            }
-        }
-    }
-
-    /**
-     * All consumable purchases must be consumed. For us it is a gift.
-     * Without confirmation the user will not be able to buy the product again.
-     */
-    private void consumeGiftPurchase(Purchase purchase, TLRPC.InputStorePaymentPurpose purpose) {
-        if (purpose instanceof TLRPC.TL_inputStorePaymentGiftPremium
-                || purpose instanceof TLRPC.TL_inputStorePaymentPremiumGiftCode
-                || purpose instanceof TLRPC.TL_inputStorePaymentStars
-                || purpose instanceof TLRPC.TL_inputStorePaymentPremiumGiveaway) {
-            billingClient.consumeAsync(
-                    ConsumeParams.newBuilder()
-                            .setPurchaseToken(purchase.getPurchaseToken())
-                            .build(), (r, s) -> {
-                    });
-        }
-    }
-
-    /**
-     * May occur in extremely rare cases.
-     * For example when Google Play decides to update.
-     */
-    @SuppressWarnings("Convert2MethodRef")
-    @Override
-    public void onBillingServiceDisconnected() {
-        FileLog.d("Billing: Service disconnected");
-        int delay = isDisconnected ? 15000 : 5000;
-        isDisconnected = true;
-        AndroidUtilities.runOnUIThread(() -> startConnection(), delay);
-    }
-
-    private ArrayList<Runnable> setupListeners = new ArrayList<>();
-    public void whenSetuped(Runnable listener) {
-        setupListeners.add(listener);
-    }
-
-    private int triesLeft = 0;
-
-    @Override
-    public void onBillingSetupFinished(@NonNull BillingResult setupBillingResult) {
-        FileLog.d("Billing: Setup finished with result " + setupBillingResult);
-        if (setupBillingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-            isDisconnected = false;
-            triesLeft = 3;
-            try {
-                queryProductDetails(Collections.singletonList(PREMIUM_PRODUCT), this::onQueriedPremiumProductDetails);
-            } catch (Exception e) {
-                FileLog.e(e);
-            }
-            queryPurchases(BillingClient.ProductType.INAPP, this::onPurchasesUpdated);
-            queryPurchases(BillingClient.ProductType.SUBS, this::onPurchasesUpdated);
-            if (!setupListeners.isEmpty()) {
-                for (int i = 0; i < setupListeners.size(); ++i) {
-                    AndroidUtilities.runOnUIThread(setupListeners.get(i));
-                }
-                setupListeners.clear();
-            }
-        } else {
-            if (!isDisconnected) {
-                switchToInvoice();
-            }
-        }
-    }
-
-    private void onQueriedPremiumProductDetails(BillingResult billingResult, List<ProductDetails> list) {
-        FileLog.d("Billing: Query product details finished " + billingResult + ", " + list);
-        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-            for (ProductDetails details : list) {
-                if (details.getProductId().equals(PREMIUM_PRODUCT_ID)) {
-                    PREMIUM_PRODUCT_DETAILS = details;
-                }
-            }
-            if (PREMIUM_PRODUCT_DETAILS == null) {
-                switchToInvoice();
-            } else {
-                switchBackFromInvoice();
-                NotificationCenter.getGlobalInstance().postNotificationNameOnUIThread(NotificationCenter.billingProductDetailsUpdated);
-            }
-        } else {
-            switchToInvoice();
-            triesLeft--;
-            if (triesLeft > 0) {
-                long delay;
-                if (triesLeft == 2) {
-                    delay = 1000;
-                } else {
-                    delay = 10000;
-                }
-                AndroidUtilities.runOnUIThread(() -> {
-                    try {
-                        queryProductDetails(Collections.singletonList(PREMIUM_PRODUCT), this::onQueriedPremiumProductDetails);
-                    } catch (Exception e) {
-                        FileLog.e(e);
-                    }
-                }, delay);
-            }
-        }
-    }
 
     public static String getResponseCodeString(int code) {
         switch (code) {
