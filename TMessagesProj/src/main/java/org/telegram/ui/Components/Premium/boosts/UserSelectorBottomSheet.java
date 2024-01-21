@@ -337,10 +337,10 @@ public class UserSelectorBottomSheet extends BottomSheetWithRecyclerListView imp
         initHints(false);
         updateList(false, true);
         fixNavigationBar();
-        BoostRepository.loadGiftOptions(null, arg -> {
+        /*BoostRepository.loadGiftOptions(null, arg -> {
             paymentOptions.clear();
             paymentOptions.addAll(arg);
-        });
+        });*/
     }
 
     private void initContacts(boolean needUpdate) {
