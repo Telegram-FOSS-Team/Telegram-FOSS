@@ -31,7 +31,6 @@ public class BuildVars {
     // SafetyNet key for Google Identity SDK, set it to empty to disable
     public static String PLAYSTORE_APP_URL = "https://f-droid.org/en/packages/org.telegram.messenger/";
 
-    public static String HUAWEI_APP_ID = "101184875";
 
     // You can use this flag to disable Google Play Billing (If you're making fork and want it to be in Google Play)
     public static boolean IS_BILLING_UNAVAILABLE = false;
