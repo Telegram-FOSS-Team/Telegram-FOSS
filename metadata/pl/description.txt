@@ -1,5 +1,4 @@
-*Warning:* Creating new accounts in the FOSS version not possible anymore, you have to create an account in the official build and then login to the FOSS. 
-<b>Uwaga</b>: ta kompilacja jest w pełni otwartoźródłową odnogą, a programiści oryginalnej wersji z opóźnieniem publikują kod źródłowy najnowszych wydań, więc nowe wersje mogą być wydawane z pewnym opóźnieniem.
+<b>Uwaga</b>: tworzenie nowych kont w wersji FOSS nie jest już możliwe, neleży utworzyć konto w wersji oficjalnej i następnie zalogować się w wersji FOSS.
 
 Klient platformy komunikacyjnej Telegram. Rozmawiaj z przyjaciółmi, uczestnicz w czatach grupowych i dziel się dowolnym rodzajem treści. Wszystkie Twoje wiadomości i rozmowy są przechowywane w chmurze Telegram.
 
@@ -9,4 +8,4 @@ Kilka własnościowych modułów zostało usuniętych z oryginalnego klienta Tel
 
 Niepożądana funkcja: niewolna sieć, serwery używają własnościowego oprogramowania.
 
-Oryginalny kod źródłowy zawiera binarki, ta wersja zawiera je skompilowane z kodu źródłowego.
+Oryginalny kod źródłowy zawiera binarki, ta wersja zawiera je skompilowane z kodu źródłowego. Z tego powodu nowe wersje mogą być publikowane z pewnym opóźnieniem.
