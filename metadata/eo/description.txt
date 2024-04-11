@@ -1,0 +1,13 @@
+<b>Averto</b>: kreado de novaj kontoj en la versio FOSS ne eblas plu; kreu konton per la oficiala kliento kaj sekve ensalutu en la version FOSS.
+
+Babili kun amikoj, ekigi grupajn babilejojn kaj kunhavigi ian ajn specon de enhavo. Ĉiuj viaj mesaĝoj kaj interparoladoj estas konservataj en la Telegram-nubon.
+
+La mesaĝ‑sistemo estas projektita por poŝtelefonoj, tamen komputilaj kaj retfoliumilaj klientoj ankaŭ estas disponeblaj.
+
+Kelkaj fermkodaj partoj estis forigitaj el la originala kliento Telegram, inkluzive servojn Google Play (por trovi pozicion), HockeySDK (por mem-ĝisdatigoj) kaj Google Cloud Messaging (por puŝ-sciigoj). Eblo por kunhavigi pozicion funkcias per OpenStreetMap.
+
+Fieblo: nelibera reto, ĉar serviloj funkcias per fermkoda programaro.
+
+La oficiala fontkodo enhavas binaraĵojn, en tiu ĉi projektforko oni kompilis ilin el fontkodoj. Pro tio novaj version povas esti eldonataj kun ioma prokrasto.
+
+Beta-versio de esperantigo: https://t.me/setlanguage/eo-beta

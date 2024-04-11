@@ -1,0 +1,11 @@
+<b>Uwaga</b>: tworzenie nowych kont w wersji FOSS nie jest już możliwe, neleży utworzyć konto w wersji oficjalnej i następnie zalogować się w wersji FOSS.
+
+Klient platformy komunikacyjnej Telegram. Rozmawiaj z przyjaciółmi, uczestnicz w czatach grupowych i dziel się dowolnym rodzajem treści. Wszystkie Twoje wiadomości i rozmowy są przechowywane w chmurze Telegram.
+
+Ta platforma komunikacji jest skoncentrowana głównie na urządzeniach mobilnych, ale są także dostępne klienty na komputer i przeglądarkę.
+
+Kilka własnościowych modułów zostało usuniętych z oryginalnego klienta Telegram, włączając Usługi Google Play (dla lokalizacji), HockeySDK (dla automatycznych aktualizacji) i powiadomienia «push» przez Google Cloud Messaging. Funkcja udostępniania lokalizacji została przywrócona używając OpenStreetMap.
+
+Niepożądana funkcja: niewolna sieć, serwery używają własnościowego oprogramowania.
+
+Oryginalny kod źródłowy zawiera binarki, ta wersja zawiera je skompilowane z kodu źródłowego. Z tego powodu nowe wersje mogą być publikowane z pewnym opóźnieniem.

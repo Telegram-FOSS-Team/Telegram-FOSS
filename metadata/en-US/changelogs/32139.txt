@@ -1,0 +1,9 @@
+* Creating new accounts in FOSS version not possible anymore, have to create an account in the official build and then login to the FOSS.
+* Power Saving Mode
+* Granular Playback Speed
+* Read Time in Small Groups
+* Auto-Send Invite Links
+* Dynamic Order for Sticker Packs
+* Translated Bot Descriptions
+* New Animated Emoji
+* New Interactive Emoji and Reactions
