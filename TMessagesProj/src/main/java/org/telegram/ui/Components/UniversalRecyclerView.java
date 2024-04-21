@@ -21,7 +21,6 @@ import org.telegram.ui.FiltersSetupActivity;
 
 import java.util.ArrayList;
 
-import kotlinx.coroutines.android.AndroidDispatcherFactory;
 
 public class UniversalRecyclerView extends RecyclerListView {
 
