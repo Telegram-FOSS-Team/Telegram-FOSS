@@ -1,32 +1,31 @@
-From 43577e445b62471dda94ac7edfcee4443df4cb97 Mon Sep 17 00:00:00 2001
-From: thermatk <thermatk@thermatk.com>
-Date: Sat, 13 Apr 2024 15:43:27 +0200
+From b3958bdfcc9c753477fdf6e0da799c1c4e4077f1 Mon Sep 17 00:00:00 2001
+From: Marcus Hoffmann <bubu@bubu1.eu>
+Date: Tue, 31 Jul 2018 17:15:39 +0200
 Subject: [PATCH] add aes ige mode
 
 ---
- build.json                      |   1 +
- crypto/fipsmodule/aes/aes_ige.c | 323 ++++++++++++++++++++++++++++++++
- gen/sources.cmake               |   1 +
- gen/sources.json                |   3 +-
- include/openssl/aes.h           |   9 +
- 5 files changed, 336 insertions(+), 1 deletion(-)
+ crypto/fipsmodule/CMakeLists.txt |   2 +
+ crypto/fipsmodule/aes/aes_ige.c  | 323 +++++++++++++++++++++++++++++++
+ include/openssl/aes.h            |   9 +
+ 3 files changed, 334 insertions(+)
  create mode 100644 crypto/fipsmodule/aes/aes_ige.c
 
-diff --git a/build.json b/build.json
-index a431f6a42..4003ac412 100644
---- a/build.json
-+++ b/build.json
-@@ -259,6 +259,7 @@
-             "crypto/evp/sign.c",
-             "crypto/ex_data.c",
-             "crypto/fipsmodule/fips_shared_support.c",
-+            "crypto/fipsmodule/aes/aes_ige.c",
-             "crypto/hpke/hpke.c",
-             "crypto/hrss/hrss.c",
-             "crypto/keccak/keccak.c",
+diff --git a/crypto/fipsmodule/CMakeLists.txt b/crypto/fipsmodule/CMakeLists.txt
+index 30823755..b349572c 100644
+--- a/crypto/fipsmodule/CMakeLists.txt
++++ b/crypto/fipsmodule/CMakeLists.txt
+@@ -198,6 +198,8 @@ else()
+     bcm.c
+     fips_shared_support.c
+ 
++    aes/aes_ige.c
++
+     ${BCM_ASM_SOURCES}
+   )
+
 diff --git a/crypto/fipsmodule/aes/aes_ige.c b/crypto/fipsmodule/aes/aes_ige.c
 new file mode 100644
-index 000000000..b425c7d69
+index 00000000..b425c7d6
 --- /dev/null
 +++ b/crypto/fipsmodule/aes/aes_ige.c
 @@ -0,0 +1,323 @@
@@ -353,42 +352,11 @@ index 000000000..b425c7d69
 +			}
 +		}
 +	}
-diff --git a/gen/sources.cmake b/gen/sources.cmake
-index 927363daf..c73ecf1a9 100644
---- a/gen/sources.cmake
-+++ b/gen/sources.cmake
-@@ -374,6 +374,7 @@ set(
-   crypto/evp/sign.c
-   crypto/ex_data.c
-   crypto/fipsmodule/fips_shared_support.c
-+  crypto/fipsmodule/aes/aes_ige.c
-   crypto/hpke/hpke.c
-   crypto/hrss/hrss.c
-   crypto/keccak/keccak.c
-diff --git a/gen/sources.json b/gen/sources.json
-index 1fe651706..56a0f4f71 100644
---- a/gen/sources.json
-+++ b/gen/sources.json
-@@ -344,6 +344,7 @@
-       "crypto/evp/sign.c",
-       "crypto/ex_data.c",
-       "crypto/fipsmodule/fips_shared_support.c",
-+      "crypto/fipsmodule/aes/aes_ige.c",
-       "crypto/hpke/hpke.c",
-       "crypto/hrss/hrss.c",
-       "crypto/keccak/keccak.c",
-@@ -2630,4 +2631,4 @@
-       "crypto/fipsmodule/rand/urandom_test.cc"
-     ]
-   }
--}
-\ No newline at end of file
-+}
 diff --git a/include/openssl/aes.h b/include/openssl/aes.h
-index 496ec90d1..ecf276672 100644
+index 11565854..0130fec5 100644
 --- a/include/openssl/aes.h
 +++ b/include/openssl/aes.h
-@@ -150,6 +150,15 @@ OPENSSL_EXPORT void AES_cfb128_encrypt(const uint8_t *in, uint8_t *out,
+@@ -138,6 +138,15 @@ OPENSSL_EXPORT void AES_cfb128_encrypt(const uint8_t *in, uint8_t *out,
                                         size_t len, const AES_KEY *key,
                                         uint8_t *ivec, int *num, int enc);
  
@@ -405,5 +373,5 @@ index 496ec90d1..ecf276672 100644
  // AES key wrap.
  //
 -- 
-2.44.0
+2.17.1
 
