@@ -32,12 +32,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import com.google.mlkit.common.MlKitException;
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.segmentation.subject.Subject;
-import com.google.mlkit.vision.segmentation.subject.SubjectSegmentation;
-import com.google.mlkit.vision.segmentation.subject.SubjectSegmenter;
-import com.google.mlkit.vision.segmentation.subject.SubjectSegmenterOptions;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLoader;
@@ -532,6 +526,7 @@ public class StickerMakerView extends FrameLayout implements NotificationCenter.
         }
         if (segmentingLoading || source == null) return;
         if (Build.VERSION.SDK_INT < 24) return;
+        /*
         SubjectSegmenter segmenter = SubjectSegmentation.getClient(
             new SubjectSegmenterOptions.Builder()
                 .enableMultipleSubjects(
@@ -540,9 +535,10 @@ public class StickerMakerView extends FrameLayout implements NotificationCenter.
                         .build()
                 )
                 .build()
-        );
+        );*/
         segmentingLoading = true;
         sourceBitmap = source;
+        /*
         InputImage inputImage = InputImage.fromBitmap(source, orientation);
         segmenter.process(inputImage)
                 .addOnSuccessListener(result -> {
@@ -605,10 +601,10 @@ public class StickerMakerView extends FrameLayout implements NotificationCenter.
                     FileLog.e(error);
                     if (isWaitingMlKitError(error) && isAttachedToWindow()) {
                         AndroidUtilities.runOnUIThread(() -> segmentImage(source, orientation, containerWidth, containerHeight), 2000);
-                    } else {
+                    } else {*/
                         segmentingLoaded = true;
-                    }
-                });
+                    //}
+                //});
     }
 
     private void createSegmentImagePath(SegmentedObject object, int containerWidth, int containerHeight) {
@@ -817,9 +813,6 @@ public class StickerMakerView extends FrameLayout implements NotificationCenter.
         actionTextView.setScaleY(0.3f);
     }
 
-    public static boolean isWaitingMlKitError(Exception e) {
-        return e instanceof MlKitException && e.getMessage() != null && e.getMessage().contains("segmentation optional module to be downloaded");
-    }
 
     public void setCurrentAccount(int account) {
         if (currentAccount != account) {
