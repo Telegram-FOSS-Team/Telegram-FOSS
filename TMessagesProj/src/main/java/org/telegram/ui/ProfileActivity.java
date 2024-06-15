@@ -78,6 +78,7 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -152,6 +153,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.browser.Browser;
+import org.telegram.messenger.voip.VoIPService;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLObject;
@@ -2645,7 +2647,6 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
 
         fragmentView = new NestedFrameLayout(context) {
-
             @Override
             public boolean dispatchTouchEvent(MotionEvent ev) {
                 if (pinchToZoomHelper.isInOverlayMode()) {
@@ -2658,6 +2659,21 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     return true;
                 }
                 return super.dispatchTouchEvent(ev);
+            }
+
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent event) {
+                if(event.getKeyCode() ==KeyEvent.KEYCODE_CALL) {
+                    if(event.getAction() ==KeyEvent.ACTION_DOWN &&actionBar!=null &&actionBar.actionBarMenuOnItemClick!=null &&(callItemVisible ||videoCallItemVisible)) {
+                        //event.startTracking();
+                        return true;
+                    }
+                    else if(event.getAction()==KeyEvent.ACTION_UP &&getParentActivity() !=null) {
+                        actionBar.actionBarMenuOnItemClick.onItemClick(event.getRepeatCount() == 0 || (callItemVisible && !videoCallItemVisible) ? call_item : video_call_item);
+                        return true;
+                    }
+                }
+                return super.dispatchKeyEvent(event);
             }
 
             private boolean ignoreLayout;

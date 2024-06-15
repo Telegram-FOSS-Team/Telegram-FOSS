@@ -316,6 +316,28 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
                     fragment.onBackPressed();
                     return true;
                 }
+                //if(event.getAction() ==KeyEvent.ACTION_DOWN &&keyCode ==KeyEvent.KEYCODE_CALL) event.startTracking();
+                if(event.getAction() ==KeyEvent.ACTION_DOWN &&event.getRepeatCount()==0 &&(keyCode ==KeyEvent.KEYCODE_CALL ||keyCode ==KeyEvent.KEYCODE_F1 ||keyCode ==KeyEvent.KEYCODE_MENU)) {
+                    VoIPService s=VoIPService.getSharedInstance();
+                    if(keyCode ==KeyEvent.KEYCODE_CALL) {
+                        if(!fragment.acceptIncomingCallOrCall()) {
+                            s.setMicMute(!s.isMicMute(), false, true);
+                            fragment.previousState = fragment.currentState;
+                            fragment.updateViewState();
+                            AccessibilityManager ac=((AccessibilityManager) getContext().getSystemService(Context.ACCESSIBILITY_SERVICE));
+if(ac.isTouchExplorationEnabled())announceForAccessibility(s.isMicMute() ? LocaleController.getString("AccDescrVoipMicOff", R.string.AccDescrVoipMicOff) : LocaleController.getString("AccDescrVoipMicOn", R.string.AccDescrVoipMicOn));
+ac=null;
+                        }
+                    }
+                    else if(keyCode ==KeyEvent.KEYCODE_F1) {
+                        if (s==null ||s.getCallState() == VoIPService.STATE_BUSY) fragment.windowView.finish();
+                        else if (s.getCallState() == VoIPService.STATE_WAITING_INCOMING) s.hangUp(); else if (s.getCallState() != VoIPService.STATE_BUSY) s.declineIncomingCall();
+                    }
+                    else if(keyCode==KeyEvent.KEYCODE_MENU) {
+                        if(s!=null) s.toggleSpeakerphoneOrShowRouteSheet(getContext(), false);
+                    }
+                    return true;
+                }
                 if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
                     if (fragment.currentState == VoIPService.STATE_WAITING_INCOMING) {
                         final VoIPService service = VoIPService.getSharedInstance();
@@ -598,6 +620,48 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
 
     }
 
+    public boolean acceptIncomingCallOrCall() {
+        if (currentState == VoIPService.STATE_BUSY) {
+            Intent intent = new Intent(activity, VoIPService.class);
+            intent.putExtra("user_id", callingUser.id);
+            intent.putExtra("is_outgoing", true);
+            intent.putExtra("start_incall_activity", false);
+            intent.putExtra("video_call", isVideoCall);
+            intent.putExtra("can_video_call", isVideoCall);
+            intent.putExtra("account", currentAccount);
+            try {
+                activity.startService(intent);
+                return true;
+            } catch (Throwable e) {
+                FileLog.e(e);
+                return false;
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                activity.requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 101);
+                return true;
+            } else {
+                if (VoIPService.getSharedInstance() != null  &&VoIPService.getSharedInstance().getCallState() ==VoIPService.STATE_WAITING_INCOMING) {
+                    /*runAcceptCallAnimation(() -> {
+                        if (VoIPService.getSharedInstance() != null  &&VoIPService.getSharedInstance().getCallState() ==VoIPService.STATE_WAITING_INCOMING) {
+                            VoIPService.getSharedInstance().acceptIncomingCall();
+                            if (currentUserIsVideo) {
+                                VoIPService.getSharedInstance().requestVideoCall(false);
+                            }
+                        }
+                    });*/
+                    if (VoIPService.getSharedInstance() != null &&VoIPService.getSharedInstance().getCallState() ==VoIPService.STATE_WAITING_INCOMING) {
+                        VoIPService.getSharedInstance().acceptIncomingCall();
+                        if (currentUserIsVideo) {
+                            VoIPService.getSharedInstance().requestVideoCall(false);
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     public View createView(Context context) {
         touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         accessibilityManager = ContextCompat.getSystemService(context, AccessibilityManager.class);
@@ -1038,35 +1102,7 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
 
             @Override
             public void onAccept() {
-                if (currentState == VoIPService.STATE_BUSY) {
-                    Intent intent = new Intent(activity, VoIPService.class);
-                    intent.putExtra("user_id", callingUser.id);
-                    intent.putExtra("is_outgoing", true);
-                    intent.putExtra("start_incall_activity", false);
-                    intent.putExtra("video_call", isVideoCall);
-                    intent.putExtra("can_video_call", isVideoCall);
-                    intent.putExtra("account", currentAccount);
-                    try {
-                        activity.startService(intent);
-                    } catch (Throwable e) {
-                        FileLog.e(e);
-                    }
-                } else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                        activity.requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 101);
-                    } else {
-                        if (VoIPService.getSharedInstance() != null) {
-                            runAcceptCallAnimation(() -> {
-                                if (VoIPService.getSharedInstance() != null) {
-                                    VoIPService.getSharedInstance().acceptIncomingCall();
-                                    if (currentUserIsVideo) {
-                                        VoIPService.getSharedInstance().requestVideoCall(false);
-                                    }
-                                }
-                            });
-                        }
-                    }
-                }
+                acceptIncomingCallOrCall();
             }
 
             @Override
@@ -1846,18 +1882,7 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
                                     .setPositiveButton(LocaleController.getString("VoipPeerVideoOutdatedMakeVoice", R.string.VoipPeerVideoOutdatedMakeVoice), (dialogInterface, i) -> {
                                         callAgain[0] = true;
                                         currentState = VoIPService.STATE_BUSY;
-                                        Intent intent = new Intent(activity, VoIPService.class);
-                                        intent.putExtra("user_id", callingUser.id);
-                                        intent.putExtra("is_outgoing", true);
-                                        intent.putExtra("start_incall_activity", false);
-                                        intent.putExtra("video_call", false);
-                                        intent.putExtra("can_video_call", false);
-                                        intent.putExtra("account", currentAccount);
-                                        try {
-                                            activity.startService(intent);
-                                        } catch (Throwable e) {
-                                            FileLog.e(e);
-                                        }
+acceptIncomingCallOrCall();
                                     })
                                     .show();
                             dlg.setCanceledOnTouchOutside(true);
