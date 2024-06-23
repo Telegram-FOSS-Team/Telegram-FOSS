@@ -320,7 +320,7 @@ public class VoIPFragment implements VoIPService.StateListener, NotificationCent
                 if(event.getAction() ==KeyEvent.ACTION_DOWN &&event.getRepeatCount()==0 &&(keyCode ==KeyEvent.KEYCODE_CALL ||keyCode ==KeyEvent.KEYCODE_F1 ||keyCode ==KeyEvent.KEYCODE_MENU)) {
                     VoIPService s=VoIPService.getSharedInstance();
                     if(keyCode ==KeyEvent.KEYCODE_CALL) {
-                        if(!fragment.acceptIncomingCallOrCall()) {
+                        if(!fragment.acceptIncomingCallOrCall() &&s!=null) {
                             s.setMicMute(!s.isMicMute(), false, true);
                             fragment.previousState = fragment.currentState;
                             fragment.updateViewState();
