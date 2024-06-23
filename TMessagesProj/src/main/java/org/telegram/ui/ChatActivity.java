@@ -8043,7 +8043,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             botMessageHint.show();
         });
     }
-    
+
     private void hideHints() {
         if (savedMessagesTagHint != null && savedMessagesTagHint.shown()) {
             savedMessagesTagHint.hide();
@@ -16343,6 +16343,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == 1 && forwardingPreviewView != null && forwardingPreviewView.isShowing()) {
                 forwardingPreviewView.dismiss(true);
                 return true;
+            }
+            else if(event.getKeyCode() ==KeyEvent.KEYCODE_CALL &&currentUser!=null) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    //event.startTracking();
+                    return true;
+                } else if (event.getAction() == KeyEvent.ACTION_UP && getParentActivity() != null) {
+                    TLRPC.UserFull userFull = getMessagesController().getUserFull(currentUser.id);
+                    if (userFull != null && userFull.phone_calls_available && VoIPService.getSharedInstance() == null)
+                        VoIPHelper.startCall(currentUser, event.getRepeatCount() > 0, userInfo != null && userInfo.video_calls_available, getParentActivity(), getMessagesController().getUserFull(currentUser.id), getAccountInstance());
+                    return true;
+                }
             }
             return super.dispatchKeyEvent(event);
         }
@@ -37367,7 +37378,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             clip[1] = chatListView.getMeasuredHeight() - (chatListView.getPaddingBottom() - AndroidUtilities.dp(3));
         }
     }
-    
+
     private void updateVisibleWallpaperActions() {
         if (chatListView != null && chatAdapter != null) {
             for (int i = 0; i < chatListView.getChildCount(); ++i) {
