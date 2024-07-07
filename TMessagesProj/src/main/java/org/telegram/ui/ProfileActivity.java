@@ -12604,7 +12604,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             ArrayList<TLRPC.TL_premiumGiftOption> options = new ArrayList<>(userInfo.premium_gifts);
             if (options.isEmpty()) {
                 if (getVisibleDialog() != null) return;
-                final AlertDialog progressDialog = new AlertDialog(getContext(), AlertDialog.ALERT_TYPE_SPINNER);
+                /*final AlertDialog progressDialog = new AlertDialog(getContext(), AlertDialog.ALERT_TYPE_SPINNER);
                 final int reqId = BoostRepository.loadGiftOptions(null, loadedOptions -> {
                     progressDialog.dismiss();
                     if (getVisibleDialog() != null) return;
@@ -12618,6 +12618,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     getConnectionsManager().cancelRequest(reqId, true);
                 });
                 progressDialog.showDelayed(500);
+                */
             } else {
                 showDialog(new GiftPremiumBottomSheet(this, user));
             }

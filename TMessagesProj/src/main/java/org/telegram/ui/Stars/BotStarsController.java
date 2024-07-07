@@ -11,10 +11,6 @@ import android.util.LongSparseArray;
 
 import androidx.annotation.NonNull;
 
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.ProductDetails;
-import com.android.billingclient.api.QueryProductDetailsParams;
 
 import org.json.JSONObject;
 import org.telegram.messenger.AccountInstance;

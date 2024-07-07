@@ -8,11 +8,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.ProductDetails;
-import com.android.billingclient.api.QueryProductDetailsParams;
-
 import org.json.JSONObject;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -188,7 +183,7 @@ public class StarsController {
             optionsLoaded = true;
             optionsLoading = false;
             NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.starOptionsLoaded);
-            if (!toLoadStorePrice.isEmpty()) {
+            /*if (!toLoadStorePrice.isEmpty()) {
                 Runnable fetchStorePrices = () -> {
                     ArrayList<QueryProductDetailsParams.Product> productQueries = new ArrayList<>();
                     for (int i = 0; i < toLoadStorePrice.size(); ++i) {
@@ -232,7 +227,7 @@ public class StarsController {
                 } else {
                     fetchStorePrices.run();
                 }
-            }
+            }*/
         }));
         return options;
     }
@@ -347,7 +342,7 @@ public class StarsController {
             return;
         }
 
-        if (BuildVars.useInvoiceBilling() || !BillingController.getInstance().isReady()) {
+        if (BuildVars.useInvoiceBilling()) {
             TLRPC.TL_inputStorePaymentStars payload = new TLRPC.TL_inputStorePaymentStars();
             payload.stars = option.stars;
             payload.currency = option.currency;
@@ -417,41 +412,6 @@ public class StarsController {
         payload.stars = option.stars;
         payload.currency = option.currency;
         payload.amount = option.amount;
-        QueryProductDetailsParams.Product product = QueryProductDetailsParams.Product.newBuilder()
-                .setProductType(BillingClient.ProductType.INAPP)
-                .setProductId(option.store_product)
-                .build();
-        BillingController.getInstance().queryProductDetails(Arrays.asList(product), (billingResult, list) -> AndroidUtilities.runOnUIThread(() -> {
-            if (list.isEmpty()) {
-                AndroidUtilities.runOnUIThread(() -> whenDone.run(false, "PRODUCT_NOT_FOUND"));
-                return;
-            }
-
-            ProductDetails productDetails = list.get(0);
-            ProductDetails.OneTimePurchaseOfferDetails offerDetails = productDetails.getOneTimePurchaseOfferDetails();
-            if (offerDetails == null) {
-                AndroidUtilities.runOnUIThread(() -> whenDone.run(false, "PRODUCT_NO_ONETIME_OFFER_DETAILS"));
-                return;
-            }
-
-            payload.currency = offerDetails.getPriceCurrencyCode();
-            payload.amount = (long) ((offerDetails.getPriceAmountMicros() / Math.pow(10, 6)) * Math.pow(10, BillingController.getInstance().getCurrencyExp(option.currency)));
-
-            BillingController.getInstance().addResultListener(productDetails.getProductId(), billingResult1 -> {
-                final boolean success = billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK;
-                final String error = success ? null : BillingController.getResponseCodeString(billingResult.getResponseCode());
-                AndroidUtilities.runOnUIThread(() -> whenDone.run(success, error));
-            });
-            BillingController.getInstance().setOnCanceled(() -> {
-                AndroidUtilities.runOnUIThread(() -> whenDone.run(false, null));
-            });
-            BillingController.getInstance().launchBillingFlow(
-                    activity, AccountInstance.getInstance(UserConfig.selectedAccount), payload,
-                    Collections.singletonList(BillingFlowParams.ProductDetailsParams.newBuilder()
-                            .setProductDetails(list.get(0))
-                            .build())
-            );
-        }));
     }
 
     public Runnable pay(MessageObject messageObject, Runnable whenShown) {
