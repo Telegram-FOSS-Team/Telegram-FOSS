@@ -629,10 +629,6 @@ extern "C" int registerNativeTgNetFunctions(JavaVM *vm, JNIEnv *env) {
     if (jclass_ConnectionsManager_onPremiumFloodWait == 0) {
         return JNI_FALSE;
     }
-    jclass_ConnectionsManager_onIntegrityCheckClassic = env->GetStaticMethodID(jclass_ConnectionsManager, "onIntegrityCheckClassic", "(IILjava/lang/String;Ljava/lang/String;)V");
-    if (jclass_ConnectionsManager_onIntegrityCheckClassic == 0) {
-        return JNI_FALSE;
-    }
 
     return JNI_TRUE;
 }
