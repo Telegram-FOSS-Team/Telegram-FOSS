@@ -154,7 +154,7 @@ public class NotificationPermissionDialog extends BottomSheet implements Notific
 
     @Override
     protected void onDismissWithTouchOutside() {
-        mayBeAccidentalDismiss = (System.currentTimeMillis() - showTime) < 3000L;
+        mayBeAccidentalDismiss = (System.currentTimeMillis() - showTime) < 1000L;
         super.onDismissWithTouchOutside();
     }
 
